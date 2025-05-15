@@ -27,7 +27,7 @@ public class MdtLog {
     @Column(name = "event_type", length = 10, nullable = false)
     private String eventType;
 
-    @Column(name = "tx_uid", columnDefinition = "BINARY(36)", nullable = false)
+    @Column(name = "tx_uid", columnDefinition = "BINARY(16)", nullable = false)
     private byte[] txUid;
 
     @Column(name = "car_id", length = 32, nullable = false)
