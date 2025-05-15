@@ -1,8 +1,8 @@
 CREATE TABLE `car_event_logs` (
-    `log_id` BINARY(64) NOT NULL,
+    `log_id` BINARY(16) NOT NULL,
     `packet_ver` UNSIGNED SMALLINT NOT NULL,
     `event_type` VARCHAR(10) NOT NULL,
-    `tx_uid` BINARY(36) NOT NULL,
+    `tx_uid` BINARY(16) NOT NULL,
     `car_id` VARCHAR(32) NOT NULL,
     `terminal_id` VARCHAR(16) NOT NULL,
     `manufacture_id` VARCHAR(16) NOT NULL,
