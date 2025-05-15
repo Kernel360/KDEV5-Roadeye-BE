@@ -79,7 +79,7 @@ public class MdtLog {
     private LocalDateTime receivedAt;
 
     @Builder
-    public MdtLog(int packetVer, String eventType, byte[] txUid, String carId, String terminalId, String manufactureId, String deviceId, String gpsCond, BigDecimal gpsLat, BigDecimal gpsLon, int mdtAngle, int mdtSpeed, int mdtMileageSum, Integer mdtBatteryVoltage, LocalDateTime mdtIgnitionOnTime, LocalDateTime mdtIgnitionOffTime, LocalDateTime occurredAt, LocalDateTime sentAt, LocalDateTime receivedAt) {
+    MdtLog(int packetVer, String eventType, byte[] txUid, String carId, String terminalId, String manufactureId, String deviceId, String gpsCond, BigDecimal gpsLat, BigDecimal gpsLon, int mdtAngle, int mdtSpeed, int mdtMileageSum, Integer mdtBatteryVoltage, LocalDateTime mdtIgnitionOnTime, LocalDateTime mdtIgnitionOffTime, LocalDateTime occurredAt, LocalDateTime sentAt, LocalDateTime receivedAt) {
         this.packetVer = packetVer;
         this.eventType = eventType;
         this.txUid = txUid;
