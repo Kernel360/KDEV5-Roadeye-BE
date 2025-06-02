@@ -1,0 +1,17 @@
+spring:
+  mail:
+    host: ${MAIL_HOST:smtp.example.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:no-reply@example.com}
+    password: ${MAIL_PASSWORD:password}
+    protocol: ${MAIL_PROTOCOL:smtp}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS_ENABLE:true}
+            required: ${MAIL_SMTP_STARTTLS_REQUIRED:false}
+          connectiontimeout: ${MAIL_CONNECTION_TIMEOUT:5000}
+          timeout: ${MAIL_TIMEOUT:5000}
+          writetimeout: ${MAIL_WRITE_TIMEOUT:5000}

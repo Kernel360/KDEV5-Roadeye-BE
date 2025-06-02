@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -55,6 +56,8 @@ class MdtIgnitionControllerTest {
         // when
         var req = post("/api/ignition/on")
             .contentType(MediaType.APPLICATION_JSON)
+            .header("X-Timestamp", "2025-05-16 12:00:00.123")
+            .header("X-TUID", UUID.randomUUID().toString())
             .content(requestBody);
 
         // then
@@ -232,6 +235,8 @@ class MdtIgnitionControllerTest {
         // when
         var req = post("/api/ignition/off")
             .contentType(MediaType.APPLICATION_JSON)
+            .header("X-Timestamp", "2025-05-16 12:00:00.123")
+            .header("X-TUID", UUID.randomUUID().toString())
             .content(requestBody);
 
         // then

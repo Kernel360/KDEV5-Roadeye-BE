@@ -16,6 +16,14 @@ public class ReservationPeriod {
     private LocalDateTime rentEndAt;
 
     private ReservationPeriod(LocalDateTime rentStartAt, LocalDateTime rentEndAt) {
+        if(rentStartAt.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Rent start time must be after current time");
+        }
+
+        if(!rentEndAt.isAfter(rentStartAt)) {
+            throw new IllegalArgumentException("Rent end time must be after rent start time");
+        }
+
         this.rentStartAt = rentStartAt;
         this.rentEndAt = rentEndAt;
     }

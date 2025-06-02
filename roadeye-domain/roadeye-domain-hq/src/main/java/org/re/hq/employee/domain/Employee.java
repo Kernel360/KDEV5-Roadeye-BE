@@ -1,16 +1,17 @@
 package org.re.hq.employee.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import org.re.hq.domain.common.BaseEntity;
 import org.re.hq.employee.dto.UpdateEmployeeCommand;
+import org.re.util.Integers;
 
 @Entity
 @Getter
+@SQLRestriction("status != 'DELETED'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Employee extends BaseEntity {
 
@@ -25,15 +26,41 @@ public class Employee extends BaseEntity {
     @Embedded
     private EmployeeMetadata metadata;
 
-    private Employee(Long tenantId, int tryCount, EmployeeCredentials credentials, EmployeeMetadata metadata) {
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EmployeeRole role;
+
+    private Employee(Long tenantId, int tryCount, EmployeeCredentials credentials, EmployeeMetadata metadata, EmployeeRole role) {
         this.tenantId = tenantId;
         this.tryCount = tryCount;
         this.credentials = credentials;
         this.metadata = metadata;
+        this.role = role;
     }
 
     public static Employee of(Long tenantId, EmployeeCredentials authentication, EmployeeMetadata metadata) {
-        return new Employee(tenantId, 0, authentication, metadata);
+        throw new UnsupportedOperationException();
+        //return new Employee(tenantId, 0, authentication, metadata);
+    }
+
+    public static Employee createNormal(Long tenantId, EmployeeCredentials authentication, EmployeeMetadata metadata) {
+        return new Employee(
+            tenantId,
+            Integers.ZERO,
+            authentication,
+            metadata,
+            EmployeeRole.NORMAL
+        );
+    }
+
+    public static Employee createRoot(Long tenantId, EmployeeCredentials authentication, EmployeeMetadata metadata) {
+        return new Employee(
+            tenantId,
+            Integers.ZERO,
+            authentication,
+            metadata,
+            EmployeeRole.ROOT
+        );
     }
 
     public void update(UpdateEmployeeCommand updateEmployeeCommand) {

@@ -11,7 +11,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 import java.io.IOException;
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class RoadeyeAuthenticationFailureHandler implements AuthenticationFailureHandler {
@@ -24,12 +23,6 @@ public class RoadeyeAuthenticationFailureHandler implements AuthenticationFailur
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             objectMapper.writeValue(writer, jsonResponse);
-        } catch (IOException e) {
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            objectMapper.writeValue(response.getWriter(), Map.of("error", "Internal Server Error"));
-        } finally {
-            response.getWriter().flush();
         }
     }
 }

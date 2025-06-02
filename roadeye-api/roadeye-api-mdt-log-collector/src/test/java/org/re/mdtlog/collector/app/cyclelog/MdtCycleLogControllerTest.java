@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,6 +44,8 @@ class MdtCycleLogControllerTest {
         // when
         var req = post("/api/cycle-log")
             .contentType(MediaType.APPLICATION_JSON)
+            .header("X-Timestamp", "2025-05-26 12:00:00.123")
+            .header("X-TUID", UUID.randomUUID().toString())
             .content(requestBody);
 
         // then
@@ -64,13 +67,7 @@ class MdtCycleLogControllerTest {
         params.put("mid", "manu-003");
         params.put("pv", 1);
         params.put("did", "dev-004");
-        params.put("onTime", "20250516120000");
-        params.put("gcd", "A");
-        params.put("lat", 37.123456);
-        params.put("lon", 127.123456);
-        params.put("ang", 90);
-        params.put("spd", 60);
-        params.put("sum", 1000);
+        params.put("oTime", "202505161200");
 
         var cList = List.of(
             createCycleLogItem(0, "A", 37.123456, 127.123456),

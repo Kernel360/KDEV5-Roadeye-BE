@@ -19,3 +19,4 @@ include 'roadeye-emulator'
 include 'roadeye-monitoring'
 
 include 'roadeye-domain:roadeye-domain-hq'
+include 'roadeye-notification'

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.re.domain.common.CommonAppExceptionCode;
 import org.re.exception.AppException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -25,6 +26,14 @@ public class AppExceptionAdvice {
         return ResponseEntity
             .status(code.getHttpStatus())
             .body(body);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Object handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.error(e.getMessage(), e);
+
+        var ae = new AppException(CommonAppExceptionCode.INVALID_HTTP_MESSAGE, e);
+        return handleAppException(ae);
     }
 
     @ExceptionHandler(RuntimeException.class)

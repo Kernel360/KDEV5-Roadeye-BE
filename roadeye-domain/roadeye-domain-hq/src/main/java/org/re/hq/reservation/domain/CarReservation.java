@@ -19,7 +19,6 @@ public class CarReservation extends BaseEntity {
     @Column(nullable = false)
     private Long reserverId;
 
-    @Column(nullable = false)
     private Long approverId;
 
     @Embedded
@@ -50,5 +49,24 @@ public class CarReservation extends BaseEntity {
     public static CarReservation createReservation(Long carId, Long reserverId, ReservationPeriod reservationPeriod,
                                                    ReserveReason reserveReason, LocalDateTime reservedAt) {
         return new CarReservation(carId, reserverId, reservationPeriod, reserveReason, reservedAt);
+    }
+
+    public void approve(Long approverId, LocalDateTime processedAt) {
+        if (this.reserveStatus != ReserveStatus.REQUESTED) {
+            throw new IllegalStateException("Only reservations with REQUESTED status can be approved.");
+        }
+        this.reserveStatus = ReserveStatus.APPROVED;
+        this.approverId = approverId;
+        this.processedAt = processedAt;
+    }
+
+    public void reject(Long approverId, String rejectReason, LocalDateTime processedAt) {
+        if (this.reserveStatus != ReserveStatus.REQUESTED) {
+            throw new IllegalStateException("Only reservations with REQUESTED status can be approved.");
+        }
+        this.reserveStatus = ReserveStatus.REJECTED;
+        this.approverId = approverId;
+        this.rejectReason = rejectReason;
+        this.processedAt = processedAt;
     }
 }

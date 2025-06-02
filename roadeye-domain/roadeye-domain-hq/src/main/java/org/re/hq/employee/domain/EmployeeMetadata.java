@@ -1,9 +1,6 @@
 package org.re.hq.employee.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,30 +19,13 @@ public class EmployeeMetadata {
     @Setter(AccessLevel.PRIVATE)
     private String position;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EmployeeRole role;
-
-    private EmployeeMetadata(String name, String position, EmployeeRole role) {
+    private EmployeeMetadata(String name, String position) {
         this.name = name;
         this.position = position;
-        this.role = role;
     }
 
-    public static EmployeeMetadata createRoot(String name, String position) {
-        return new EmployeeMetadata(
-            name,
-            position,
-            EmployeeRole.ROOT
-        );
-    }
-
-    public static EmployeeMetadata createNormal(String name, String position) {
-        return new EmployeeMetadata(
-            name,
-            position,
-            EmployeeRole.NORMAL
-        );
+    public static EmployeeMetadata create(String name, String position) {
+        return new EmployeeMetadata(name, position);
     }
 
     public void updateName(String name) {
