@@ -35,7 +35,7 @@ public class EmployeeApi {
 
     @PutMapping("/{employeeId}")
     public void update(TenantId tenantId, @PathVariable Long employeeId, @RequestBody EmployeeUpdateRequest employeeUpdateRequest) {
-        employeeService.update(tenantId, employeeId, employeeUpdateRequest.toCommand());
+        employeeService.update(tenantId, employeeId, employeeUpdateRequest.toCommand(), employeeUpdateRequest.status());
     }
 
     @PatchMapping("/{employeeId}/status")
@@ -49,8 +49,8 @@ public class EmployeeApi {
     }
 
     @GetMapping
-    public PagedModel<EmployeeSearchResponse> getAll(TenantId tenantId, Pageable pageable) {
-        return new PagedModel<>(employeeService.readAll(tenantId, pageable)
+    public PagedModel<EmployeeSearchResponse> getAll(TenantId tenantId, Pageable pageable, @RequestParam(required = false) String status) {
+        return new PagedModel<>(employeeService.readByStatus(tenantId, pageable, status)
             .map(EmployeeSearchResponse::from)
         );
     }

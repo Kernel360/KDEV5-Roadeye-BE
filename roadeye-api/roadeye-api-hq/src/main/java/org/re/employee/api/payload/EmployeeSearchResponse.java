@@ -3,13 +3,17 @@ package org.re.employee.api.payload;
 import org.re.employee.domain.Employee;
 import org.re.employee.domain.EmployeeRole;
 
+import java.time.LocalDateTime;
+
 public record EmployeeSearchResponse(
     Long employeeId,
     Long tenantId,
     String loginId,
     String name,
     EmployeeRole role,
-    String position
+    String position,
+    LocalDateTime createdAt,
+    String status
 ) {
 
     public static EmployeeSearchResponse from(Employee employee) {
@@ -19,7 +23,9 @@ public record EmployeeSearchResponse(
             employee.getCredentials().loginId(),
             employee.getMetadata().getName(),
             employee.getRole(),
-            employee.getMetadata().getPosition()
+            employee.getMetadata().getPosition(),
+            employee.getCreatedAt(),
+            employee.getStatus().name()
         );
     }
 }
