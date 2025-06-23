@@ -2,7 +2,7 @@ package org.re.dashboard.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.re.driving.dto.DrivingHistoryMonthlyCountCommand;
+import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.service.DrivingHistoryDomainService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DashboardService {
     private final DrivingHistoryDomainService drivingHistoryDomainService;
 
-    public List<DrivingHistoryMonthlyCountCommand> getDrivingHistoryMonthlyCountCommand() {
+    public List<DrivingHistoryMonthlyCountResult> getDrivingHistoryMonthlyCountCommand() {
         return drivingHistoryDomainService.getMonthlyCount();
     }
 }
