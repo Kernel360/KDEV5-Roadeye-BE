@@ -1,6 +1,6 @@
 package org.re.driving.dto;
 
-public record DrivingHistoryMonthlyCountCommand(
+public record DrivingHistoryMonthlyCountResult(
     String month,
     Long count
 ) {

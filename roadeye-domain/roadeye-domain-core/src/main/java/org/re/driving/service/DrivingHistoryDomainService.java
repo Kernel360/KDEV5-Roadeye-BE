@@ -9,7 +9,7 @@ import org.re.car.domain.Car;
 import org.re.common.stereotype.DomainService;
 import org.re.driving.domain.DrivingHistory;
 import org.re.driving.domain.DrivingHistoryStatus;
-import org.re.driving.dto.DrivingHistoryMonthlyCountCommand;
+import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.repository.DrivingHistoryRepository;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.springframework.data.domain.Page;
@@ -35,13 +35,7 @@ public class DrivingHistoryDomainService {
         return drivingHistoryRepository.findAll(pageable);
     }
 
-    public List<DrivingHistoryMonthlyCountCommand> getMonthlyCount() {
-        var results = drivingHistoryRepository.countByMonth(LocalDateTime.now().minusMonths(11));
-        return results.stream()
-                .map(r -> new DrivingHistoryMonthlyCountCommand(
-                        (String) r[0],
-                        ((Number) r[1]).longValue()
-                ))
-                .collect(Collectors.toList());
+    public List<DrivingHistoryMonthlyCountResult> getMonthlyCount() {
+        return drivingHistoryRepository.countByMonth(LocalDateTime.now().minusMonths(11));
     }
 }
