@@ -27,6 +27,15 @@ public interface CarRepository extends JpaRepository<Car, Long> {
         """)
     Page<Car> findByCompanyIdAndIgnitionStatusAndStatus(Long companyId, CarIgnitionStatus ignitionStatus, EntityLifecycleStatus entityLifecycleStatus, Pageable pageable);
 
+    @Query("""
+        SELECT c
+        FROM Car c
+        WHERE c.company.id = :companyId
+          AND c.mdtStatus.ignition = :ignitionStatus
+          AND c.status = :entityLifecycleStatus
+        """)
+    List<Car> findByCompanyIdAndIgnitionStatusAndStatus(Long companyId, CarIgnitionStatus ignitionStatus, EntityLifecycleStatus entityLifecycleStatus);
+
     Long countByCompanyIdAndStatus(Long companyId, EntityLifecycleStatus status);
 
     @Query("""

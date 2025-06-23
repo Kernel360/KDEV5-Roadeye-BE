@@ -41,13 +41,13 @@ public class CarDomainService {
 
     public Car getCarById(Long carId) {
         return carRepository.findByIdAndStatus(carId, EntityLifecycleStatus.ACTIVE)
-            .orElseThrow(() -> new DomainException(CarDomainException.CAR_NOT_FOUND));
+                .orElseThrow(() -> new DomainException(CarDomainException.CAR_NOT_FOUND));
     }
 
     public Car getCarById(Company company, Long carId) {
         var companyId = company.getId();
         return carRepository.findByCompanyIdAndIdAndStatus(companyId, carId, EntityLifecycleStatus.ACTIVE)
-            .orElseThrow(() -> new DomainException(CarDomainException.CAR_NOT_FOUND));
+                .orElseThrow(() -> new DomainException(CarDomainException.CAR_NOT_FOUND));
     }
 
     public Page<Car> searchByIgnitionStatus(Company company, CarIgnitionStatus status, Pageable pageable) {
@@ -55,14 +55,19 @@ public class CarDomainService {
         return carRepository.findByCompanyIdAndIgnitionStatusAndStatus(companyId, status, EntityLifecycleStatus.ACTIVE, pageable);
     }
 
+    public List<Car> searchByIgnitionStatus(Company company, CarIgnitionStatus status) {
+        var companyId = company.getId();
+        return carRepository.findByCompanyIdAndIgnitionStatusAndStatus(companyId, status, EntityLifecycleStatus.ACTIVE);
+    }
+
     public Long countCarsByStatus(Company company, EntityLifecycleStatus status) {
         var companyId = company.getId();
         return carRepository.countByCompanyIdAndStatus(companyId, status);
     }
 
-    public Long countByIgnitionStatus(Company company, CarIgnitionStatus status) {
+    public Long countByIgnitionStatus(Company company, CarIgnitionStatus status, EntityLifecycleStatus lifecycleStatus) {
         var companyId = company.getId();
-        return carRepository.countByCompanyIdAndIgnitionStatusAndStatus(companyId, status, EntityLifecycleStatus.ACTIVE);
+        return carRepository.countByCompanyIdAndIgnitionStatusAndStatus(companyId, status, lifecycleStatus);
     }
 
     public Car createCar(Company company, CarCreationCommand command) {

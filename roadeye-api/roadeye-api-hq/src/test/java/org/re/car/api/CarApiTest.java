@@ -1,5 +1,13 @@
 package org.re.car.api;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,6 +18,7 @@ import org.re.car.api.payload.CarCreationRequestFixture;
 import org.re.car.api.payload.CarUpdateRequestFixture;
 import org.re.car.domain.CarIgnitionStatus;
 import org.re.car.service.CarService;
+import org.re.common.domain.EntityLifecycleStatus;
 import org.re.employee.domain.EmployeeRole;
 import org.re.security.access.ManagerOnlyHandler;
 import org.re.tenant.TenantId;
@@ -23,11 +32,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Import({AopAutoConfiguration.class, ManagerOnlyHandler.class})
 @WebMvcTest(CarApi.class)
@@ -111,10 +115,12 @@ class CarApiTest {
             // given
             var tenantId = new TenantId(111L);
             var nOnCars = 5L;
-            Mockito.when(carService.countByIgnitionStatus(Mockito.any(), Mockito.eq(CarIgnitionStatus.ON)))
+            Mockito.when(carService.countByIgnitionStatus(Mockito.any(), Mockito.eq(CarIgnitionStatus.ON), Mockito.eq(
+                    EntityLifecycleStatus.ACTIVE)))
                 .thenReturn(nOnCars);
             var nOffCars = 3L;
-            Mockito.when(carService.countByIgnitionStatus(Mockito.any(), Mockito.eq(CarIgnitionStatus.OFF)))
+            Mockito.when(carService.countByIgnitionStatus(Mockito.any(), Mockito.eq(CarIgnitionStatus.OFF),
+                    Mockito.eq(EntityLifecycleStatus.ACTIVE)))
                 .thenReturn(nOffCars);
 
             // 시동 On 차량 수 조회
@@ -147,12 +153,14 @@ class CarApiTest {
 
             var nOnCars = 5;
             var onCars = CarFixture.createList(nOnCars);
-            Mockito.when(carService.searchByIgnitionStatus(Mockito.any(), Mockito.eq(CarIgnitionStatus.ON), Mockito.any()))
+            Mockito.when(
+                    carService.searchByIgnitionStatus(Mockito.any(), Mockito.eq(CarIgnitionStatus.ON), Mockito.any()))
                 .thenReturn(new PageImpl<>(onCars));
 
             var nOffCars = 3;
             var offCars = CarFixture.createList(nOffCars);
-            Mockito.when(carService.searchByIgnitionStatus(Mockito.any(), Mockito.eq(CarIgnitionStatus.OFF), Mockito.any()))
+            Mockito.when(
+                    carService.searchByIgnitionStatus(Mockito.any(), Mockito.eq(CarIgnitionStatus.OFF), Mockito.any()))
                 .thenReturn(new PageImpl<>(offCars));
 
             // 시동 On 차량
