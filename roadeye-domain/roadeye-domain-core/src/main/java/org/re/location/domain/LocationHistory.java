@@ -36,4 +36,8 @@ public class LocationHistory {
         this.carLocation = carLocation;
         this.drivingMoment = drivingMoment;
     }
+
+    public static LocationHistory of(Long drivingId, CarLocation carLocation, DrivingMoment drivingMoment) {
+        return new LocationHistory(drivingId, carLocation, drivingMoment);
+    }
 }

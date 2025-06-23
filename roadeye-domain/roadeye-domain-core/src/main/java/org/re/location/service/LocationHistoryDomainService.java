@@ -18,6 +18,10 @@ public class LocationHistoryDomainService {
         locationHistoryRepository.save(locationHistory);
     }
 
+    public void save(List<LocationHistory> locationHistories) {
+        locationHistoryRepository.saveAll(locationHistories);
+    }
+
     public List<LocationHistory> findByDrivingId(Long drivingId) {
         return locationHistoryRepository.findByDrivingId(drivingId);
     }
