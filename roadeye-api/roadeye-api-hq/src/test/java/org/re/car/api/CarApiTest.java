@@ -126,6 +126,7 @@ class CarApiTest {
             // 시동 On 차량 수 조회
             var reqOn = get("/api/cars/count/ignition")
                 .param("status", CarIgnitionStatus.ON.toString())
+                .param("lifecycleStatus", EntityLifecycleStatus.ACTIVE.toString())
                 .sessionAttr(TenantIdArgumentResolver.TENANT_ID_SESSION_ATTRIBUTE_NAME, tenantId);
             mvc.perform(reqOn)
                 .andExpect(status().isOk())
@@ -134,6 +135,7 @@ class CarApiTest {
             // 시동 Off 차량 수 조회
             var reqOff = get("/api/cars/count/ignition")
                 .param("status", CarIgnitionStatus.OFF.toString())
+                .param("lifecycleStatus", EntityLifecycleStatus.ACTIVE.toString())
                 .sessionAttr(TenantIdArgumentResolver.TENANT_ID_SESSION_ATTRIBUTE_NAME, tenantId);
             mvc.perform(reqOff)
                 .andExpect(status().isOk())
