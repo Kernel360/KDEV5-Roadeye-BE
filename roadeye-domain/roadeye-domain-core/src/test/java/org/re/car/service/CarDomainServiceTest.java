@@ -20,7 +20,7 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Import({CarDomainService.class})
+@Import({ QueryDslConfig.class,CarDomainService.class})
 @DataJpaTest
 @WithCompany
 class CarDomainServiceTest {

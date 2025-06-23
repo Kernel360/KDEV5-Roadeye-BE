@@ -8,6 +8,7 @@ import org.re.admin.domain.PlatformAdmin;
 import org.re.company.CompanyQuoteFixture;
 import org.re.company.domain.CompanyQuoteStatus;
 import org.re.company.dto.CompanyQuoteRequestCommandFixture;
+import org.re.config.QueryDslConfig;
 import org.re.employee.service.EmployeeDomainService;
 import org.re.test.supports.WithPlatformAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,11 @@ import org.springframework.data.domain.PageRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Import({CompanyQuoteDomainService.class, CompanyDomainService.class, EmployeeDomainService.class})
+@Import({ QueryDslConfig.class, CompanyQuoteDomainService.class, CompanyDomainService.class, EmployeeDomainService.class})
 @DataJpaTest
 @WithPlatformAdmin
 class CompanyQuoteDomainServiceTest {
+
     @Autowired
     CompanyQuoteDomainService companyQuoteDomainService;
 

@@ -33,7 +33,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@Import({AopAutoConfiguration.class, ManagerOnlyHandler.class})
+@Import({ QueryDslConfig.class,AopAutoConfiguration.class, ManagerOnlyHandler.class})
 @WebMvcTest(CarApi.class)
 @AutoConfigureMockMvc
 class CarApiTest {
