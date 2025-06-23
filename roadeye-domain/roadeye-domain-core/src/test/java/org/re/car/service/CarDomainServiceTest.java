@@ -9,6 +9,7 @@ import org.re.car.dto.CarDisableCommand;
 import org.re.car.dto.CarUpdateCommand;
 import org.re.common.domain.EntityLifecycleStatus;
 import org.re.company.domain.Company;
+import org.re.config.QueryDslConfig;
 import org.re.test.supports.WithCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
