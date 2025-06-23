@@ -1,27 +1,10 @@
-import org.gradle.api.tasks.Copy
-import org.gradle.kotlin.dsl.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("com.google.cloud.tools.jib")
 }
 
-val agent: Configuration = configurations.create("agent")
-
-dependencies {
-    agent("io.opentelemetry.javaagent:opentelemetry-javaagent:2.15.0")
-}
-
-val copyAgent = tasks.register<Copy>("copyAgent") {
-    from(agent.singleFile)
-    into(layout.buildDirectory.dir("agent"))
-    rename("opentelemetry-javaagent-.*\\.jar", "opentelemetry-javaagent.jar")
-}
-
-
 tasks.named<BootJar>("bootJar") {
-    dependsOn(copyAgent)
-
     archiveFileName = "app.jar"
 }
 
@@ -33,25 +16,14 @@ jib {
                 architecture = "arm64"
                 os = "linux"
             }
-        }
-    }
-
-    extraDirectories {
-        paths {
-            path {
-                setFrom(layout.buildDirectory.dir("agent"))
-                into = "/otelagent"
+            platform {
+                architecture = "amd64"
+                os = "linux"
             }
         }
     }
 
-    container {
-        jvmFlags = listOf(
-            "-javaagent:/otelagent/opentelemetry-javaagent.jar"
-        )
+    to {
+        tags = setOf("latest")
     }
-}
-
-tasks.named("jibDockerBuild").configure {
-    dependsOn(copyAgent)
 }

@@ -1,74 +1,31 @@
 package org.re.driving.domain;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.re.car.domain.CarLocation;
-import org.re.mdtlog.domain.TransactionUUID;
+import org.re.car.CarFixture;
+import org.re.common.exception.DomainException;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DrivingHistoryTest {
-    private DrivingSnapShot createSnapShot(int mileage, double lat, double lon, LocalDateTime time) {
-        return new DrivingSnapShot(
-            mileage,
-            new CarLocation(BigDecimal.valueOf(lat), BigDecimal.valueOf(lon)),
-            time
-        );
-    }
 
     @Test
-    void of_정상_생성() {
+    @DisplayName("이력 작성 종료 시 이미 작성 완료된 이력인 경우 예외가 발생해야 한다.")
+    void drive_history_end_dup_test() {
         // given
-        var txid = TransactionUUID.from(UUID.randomUUID().toString().getBytes());
-        var carId = 1L;
-        DrivingSnapShot startSnap = createSnapShot(1000, 37.123456, 127.654321, LocalDateTime.now());
+        var car = CarFixture.create();
+        var driveStartAt = LocalDateTime.now();
+        var driveEndAt = driveStartAt.plusMinutes(10);
 
-        // when
-        DrivingHistory history = DrivingHistory.of(txid, startSnap, carId);
-
-        // then
-        assertThat(history.getStatus()).isEqualTo(DrivingHistoryStatus.DRIVING);
-        assertThat(history.getTxUid()).isEqualTo(txid);
-        assertThat(history.getPreviousDrivingSnapShot()).isEqualTo(startSnap);
-        assertThat(history.getEndDrivingSnapShot()).isNull();
-    }
-
-    @Test
-    void end_정상_상태_전이() {
-        // given
-        var txid = TransactionUUID.from(UUID.randomUUID().toString().getBytes());
-        var carId = 1L;
-        LocalDateTime now = LocalDateTime.now();
-        DrivingSnapShot startSnap = createSnapShot(1000, 37.0, 127.0, now);
-        DrivingSnapShot endSnap = createSnapShot(1050, 37.1, 127.1, now.plusMinutes(30));
-        DrivingHistory history = DrivingHistory.of(txid, startSnap, carId);
-
-        // when
-        history.end(endSnap);
-
-        // then
-        assertThat(history.getStatus()).isEqualTo(DrivingHistoryStatus.ENDED);
-        assertThat(history.getEndDrivingSnapShot()).isEqualTo(endSnap);
-    }
-
-    @Test
-    void end_이미종료된_이력_예외_발생() {
-        // given
-        var txid = TransactionUUID.from(UUID.randomUUID().toString().getBytes());
-        var carId = 1L;
-        DrivingSnapShot startSnap = createSnapShot(2000, 37.0, 127.0, LocalDateTime.now());
-        DrivingHistory history = DrivingHistory.of(txid, startSnap, carId);
-
-        DrivingSnapShot endSnap = createSnapShot(2100, 37.2, 127.2, LocalDateTime.now().plusHours(1));
-        history.end(endSnap);
+        var history = DrivingHistory.createNew(car, driveStartAt);
+        history.end(car, driveEndAt);
 
         // when & then
-        assertThatThrownBy(() -> history.end(endSnap))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("status is not DRIVING");
+        assertThrows(DomainException.class, () -> {
+            var driveEndAt2 = driveStartAt.plusMinutes(20);
+            history.end(car, driveEndAt2);
+        });
     }
 }

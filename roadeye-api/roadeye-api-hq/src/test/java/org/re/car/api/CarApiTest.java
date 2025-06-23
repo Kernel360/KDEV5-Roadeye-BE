@@ -96,10 +96,10 @@ class CarApiTest {
                 .andExpect(jsonPath("$.data.name").value(car.getProfile().getName()))
                 .andExpect(jsonPath("$.data.licenseNumber").value(car.getProfile().getLicenseNumber()))
                 .andExpect(jsonPath("$.data.imageUrl").value(car.getProfile().getImageUrl()))
-                .andExpect(jsonPath("$.data.latitude").value(car.getLocation().getLatitude()))
-                .andExpect(jsonPath("$.data.longitude").value(car.getLocation().getLongitude()))
-                .andExpect(jsonPath("$.data.mileageInitial").value(car.getMileage().getInitial()))
-                .andExpect(jsonPath("$.data.mileageCurrent").value(car.getMileage().getTotal()))
+                .andExpect(jsonPath("$.data.latitude").value(car.getMdtStatus().getLocation().getLatitude()))
+                .andExpect(jsonPath("$.data.longitude").value(car.getMdtStatus().getLocation().getLongitude()))
+                .andExpect(jsonPath("$.data.mileageInitial").value(car.getMdtStatus().getMileageInitial()))
+                .andExpect(jsonPath("$.data.mileageCurrent").value(car.getMdtStatus().getMileageSum()))
                 .andExpect(jsonPath("$.data.batteryVoltage").value(car.getMdtStatus().getBatteryVoltage()))
                 .andExpect(jsonPath("$.data.ignitionStatus").value(car.getMdtStatus().getIgnition().toString()));
         }

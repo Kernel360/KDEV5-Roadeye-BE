@@ -11,15 +11,18 @@ import java.util.stream.IntStream;
 public class CarFixture {
     public static Car create() {
         var company = CompanyFixture.create();
-        var profile = new CarProfile("name", "licenseNumber", "imageUrl");
-        var initialMileage = 0;
-        return Car.of(company, profile, initialMileage);
+        var carName = "name";
+        return CarFixture.create(company, carName);
     }
 
     public static Car create(Company company) {
-        var profile = new CarProfile("name", "123가123", "imageUrl");
-        var initialMileage = 0;
-        return Car.of(company, profile, initialMileage);
+        var carName = "name";
+        return CarFixture.create(company, carName);
+    }
+
+    public static Car create(Company company, String carName) {
+        var profile = new CarProfile(carName, "123가123", "imageUrl");
+        return Car.of(company, profile);
     }
 
     public static List<Car> createList(int size) {

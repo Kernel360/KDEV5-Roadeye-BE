@@ -9,14 +9,12 @@ import org.re.car.dto.CarDisableCommand;
 import org.re.car.dto.CarUpdateCommand;
 import org.re.common.domain.EntityLifecycleStatus;
 import org.re.company.domain.Company;
-import org.re.mdtlog.domain.TransactionUUID;
 import org.re.test.supports.WithCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.UUID;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -235,325 +233,141 @@ class CarDomainServiceTest {
             assertThat(disabledCount).isEqualTo(numDisabledCars);
         }
 
-        @Test
-        @DisplayName("차량 시동 상태별 목록 조회가 가능해야 한다.")
-        void 차량시동상태별_목록조회_테스트(Company company) {
-            // given
-            var numOnCars = 5;
-            var numOffCars = 3;
-            var creationCommand = CarCreationCommandFixture.create();
+        @Nested
+        @DisplayName("차량 등록 테스트")
+        class CarCreationTests {
 
-            // 차량 시동 OFF 상태 등록
-            for (int i = 0; i < numOffCars; i++) {
-                carDomainService.createCar(company, creationCommand);
+            @Test
+            @DisplayName("차량 등록에 성공해야 한다.")
+            void 차량등록_성공_테스트(Company company) {
+                // given
+                var command = CarCreationCommandFixture.create();
+
+                // when
+                var car = carDomainService.createCar(company, command);
+
+                // then
+                assertThat(car).isNotNull();
+                assertThat(car.getCompany().getId()).isEqualTo(company.getId());
+                assertThat(car.getProfile().getName()).isEqualTo(command.name());
+                assertThat(car.getProfile().getLicenseNumber()).isEqualTo(command.licenseNumber());
+                assertThat(car.getProfile().getImageUrl()).isEqualTo(command.imageUrl());
+                assertThat(car.getMdtStatus().getMileageInitial()).isEqualTo(command.mileageInitial());
             }
 
-            // 차량 시동 ON 상태 등록
-            for (int i = 0; i < numOnCars; i++) {
+            @Test
+            @DisplayName("차량 최초 등록 시 시동 상태가 OFF가 되야 한다.")
+            void 차량등록_시_시동상태_OFF_테스트(Company company) {
+                // given
+                var command = CarCreationCommandFixture.create();
+
+                // when
+                var car = carDomainService.createCar(company, command);
+
+                // then
+                assertThat(car).isNotNull();
+                assertThat(car.getMdtStatus().getIgnition()).isEqualTo(CarIgnitionStatus.OFF);
+            }
+        }
+
+        @Nested
+        @DisplayName("차량 정보 수정 테스트")
+        class CarUpdateTests {
+            @Test
+            @DisplayName("차량 이름 변경이 가능해야 한다.")
+            void 차량이름_변경_테스트(Company company) {
+                // given
+                var creationCommand = CarCreationCommandFixture.create();
+                var nextName = "Next Car Name";
+                var updatedCommand = new CarUpdateCommand(nextName, null);
+
+                // when
                 var car = carDomainService.createCar(company, creationCommand);
-                var tuid = new TransactionUUID(UUID.randomUUID().toString());
-                carDomainService.turnOnIgnition(car, tuid);
+                var updatedCar = carDomainService.updateCarProfile(car, updatedCommand);
+
+                // then
+                assertThat(updatedCar).isNotNull();
+                assertThat(updatedCar.getProfile().getName()).isEqualTo(nextName);
+                assertThat(updatedCar.getProfile().getLicenseNumber()).isEqualTo(creationCommand.licenseNumber());
             }
 
-            // when
-            var onCars = carDomainService.searchByIgnitionStatus(company, CarIgnitionStatus.ON, PageRequest.of(0, 10));
-            var offCars = carDomainService.searchByIgnitionStatus(company, CarIgnitionStatus.OFF, PageRequest.of(0, 10));
+            @Test
+            @DisplayName("차량 이미지 변경이 가능해야 한다.")
+            void 차량이미지_변경_테스트(Company company) {
+                // given
+                var creationCommand = CarCreationCommandFixture.create();
+                var nextImageUrl = "http://example.com/next_car.jpg";
+                var updatedCommand = new CarUpdateCommand(null, nextImageUrl);
 
-            // then
-            assertThat(onCars).isNotNull();
-            assertThat(onCars.getTotalElements()).isEqualTo(numOnCars);
-            assertThat(offCars).isNotNull();
-            assertThat(offCars.getTotalElements()).isEqualTo(numOffCars);
-        }
-
-        @Test
-        @DisplayName("차량 시동 상태별 카운트 조회가 가능해야 한다.")
-        void 차량시동상태별_카운트조회_테스트(Company company) {
-            // given
-            var numOnCars = 5;
-            var numOffCars = 3;
-            var creationCommand = CarCreationCommandFixture.create();
-
-            // 차량 시동 OFF 상태 등록
-            for (int i = 0; i < numOffCars; i++) {
-                carDomainService.createCar(company, creationCommand);
-            }
-
-            // 차량 시동 ON 상태 등록
-            for (int i = 0; i < numOnCars; i++) {
+                // when
                 var car = carDomainService.createCar(company, creationCommand);
-                var tuid = new TransactionUUID(UUID.randomUUID().toString());
-                carDomainService.turnOnIgnition(car, tuid);
+                var updatedCar = carDomainService.updateCarProfile(car, updatedCommand);
+
+                // then
+                assertThat(updatedCar).isNotNull();
+                assertThat(updatedCar.getProfile().getImageUrl()).isEqualTo(nextImageUrl);
             }
 
-            // when
-            var onCount = carDomainService.countByIgnitionStatus(company, CarIgnitionStatus.ON);
-            var offCount = carDomainService.countByIgnitionStatus(company, CarIgnitionStatus.OFF);
+            @Test
+            @DisplayName("비활성화 이유가 등록되어야 한다.")
+            void 차량비활성화_이유_등록_테스트(Company company) {
+                // given
+                var creationCommand = CarCreationCommandFixture.create();
+                var disableReason = "차량 고장";
 
-            // then
-            assertThat(onCount).isEqualTo(numOnCars);
-            assertThat(offCount).isEqualTo(numOffCars);
-        }
-    }
+                // when
+                var car = carDomainService.createCar(company, creationCommand);
+                var disabledCar = carDomainService.disable(car, new CarDisableCommand(disableReason));
 
-    @Nested
-    @DisplayName("차량 등록 테스트")
-    class CarCreationTests {
-
-        @Test
-        @DisplayName("차량 등록에 성공해야 한다.")
-        void 차량등록_성공_테스트(Company company) {
-            // given
-            var command = CarCreationCommandFixture.create();
-
-            // when
-            var car = carDomainService.createCar(company, command);
-
-            // then
-            assertThat(car).isNotNull();
-            assertThat(car.getCompany().getId()).isEqualTo(company.getId());
-            assertThat(car.getProfile().getName()).isEqualTo(command.name());
-            assertThat(car.getProfile().getLicenseNumber()).isEqualTo(command.licenseNumber());
-            assertThat(car.getProfile().getImageUrl()).isEqualTo(command.imageUrl());
-            assertThat(car.getMileage().getInitial()).isEqualTo(command.mileageInitial());
+                // then
+                assertThat(disabledCar).isNotNull();
+                assertThat(disabledCar.getStatus()).isEqualTo(EntityLifecycleStatus.DISABLED);
+                assertThat(disabledCar.getDisableReason()).isEqualTo(disableReason);
+            }
         }
 
-        @Test
-        @DisplayName("차량 최초 등록 시 시동 상태가 OFF가 되야 한다.")
-        void 차량등록_시_시동상태_OFF_테스트(Company company) {
-            // given
-            var command = CarCreationCommandFixture.create();
+        @Nested
+        @DisplayName("차량 삭제 테스트")
+        class CarDeletionTests {
+            @Test
+            @DisplayName("차량 삭제 후 목록 조회에서 제외되어야 한다.")
+            void 차량삭제_후_목록조회_제외_테스트(Company company) {
+                // given
+                var creationCommand = CarCreationCommandFixture.create();
+                var numCars = 10;
+                var numCarsToDelete = 5;
+                var pageable = PageRequest.of(0, numCars);
 
-            // when
-            var car = carDomainService.createCar(company, command);
+                // 차량 10개 등록
+                var cars = IntStream.range(0, numCars).mapToObj(i -> carDomainService.createCar(company, creationCommand)).toList();
+                // 차량 5개 삭제
+                cars.stream().limit(numCarsToDelete).forEach(car -> carDomainService.deleteCar(car));
 
-            // then
-            assertThat(car).isNotNull();
-            assertThat(car.getMdtStatus().getIgnition()).isEqualTo(CarIgnitionStatus.OFF);
-        }
-    }
+                // when
+                var carPage = carDomainService.getCars(company, pageable);
 
-    @Nested
-    @DisplayName("차량 정보 수정 테스트")
-    class CarUpdateTests {
-        @Test
-        @DisplayName("차량 이름 변경이 가능해야 한다.")
-        void 차량이름_변경_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var nextName = "Next Car Name";
-            var updatedCommand = new CarUpdateCommand(nextName, null);
+                // then
+                assertThat(carPage).isNotNull();
+                assertThat(carPage.getTotalElements()).isEqualTo(numCars - numCarsToDelete);
+            }
 
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            var updatedCar = carDomainService.updateCarProfile(car, updatedCommand);
+            @Test
+            @DisplayName("차량 삭제 후 단건 조회가 불가능해야 한다.")
+            void 차량삭제_후_단건조회_테스트(Company company) {
+                // given
+                var creationCommand = CarCreationCommandFixture.create();
 
-            // then
-            assertThat(updatedCar).isNotNull();
-            assertThat(updatedCar.getProfile().getName()).isEqualTo(nextName);
-            assertThat(updatedCar.getProfile().getLicenseNumber()).isEqualTo(creationCommand.licenseNumber());
-        }
+                // when
+                var car = carDomainService.createCar(company, creationCommand);
+                carDomainService.deleteCar(car);
 
-        @Test
-        @DisplayName("차량 이미지 변경이 가능해야 한다.")
-        void 차량이미지_변경_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var nextImageUrl = "http://example.com/next_car.jpg";
-            var updatedCommand = new CarUpdateCommand(null, nextImageUrl);
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            var updatedCar = carDomainService.updateCarProfile(car, updatedCommand);
-
-            // then
-            assertThat(updatedCar).isNotNull();
-            assertThat(updatedCar.getProfile().getImageUrl()).isEqualTo(nextImageUrl);
-        }
-
-        @Test
-        @DisplayName("비활성화 이유가 등록되어야 한다.")
-        void 차량비활성화_이유_등록_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var disableReason = "차량 고장";
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            var disabledCar = carDomainService.disable(car, new CarDisableCommand(disableReason));
-
-            // then
-            assertThat(disabledCar).isNotNull();
-            assertThat(disabledCar.getStatus()).isEqualTo(EntityLifecycleStatus.DISABLED);
-            assertThat(disabledCar.getDisableReason()).isEqualTo(disableReason);
-        }
-    }
-
-    @Nested
-    @DisplayName("차량 삭제 테스트")
-    class CarDeletionTests {
-        @Test
-        @DisplayName("차량 삭제 후 목록 조회에서 제외되어야 한다.")
-        void 차량삭제_후_목록조회_제외_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var numCars = 10;
-            var numCarsToDelete = 5;
-            var pageable = PageRequest.of(0, numCars);
-
-            // 차량 10개 등록
-            var cars = IntStream.range(0, numCars).mapToObj(i -> carDomainService.createCar(company, creationCommand)).toList();
-            // 차량 5개 삭제
-            cars.stream().limit(numCarsToDelete).forEach(car -> carDomainService.deleteCar(car));
-
-            // when
-            var carPage = carDomainService.getCars(company, pageable);
-
-            // then
-            assertThat(carPage).isNotNull();
-            assertThat(carPage.getTotalElements()).isEqualTo(numCars - numCarsToDelete);
-        }
-
-        @Test
-        @DisplayName("차량 삭제 후 단건 조회가 불가능해야 한다.")
-        void 차량삭제_후_단건조회_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            carDomainService.deleteCar(car);
-
-            // then
-            assertThrows(
-                Exception.class, () -> {
-                    carDomainService.getCarById(company, car.getId());
-                }
-            );
-        }
-    }
-
-    @Nested
-    @DisplayName("차량 시동 테스트")
-    class CarIgnitionTests {
-        @Test
-        @DisplayName("시동 OFF 상태에서만 시동 ON이 가능해야 한다.")
-        void 시동OFF_상태에서_시동ON_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var transactionId = new TransactionUUID(UUID.randomUUID().toString());
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            var updatedCar = carDomainService.turnOnIgnition(car, transactionId);
-
-            // then
-            assertThat(updatedCar).isNotNull();
-            assertThat(updatedCar.getMdtStatus().getIgnition()).isEqualTo(CarIgnitionStatus.ON);
-        }
-
-        @Test
-        @DisplayName("시동을 킬 때 트랜잭션 ID가 설정되어야 한다.")
-        void 시동킬때_트랜잭션ID_설정_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var transactionId = new TransactionUUID(UUID.randomUUID().toString());
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            var updatedCar = carDomainService.turnOnIgnition(car, transactionId);
-
-            // then
-            assertThat(updatedCar).isNotNull();
-            assertThat(updatedCar.getMdtStatus().getActiveTuid()).isEqualTo(transactionId);
-        }
-
-        @Test
-        @DisplayName("시동 ON 상태에서만 시동 OFF가 가능해야 한다.")
-        void 시동ON_상태에서_시동OFF_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var transactionId = new TransactionUUID(UUID.randomUUID().toString());
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            carDomainService.turnOnIgnition(car, transactionId);
-            var updatedCar = carDomainService.turnOffIgnition(car, transactionId);
-
-            // then
-            assertThat(updatedCar).isNotNull();
-            assertThat(updatedCar.getMdtStatus().getIgnition()).isEqualTo(CarIgnitionStatus.OFF);
-        }
-
-        @Test
-        @DisplayName("트랜잭션 ID가 일치하지 않으면 시동 OFF가 실패해야 한다.")
-        void 시동끄기_트랜잭션ID_일치_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var transactionId = new TransactionUUID(UUID.randomUUID().toString());
-            var wrongTransactionId = new TransactionUUID(UUID.randomUUID().toString());
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            carDomainService.turnOnIgnition(car, transactionId);
-
-            // then
-            assertThrows(
-                Exception.class, () -> {
-                    carDomainService.turnOffIgnition(car, wrongTransactionId);
-                }
-            );
-        }
-
-        @Test
-        @DisplayName("시동을 끈 후 트랜잭션 ID가 null이 되어야 한다.")
-        void 시동끄기_후_트랜잭션ID_null_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var transactionId = new TransactionUUID(UUID.randomUUID().toString());
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            carDomainService.turnOnIgnition(car, transactionId);
-            var updatedCar = carDomainService.turnOffIgnition(car, transactionId);
-
-            // then
-            assertThat(updatedCar).isNotNull();
-            assertThat(updatedCar.getMdtStatus().getActiveTuid()).isNull();
-        }
-
-        @Test
-        @DisplayName("시동 상태를 초기화할 수 있어야 한다.")
-        void 시동상태_초기화_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var transactionId = new TransactionUUID(UUID.randomUUID().toString());
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            carDomainService.turnOnIgnition(car, transactionId);
-            var updatedCar = carDomainService.resetIgnitionStatus(car);
-
-            // then
-            assertThat(updatedCar).isNotNull();
-            assertThat(updatedCar.getMdtStatus().getIgnition()).isEqualTo(CarIgnitionStatus.OFF);
-        }
-
-        @Test
-        @DisplayName("시동 상태를 초기화할 때 트랜잭션 ID가 null이 되어야 한다.")
-        void 시동상태_초기화_후_트랜잭션ID_null_테스트(Company company) {
-            // given
-            var creationCommand = CarCreationCommandFixture.create();
-            var transactionId = new TransactionUUID(UUID.randomUUID().toString());
-
-            // when
-            var car = carDomainService.createCar(company, creationCommand);
-            carDomainService.turnOnIgnition(car, transactionId);
-            var updatedCar = carDomainService.resetIgnitionStatus(car);
-
-            // then
-            assertThat(updatedCar).isNotNull();
-            assertThat(updatedCar.getMdtStatus().getActiveTuid()).isNull();
+                // then
+                assertThrows(
+                    Exception.class, () -> {
+                        carDomainService.getCarById(company, car.getId());
+                    }
+                );
+            }
         }
     }
 }

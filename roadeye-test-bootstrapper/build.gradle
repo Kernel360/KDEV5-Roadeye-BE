@@ -1,0 +1,19 @@
+plugins {
+    id("roadeye-jib")
+}
+
+dependencies {
+    implementation(project(":roadeye-domain:roadeye-domain-core"))
+
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    runtimeOnly("com.mysql:mysql-connector-j")
+
+    implementation(testFixtures(project(":roadeye-domain:roadeye-domain-core")))
+}
+
+jib {
+    container {
+        mainClass = "org.re.RoadEyeBootstrapperApplication"
+    }
+}

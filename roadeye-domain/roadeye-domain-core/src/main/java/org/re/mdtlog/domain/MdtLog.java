@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.re.car.domain.CarLocation;
 import org.re.mdtlog.converter.MdtLogEventTypeConverter;
 import org.re.mdtlog.converter.MdtLogGpsConditionConverter;
 import org.re.mdtlog.converter.TransactionIdConverter;
@@ -21,7 +22,7 @@ public class MdtLog {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "log_id", columnDefinition = "BINARY(16)", nullable = false)
-    private UUID logId;
+    private UUID id;
 
     @Column(name = "packet_ver", nullable = false, columnDefinition = "SMALLINT UNSIGNED")
     private int packetVer;
@@ -104,5 +105,9 @@ public class MdtLog {
         this.occurredAt = occurredAt;
         this.sentAt = sentAt;
         this.receivedAt = receivedAt;
+    }
+
+    public CarLocation toCarLocation() {
+        return new CarLocation(gpsLat, gpsLon);
     }
 }

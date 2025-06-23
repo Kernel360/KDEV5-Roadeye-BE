@@ -51,7 +51,8 @@ jobs:
         run: |
           ./gradlew --build-cache \
             :roadeye-api:roadeye-api-hq:jibDockerBuild \
-            :roadeye-api:roadeye-api-mdt-log-collector:jibDockerBuild \
+            :roadeye-api:roadeye-api-hub:jibDockerBuild \
+            :roadeye-consumer:jibDockerBuild \
               -Djib.to.tags=latest
 
   deploy-ecr:
@@ -76,10 +77,15 @@ jobs:
           docker tag roadeye-api-hq:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hq:latest
           docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hq:latest
 
-      - name: Push API-MDT image to ECR
+      - name: Push API-Hub image to ECR
         run: |
-          docker tag roadeye-api-mdt-log-collector:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-mdt:latest
-          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-mdt:latest
+          docker tag roadeye-api-hub:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hub:latest
+          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hub:latest
+
+      - name: Push Consumer image to ECR
+        run: |
+          docker tag roadeye-consumer:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/consumer:latest
+          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/consumer:latest
 
   deploy-ocr:
     runs-on: ubuntu-22.04
@@ -103,7 +109,12 @@ jobs:
           docker tag roadeye-api-hq:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hq:latest
           docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hq:latest
 
-      - name: Push API-MDT image to Oracle Container Registry
+      - name: Push API-Hub image to Oracle Container Registry
         run: |
-          docker tag roadeye-api-mdt-log-collector:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-mdt:latest
-          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-mdt:latest
+          docker tag roadeye-api-hub:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hub:latest
+          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hub:latest
+
+      - name: Push Consumer image to Oracle Container Registry
+        run: |
+          docker tag roadeye-consumer:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/consumer:latest
+          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/consumer:latest

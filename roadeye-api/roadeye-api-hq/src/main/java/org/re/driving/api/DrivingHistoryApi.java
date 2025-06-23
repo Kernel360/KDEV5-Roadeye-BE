@@ -30,9 +30,4 @@ public class DrivingHistoryApi {
         return ListResponse.of(page,DrivingLocationDetail::from);
     }
 
-    @GetMapping("/car/{carId}")
-    public ListResponse<DrivingHistoryInfo> getDrivingHistoryLogs(@PathVariable Long carId) {
-        var page = drivingHistoryService.getCarDrivingHistoryLogs(carId);
-        return ListResponse.of(page, DrivingHistoryInfo::from);
-    }
 }

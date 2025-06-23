@@ -5,9 +5,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jspecify.annotations.Nullable;
+import org.re.car.domain.Car;
+import org.re.common.exception.DomainException;
 import org.re.driving.converter.DrivingHistoryStatusConverter;
+import org.re.driving.exception.DrivingHistoryExceptionCode;
 import org.re.mdtlog.converter.TransactionIdConverter;
 import org.re.mdtlog.domain.TransactionUUID;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -18,14 +23,16 @@ public class DrivingHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "car_id", nullable = false, updatable = false)
+    private Car car;
+
     @Column(nullable = false)
     @Convert(converter = DrivingHistoryStatusConverter.class)
     private DrivingHistoryStatus status;
 
-    @Column(nullable = false)
-    private Long carId;
-
     @Convert(converter = TransactionIdConverter.class)
+    @Column(nullable = false, updatable = false)
     private TransactionUUID txUid;
 
     @Embedded
@@ -47,23 +54,30 @@ public class DrivingHistory {
     })
     private DrivingSnapShot endDrivingSnapShot;
 
-    public DrivingHistory(DrivingHistoryStatus status, TransactionUUID txUid, DrivingSnapShot previousDrivingSnapShot, Long carId) {
+    private DrivingHistory(
+        Car car,
+        DrivingHistoryStatus status,
+        TransactionUUID txUid,
+        DrivingSnapShot previousDrivingSnapShot
+    ) {
+        this.car = car;
         this.status = status;
         this.txUid = txUid;
         this.previousDrivingSnapShot = previousDrivingSnapShot;
-        this.carId = carId;
     }
 
-    public static DrivingHistory of(TransactionUUID txUid, DrivingSnapShot drivingSnapShot, Long carId) {
-        return new DrivingHistory(DrivingHistoryStatus.DRIVING, txUid, drivingSnapShot, carId);
+    public static DrivingHistory createNew(Car car, LocalDateTime driveStartAt) {
+        var snapshot = DrivingSnapShot.from(car, driveStartAt);
+        var txUid = car.getMdtStatus().getActiveTuid();
+        return new DrivingHistory(car, DrivingHistoryStatus.DRIVING, txUid, snapshot);
     }
 
-    public void end(DrivingSnapShot drivingSnapShot) {
-        // TODO do convert Domain Exception
-        if (status != DrivingHistoryStatus.DRIVING) {
-            throw new IllegalArgumentException("Cannot end DrivingHistory because the status is not DRIVING");
+    public void end(Car car, LocalDateTime driveEndAt) {
+        if (this.status != DrivingHistoryStatus.DRIVING) {
+            throw new DomainException(DrivingHistoryExceptionCode.ALREADY_ENDED);
+
         }
         this.status = DrivingHistoryStatus.ENDED;
-        this.endDrivingSnapShot = drivingSnapShot;
+        this.endDrivingSnapShot = DrivingSnapShot.from(car, driveEndAt);
     }
 }

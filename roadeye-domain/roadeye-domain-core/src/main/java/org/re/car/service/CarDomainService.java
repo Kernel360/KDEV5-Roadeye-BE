@@ -12,7 +12,6 @@ import org.re.common.domain.EntityLifecycleStatus;
 import org.re.common.exception.DomainException;
 import org.re.common.stereotype.DomainService;
 import org.re.company.domain.Company;
-import org.re.mdtlog.domain.TransactionUUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,21 +72,6 @@ public class CarDomainService {
 
     public Car updateCarProfile(Car car, CarUpdateCommand command) {
         car.update(command);
-        return car;
-    }
-
-    public Car turnOnIgnition(Car car, TransactionUUID transactionId) {
-        car.turnOnIgnition(transactionId);
-        return car;
-    }
-
-    public Car turnOffIgnition(Car car, TransactionUUID transactionId) {
-        car.turnOffIgnition(transactionId);
-        return car;
-    }
-
-    public Car resetIgnitionStatus(Car car) {
-        car.resetIgnitionStatus();
         return car;
     }
 

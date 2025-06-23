@@ -1,7 +1,13 @@
 dependencies {
     api(project(":roadeye-domain:roadeye-domain-common"))
 
+    implementation("com.fasterxml.jackson.core:jackson-annotations")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("jakarta.validation:jakarta.validation-api")
+
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    implementation("org.springframework.amqp:spring-amqp")
 
     runtimeOnly("com.h2database:h2:2.2.220")
 

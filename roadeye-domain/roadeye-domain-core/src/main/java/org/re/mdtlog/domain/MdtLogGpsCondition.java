@@ -12,7 +12,7 @@ public enum MdtLogGpsCondition implements PersistenceEnum<String> {
     NORMAL           ("A"),
     INVALID          ("V"),
     NOT_ATTACHED     ("0"),
-    GPS_INFO_INVALID ("P"),
+    GPS_INVALID_AT_KEY_OFF ("P"),
     ;
     // @formatter:on
 

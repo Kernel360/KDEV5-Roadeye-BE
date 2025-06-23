@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 import org.re.car.dto.CarUpdateCommand;
 import org.re.common.domain.BaseEntity;
 import org.re.company.domain.Company;
-import org.re.mdtlog.domain.TransactionUUID;
-
-import java.time.LocalDateTime;
+import org.re.mdtlog.dto.MdtCycleLogMessage;
+import org.re.mdtlog.dto.MdtEventMessage;
+import org.re.mdtlog.dto.MdtIgnitionOffMessage;
+import org.re.mdtlog.dto.MdtIgnitionOnMessage;
 
 @Entity
 @Getter
@@ -23,29 +24,19 @@ public class Car extends BaseEntity {
     private CarProfile profile;
 
     @Embedded
-    private CarLocation location;
-
-    @Embedded
-    private CarMileage mileage;
-
-    @Embedded
     private CarMdtStatus mdtStatus;
 
     @Column(length = 512)
     private String disableReason;
 
-    private LocalDateTime shippedAt;
-
-    private Car(Company company, CarProfile carProfile, int mileageInitial) {
+    private Car(Company company, CarProfile carProfile) {
         this.company = company;
         this.profile = carProfile;
-        this.location = CarLocation.create();
         this.mdtStatus = CarMdtStatus.create();
-        this.mileage = new CarMileage(mileageInitial);
     }
 
-    public static Car of(Company company, CarProfile carProfile, int mileageInitial) {
-        return new Car(company, carProfile, mileageInitial);
+    public static Car of(Company company, CarProfile carProfile) {
+        return new Car(company, carProfile);
     }
 
     public void disable(String reason) {
@@ -53,16 +44,38 @@ public class Car extends BaseEntity {
         super.disable();
     }
 
-    public void turnOnIgnition(TransactionUUID transactionId) {
-        this.mdtStatus.turnOnIgnition(transactionId);
+    public void turnOnIgnition(MdtEventMessage<MdtIgnitionOnMessage> message) {
+        var payload = message.payload();
+        this.mdtStatus.setLocation(payload.getLocation());
+        this.mdtStatus.turnOnIgnition(message.transactionId());
+        this.mdtStatus.setAngle(payload.mdtAngle());
+        this.mdtStatus.setSpeed(payload.mdtSpeed());
+        this.mdtStatus.setIgnitionOnTime(payload.ignitionOnTime());
+        this.mdtStatus.setMileageSum(payload.mdtMileageSum());
+        this.mdtStatus.setGpsCondition(payload.gpsCondition());
     }
 
-    public void turnOffIgnition(TransactionUUID transactionId) {
-        this.mdtStatus.turnOffIgnition(transactionId);
+    public void turnOffIgnition(MdtEventMessage<MdtIgnitionOffMessage> message) {
+        var payload = message.payload();
+        this.mdtStatus.turnOffIgnition(message.transactionId());
+        this.mdtStatus.setAngle(payload.mdtAngle());
+        this.mdtStatus.setSpeed(payload.mdtSpeed());
+        this.mdtStatus.setIgnitionOnTime(payload.ignitionOnTime());
+        this.mdtStatus.setIgnitionOffTime(payload.ignitionOffTime());
+        this.mdtStatus.setGpsCondition(payload.gpsCondition());
+        this.mdtStatus.setLocation(payload.toCarLocation());
+        this.mdtStatus.setMileageSum(payload.mdtMileageSum());
     }
 
-    public void resetIgnitionStatus() {
-        this.mdtStatus.resetIgnitionStatus();
+    public void updateMdtStatus(MdtEventMessage<MdtCycleLogMessage> message) {
+        var lastEvent = message.payload().cycleLogList().getLast();
+
+        this.mdtStatus.setGpsCondition(lastEvent.gpsCondition());
+        this.mdtStatus.setLocation(lastEvent.toCarLocation());
+        this.mdtStatus.setAngle(lastEvent.mdtAngle());
+        this.mdtStatus.setSpeed(lastEvent.mdtSpeed());
+        this.mdtStatus.setBatteryVoltage(lastEvent.batteryVoltage());
+        this.mdtStatus.setMileageSum(lastEvent.mdtMileageSum());
     }
 
     public void update(CarUpdateCommand command) {
@@ -72,10 +85,6 @@ public class Car extends BaseEntity {
         if (command.imageUrl() != null) {
             profile.setImageUrl(command.imageUrl());
         }
-    }
-
-    public void updateLocation(CarLocation lastLocation) {
-        this.location = lastLocation;
     }
 }
 

@@ -18,6 +18,6 @@ public record CarCreationCommand(
 ) {
     public Car toEntity(Company company) {
         var carProfile = new CarProfile(name, licenseNumber, imageUrl);
-        return Car.of(company, carProfile, mileageInitial);
+        return Car.of(company, carProfile);
     }
 }
