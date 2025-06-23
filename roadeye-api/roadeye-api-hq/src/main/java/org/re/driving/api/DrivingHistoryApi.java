@@ -21,13 +21,19 @@ public class DrivingHistoryApi {
     @GetMapping
     public PageResponse<DrivingHistoryInfo> getDrivingHistory(Pageable pageable) {
         var page = drivingHistoryService.getDrivingHistory(pageable);
-        return PageResponse.of(page,DrivingHistoryInfo::from);
+        return PageResponse.of(page, DrivingHistoryInfo::from);
     }
 
     @GetMapping("/{drivingId}")
     public ListResponse<DrivingLocationDetail> getDrivingHistoryLog(@PathVariable Long drivingId) {
         var page = drivingHistoryService.getDrivingHistoryLogs(drivingId);
-        return ListResponse.of(page,DrivingLocationDetail::from);
+        return ListResponse.of(page, DrivingLocationDetail::from);
+    }
+
+    @GetMapping("/car/{carId}")
+    public ListResponse<DrivingLocationDetail> getDrivingHistoryLogs(@PathVariable Long carId) {
+        var page = drivingHistoryService.getDrivingLocationLogs(carId);
+        return ListResponse.of(page, DrivingLocationDetail::from);
     }
 
 }
