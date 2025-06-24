@@ -21,7 +21,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Import({ QueryDslConfig.class,AopAutoConfiguration.class})
+@Import({AopAutoConfiguration.class})
 @ComponentScan(
     includeFilters = {
         @ComponentScan.Filter(

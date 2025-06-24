@@ -14,7 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-@Import({ QueryDslConfig.class,
+@Import({
     AopAutoConfiguration.class,
     WebSecurityConfig.class,
 })
