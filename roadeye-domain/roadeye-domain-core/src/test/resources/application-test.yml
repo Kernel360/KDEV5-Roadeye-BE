@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        show_sql: false
+
+logging:
+  level:
+    org.springframework: WARN
+    org.hibernate: WARN
+    com.zaxxer.hikari: WARN

@@ -31,6 +31,8 @@ allprojects {
         jvmArgs += "-XX:+EnableDynamicAgentLoading"
         jvmArgs += "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }}"
 
+        jvmArgs += "-Dspring.profiles.include=test"
+
         useJUnitPlatform()
     }
 }
