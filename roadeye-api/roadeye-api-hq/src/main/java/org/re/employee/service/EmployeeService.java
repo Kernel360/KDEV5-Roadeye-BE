@@ -3,6 +3,7 @@ package org.re.employee.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.re.common.domain.EntityLifecycleStatus;
 import org.re.employee.api.payload.AccountStatus;
 import org.re.employee.domain.Employee;
 import org.re.employee.domain.EmployeeCredentials;
@@ -68,7 +69,16 @@ public class EmployeeService {
         return employeeDomainService.readAll(tenantId.value(), pageable);
     }
 
-    public void update(TenantId tenantId, Long employeeId, UpdateEmployeeCommand command) {
+    public Page<Employee> readByStatus(TenantId tenantId, Pageable pageable, String status) {
+        if (status == null) return employeeDomainService.readAll(tenantId.value(), pageable);
+        return employeeDomainService.readByStatus(tenantId.value(), pageable, EntityLifecycleStatus.valueOf(status));
+    }
+
+    public void update(TenantId tenantId, Long employeeId, UpdateEmployeeCommand command, AccountStatus status) {
         employeeDomainService.updateMetadata(tenantId.value(), employeeId, command);
+        switch (status) {
+            case ENABLE -> employeeDomainService.enable(tenantId.value(), employeeId);
+            case DISABLE -> employeeDomainService.disable(tenantId.value(), employeeId);
+        }
     }
 }

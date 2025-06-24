@@ -2,6 +2,7 @@ package org.re.employee.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.re.common.domain.EntityLifecycleStatus;
 import org.re.common.exception.DomainException;
 import org.re.employee.domain.*;
 import org.re.employee.dto.UpdateEmployeeCommand;
@@ -102,5 +103,9 @@ public class EmployeeDomainService {
 
     public Page<Employee> readAll(Long tenantId, Pageable pageable) {
         return employeeRepository.findByTenantId(tenantId, pageable);
+    }
+
+    public Page<Employee> readByStatus(Long tenantId, Pageable pageable, EntityLifecycleStatus status) {
+        return employeeRepository.findByTenantIdAndStatus(tenantId, status, pageable);
     }
 }

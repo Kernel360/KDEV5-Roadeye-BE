@@ -23,7 +23,8 @@ public record CarInfoDetails(
     CarIgnitionStatus ignitionStatus,
     UUID activeTransactionId,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    LocalDateTime ignitionOnAt
 ) {
     public static CarInfoDetails from(Car car) {
         return new CarInfoDetails(
@@ -40,7 +41,8 @@ public record CarInfoDetails(
             car.getMdtStatus().getIgnition(),
             Optional.ofNullable(car.getMdtStatus().getActiveTuid()).map(TransactionUUID::value).orElse(null),
             car.getCreatedAt(),
-            car.getUpdatedAt()
+            car.getUpdatedAt(),
+            car.getMdtStatus().getIgnitionOnTime()
         );
     }
 }

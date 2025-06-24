@@ -1,18 +1,18 @@
 package org.re.car.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.re.car.api.payload.CarCreationRequest;
 import org.re.car.api.payload.CarUpdateRequest;
 import org.re.car.domain.Car;
 import org.re.car.domain.CarIgnitionStatus;
+import org.re.common.domain.EntityLifecycleStatus;
 import org.re.company.service.CompanyDomainService;
 import org.re.tenant.TenantId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -41,9 +41,15 @@ public class CarService {
         return carDomainService.searchByIgnitionStatus(company, status, pageable);
     }
 
-    public Long countByIgnitionStatus(TenantId tenantId, CarIgnitionStatus status) {
+    public List<Car> searchByIgnitionStatus(TenantId tenantId, CarIgnitionStatus status) {
         var company = companyDomainService.findById(tenantId.value());
-        return carDomainService.countByIgnitionStatus(company, status);
+        return carDomainService.searchByIgnitionStatus(company, status);
+    }
+
+    public Long countByIgnitionStatus(TenantId tenantId, CarIgnitionStatus status,
+                                      EntityLifecycleStatus entityLifecycleStatus) {
+        var company = companyDomainService.findById(tenantId.value());
+        return carDomainService.countByIgnitionStatus(company, status, entityLifecycleStatus);
     }
 
     public Car createCar(TenantId tenantId, CarCreationRequest request) {

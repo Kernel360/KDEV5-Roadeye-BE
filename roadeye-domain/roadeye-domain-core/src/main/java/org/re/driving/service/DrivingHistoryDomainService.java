@@ -1,18 +1,19 @@
 package org.re.driving.service;
 
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.re.car.domain.Car;
 import org.re.common.stereotype.DomainService;
 import org.re.driving.domain.DrivingHistory;
 import org.re.driving.domain.DrivingHistoryStatus;
+import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.repository.DrivingHistoryRepository;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 
 @DomainService
@@ -32,5 +33,9 @@ public class DrivingHistoryDomainService {
 
     public Page<DrivingHistory> findAll(Pageable pageable) {
         return drivingHistoryRepository.findAll(pageable);
+    }
+
+    public List<DrivingHistoryMonthlyCountResult> getMonthlyCount() {
+        return drivingHistoryRepository.countByMonth(LocalDateTime.now().minusMonths(11));
     }
 }

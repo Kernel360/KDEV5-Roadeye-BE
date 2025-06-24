@@ -3,6 +3,7 @@ package org.re.security;
 import org.aspectj.lang.annotation.Aspect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.re.config.QueryDslConfig;
 import org.re.employee.domain.EmployeeRole;
 import org.re.test.api.HelloApi;
 import org.re.test.security.MockCompanyUserDetails;

@@ -4,15 +4,22 @@ package org.re.mdtlog.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.re.car.domain.Car;
+import org.re.car.domain.CarLocation;
 import org.re.car.service.CarDomainService;
 import org.re.driving.domain.DrivingHistory;
 import org.re.driving.service.DrivingHistoryDomainService;
+import org.re.location.domain.DrivingMoment;
+import org.re.location.domain.LocationHistory;
+import org.re.location.service.LocationHistoryDomainService;
 import org.re.mdtlog.dto.MdtCycleLogMessage;
 import org.re.mdtlog.dto.MdtEventMessage;
 import org.re.mdtlog.dto.MdtIgnitionOffMessage;
 import org.re.mdtlog.dto.MdtIgnitionOnMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -21,6 +28,7 @@ public class MdtEventHandler {
     private final MdtLogService mdtLogService;
     private final CarDomainService carDomainService;
     private final DrivingHistoryDomainService drivingHistoryDomainService;
+    private final LocationHistoryDomainService locationHistoryDomainService;
 
     @Transactional
     public void handleMdtCarLocationMessage(MdtEventMessage<MdtCycleLogMessage> message) {
@@ -29,6 +37,19 @@ public class MdtEventHandler {
 
         var car = carDomainService.getCarById(message.payload().carId());
         car.updateMdtStatus(message);
+
+        // logs 중 10개마다 하나씩 locationHistory 저장
+        var drivingHistory = findHistoryInProgress(car, message);
+        List<LocationHistory> sampledLogs = new ArrayList<>();
+        for (int i = 0; i < logs.size(); i++) {
+            if (i % 10 == 0) {
+                DrivingMoment drivingMoment = new DrivingMoment(logs.get(i).getOccurredAt(),logs.get(i).getMdtSpeed());
+                CarLocation carLocation = logs.get(i).toCarLocation();
+                LocationHistory history = LocationHistory.of(drivingHistory.getId(),carLocation,drivingMoment);
+                sampledLogs.add(history);
+            }
+        }
+        locationHistoryDomainService.save(sampledLogs);
     }
 
     @Transactional
