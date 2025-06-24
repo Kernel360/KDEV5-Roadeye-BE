@@ -19,6 +19,7 @@ import org.re.car.api.payload.CarUpdateRequestFixture;
 import org.re.car.domain.CarIgnitionStatus;
 import org.re.car.service.CarService;
 import org.re.common.domain.EntityLifecycleStatus;
+import org.re.config.QueryDslConfig;
 import org.re.employee.domain.EmployeeRole;
 import org.re.security.access.ManagerOnlyHandler;
 import org.re.tenant.TenantId;
