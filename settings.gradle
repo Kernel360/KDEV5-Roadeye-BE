@@ -21,5 +21,3 @@ include 'roadeye-domain:roadeye-domain-core'
 
 include 'roadeye-monitoring'
 include 'roadeye-notification'
-
-include 'roadeye-emulator'
