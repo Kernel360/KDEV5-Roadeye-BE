@@ -48,20 +48,14 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Projects
+        id: build
         run: |
-          ./gradlew --build-cache \
+          ./gradlew --quiet --build-cache \
             :roadeye-api:roadeye-api-hq:jibDockerBuild \
             :roadeye-api:roadeye-api-hub:jibDockerBuild \
             :roadeye-consumer:jibDockerBuild \
               -Djib.to.tags=latest
 
-  deploy-ecr:
-    runs-on: ubuntu-22.04
-    needs: [ build ]
-    if: ${{ vars.USE_AWS_ECR == 'true' }}
-    env:
-      DOCKER_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
-    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -74,47 +68,15 @@ jobs:
 
       - name: Push API-HQ image to ECR
         run: |
-          docker tag roadeye-api-hq:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hq:latest
-          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hq:latest
+          docker tag roadeye-api-hq:latest ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hq:latest
+          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hq:latest
 
       - name: Push API-Hub image to ECR
         run: |
-          docker tag roadeye-api-hub:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hub:latest
-          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hub:latest
+          docker tag roadeye-api-hub:latest ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hub:latest
+          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hub:latest
 
       - name: Push Consumer image to ECR
         run: |
-          docker tag roadeye-consumer:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/consumer:latest
-          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/consumer:latest
-
-  deploy-ocr:
-    runs-on: ubuntu-22.04
-    needs: [ build ]
-    if: ${{ vars.USE_OCI_OCR == 'true' }}
-    env:
-      DOCKER_REGISTRY: ${{ secrets.OCI_REGION }}.ocir.io
-      DOCKER_USERNAME: ${{ secrets.OCI_TENANCY_NAMESPACE }}/${{ secrets.OCI_DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.OCI_DOCKER_PASSWORD }}
-      DOCKER_REPOSITORY: ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_TENANCY_NAMESPACE }}
-    steps:
-      - name: Login to Oracle Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
-
-      - name: Push API-HQ image to Oracle Container Registry
-        run: |
-          docker tag roadeye-api-hq:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hq:latest
-          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hq:latest
-
-      - name: Push API-Hub image to Oracle Container Registry
-        run: |
-          docker tag roadeye-api-hub:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hub:latest
-          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/api-hub:latest
-
-      - name: Push Consumer image to Oracle Container Registry
-        run: |
-          docker tag roadeye-consumer:latest ${{ env.DOCKER_REPOSITORY }}/roadeye/consumer:latest
-          docker push ${{ env.DOCKER_REPOSITORY }}/roadeye/consumer:latest
+          docker tag roadeye-consumer:latest ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/consumer:latest
+          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/consumer:latest
