@@ -3,6 +3,7 @@ package org.re.test.base;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.re.config.QueryDslConfig;
 import org.re.config.WebSecurityConfig;
 import org.re.security.userdetails.CompanyUserDetailsService;
 import org.re.security.userdetails.PlatformAdminUserDetailsService;
