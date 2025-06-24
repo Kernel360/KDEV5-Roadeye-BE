@@ -1,6 +1,24 @@
-# 사용 방법
+# RoadEye 차량 시뮬레이터
 
-## 준비
+## 설치 및 실행
+
+### 웹
+
+1. 의존성 설치:
+
+```bash
+npm install
+```
+
+2. 개발 서버 실행:
+
+```bash
+npm run dev
+```
+
+3. 브라우저에서 `http://localhost:5173` 접속
+
+### K6 스크립트
 
 1. 차량 데이터를 src/data/cars.json에 저장하기 (bootstrapper로 데이터 생성 후 json으로 저장)
 2. 위치 데이터를 src/data/stations.json에 저장하기.
@@ -10,21 +28,8 @@
 
 3. `npm run prepare`
 
-## 실행
-
-1. 시동 ON 이벤트
-
-- `npm run k6:1`
-
-2. 주기 정보 이벤트
-
-- `npm run k6:2`
-
-3. 시동 OFF 이벤트
-
-- `npm run k6:3`
-
-4. 에뮬레이터
-
-- `npm run k6:4`
-
+4. K6 스크립트 실행:
+    - 시동 ON 이벤트: `npm run k6:1`
+    - 주기 정보 이벤트: `npm run k6:2`
+    - 시동 OFF 이벤트: `npm run k6:3`
+    - 에뮬레이터: `npm run k6:4`
