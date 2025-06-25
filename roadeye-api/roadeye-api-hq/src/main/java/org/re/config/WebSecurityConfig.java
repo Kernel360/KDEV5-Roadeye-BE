@@ -26,6 +26,10 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -41,6 +45,20 @@ public class WebSecurityConfig {
         return new HttpSessionSecurityContextRepository();
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        var config = new CorsConfiguration();
+        config.addAllowedOriginPattern("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        config.setAllowCredentials(true);
+        config.setMaxAge(120L);
+
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
     @Configuration
     @RequiredArgsConstructor
     public class AdminSecurityConfig {
@@ -54,13 +72,14 @@ public class WebSecurityConfig {
             return http
                 .securityMatcher("/api/admin/**")
                 .authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                     .requestMatchers("/api/admin/auth/sign-in").permitAll()
                     .anyRequest().hasAuthority(AuthMemberType.ADMIN.getValue())
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                .cors((c) -> c.configurationSource(corsConfigurationSource()))
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
         }
@@ -101,6 +120,8 @@ public class WebSecurityConfig {
             return http
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                    .requestMatchers(CorsUtils::isCorsRequest).permitAll()
                     .requestMatchers("/api/auth/sign-in", "/api/session").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/company/quotes").permitAll()
                     .anyRequest().hasAuthority(AuthMemberType.USER.getValue())
@@ -108,6 +129,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                .cors((c) -> c.configurationSource(corsConfigurationSource()))
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
         }
