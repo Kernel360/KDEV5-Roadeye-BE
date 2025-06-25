@@ -38,6 +38,9 @@ public class CarService {
 
     public Page<Car> searchByIgnitionStatus(TenantId tenantId, CarIgnitionStatus status, Pageable pageable) {
         var company = companyDomainService.findById(tenantId.value());
+        if(status == null) {
+            return carDomainService.getCars(company, pageable);
+        }
         return carDomainService.searchByIgnitionStatus(company, status, pageable);
     }
 

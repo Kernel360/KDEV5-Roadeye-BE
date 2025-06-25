@@ -56,10 +56,10 @@ public class CarApi {
 
 
     @GetMapping("/search/ignition")
-    public PageResponse<CarInfoSimple> getCarsByIgnition(TenantId tenantId, @RequestParam CarIgnitionStatus status,
+    public PageResponse<CarInfoDetails> getCarsByIgnition(TenantId tenantId, @RequestParam(required = false) CarIgnitionStatus status,
                                                          Pageable pageable) {
         var page = carService.searchByIgnitionStatus(tenantId, status, pageable);
-        return PageResponse.of(page, CarInfoSimple::from);
+        return PageResponse.of(page, CarInfoDetails::from);
     }
 
     @GetMapping("/count/ignition")
