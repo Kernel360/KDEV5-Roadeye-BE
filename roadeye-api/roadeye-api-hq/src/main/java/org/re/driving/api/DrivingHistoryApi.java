@@ -6,6 +6,7 @@ import org.re.common.api.payload.PageResponse;
 import org.re.driving.api.payload.DrivingHistoryInfo;
 import org.re.driving.api.payload.DrivingLocationDetail;
 import org.re.driving.service.DrivingHistoryService;
+import org.re.tenant.TenantId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +20,8 @@ public class DrivingHistoryApi {
     private final DrivingHistoryService drivingHistoryService;
 
     @GetMapping
-    public PageResponse<DrivingHistoryInfo> getDrivingHistory(Pageable pageable) {
-        var page = drivingHistoryService.getDrivingHistory(pageable);
+    public PageResponse<DrivingHistoryInfo> getDrivingHistory(TenantId tenantId, Pageable pageable) {
+        var page = drivingHistoryService.getDrivingHistory(tenantId, pageable);
         return PageResponse.of(page, DrivingHistoryInfo::from);
     }
 

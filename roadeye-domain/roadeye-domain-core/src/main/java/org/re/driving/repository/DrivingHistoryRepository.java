@@ -10,5 +10,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface DrivingHistoryRepository extends JpaRepository<DrivingHistory, Long>, DrivingHistoryCustomRepository {
     @Nullable
     DrivingHistory findByCarAndTxUidAndStatus(Car car, TransactionUUID txUid, DrivingHistoryStatus status);
-
 }

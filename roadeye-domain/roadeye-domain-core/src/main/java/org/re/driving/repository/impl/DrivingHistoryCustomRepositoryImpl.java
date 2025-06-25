@@ -2,15 +2,19 @@ package org.re.driving.repository.impl;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.re.car.domain.QCar;
+import org.re.driving.domain.DrivingHistory;
 import org.re.driving.domain.QDrivingHistory;
 import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.repository.DrivingHistoryCustomRepository;
-import com.querydsl.core.types.dsl.StringTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
 public class DrivingHistoryCustomRepositoryImpl implements
@@ -42,5 +46,30 @@ public class DrivingHistoryCustomRepositoryImpl implements
                 tuple.get(dh.count())
             ))
             .toList();
+    }
+
+    @Override
+    public Page<DrivingHistory> findDrivingHistoryByCompanyId(Long companyId, Pageable pageable) {
+        QDrivingHistory history = QDrivingHistory.drivingHistory;
+        QCar car = QCar.car;
+
+        Long total = queryFactory
+            .select(history.count())
+            .from(history)
+            .join(history.car, car)
+            .where(car.company.id.eq(companyId))
+            .fetchOne();
+
+        long count = total != null ? total : 0L;
+
+        List<DrivingHistory> result = queryFactory
+            .selectFrom(history)
+            .join(history.car, car)
+            .where(car.company.id.eq(companyId))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        return new PageImpl<>(result, pageable, count);
     }
 }

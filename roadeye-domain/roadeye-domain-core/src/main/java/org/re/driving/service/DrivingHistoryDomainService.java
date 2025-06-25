@@ -12,6 +12,7 @@ import org.re.driving.domain.DrivingHistoryStatus;
 import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.repository.DrivingHistoryRepository;
 import org.re.mdtlog.domain.TransactionUUID;
+import org.re.tenant.TenantId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -31,8 +32,8 @@ public class DrivingHistoryDomainService {
         return drivingHistoryRepository.findByCarAndTxUidAndStatus(car, transactionUUID, DrivingHistoryStatus.DRIVING);
     }
 
-    public Page<DrivingHistory> findAll(Pageable pageable) {
-        return drivingHistoryRepository.findAll(pageable);
+    public Page<DrivingHistory> findAll(TenantId tenantId, Pageable pageable) {
+        return drivingHistoryRepository.findDrivingHistoryByCompanyId(tenantId.value(), pageable);
     }
 
     public List<DrivingHistoryMonthlyCountResult> getMonthlyCount() {
