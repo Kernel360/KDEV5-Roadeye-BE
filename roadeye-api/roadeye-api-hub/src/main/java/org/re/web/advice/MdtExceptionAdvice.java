@@ -8,6 +8,7 @@ import org.re.common.exception.MdtLogExceptionCode;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -46,5 +47,13 @@ public class MdtExceptionAdvice {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(new BaseMdtResponse(MdtLogExceptionCode.INVALID_ACCESS_PATH));
+    }
+
+    @Priority(Ordered.HIGHEST_PRECEDENCE)
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public Object handleMethodNotAllowedException() {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(new BaseMdtResponse(MdtLogExceptionCode.WRONG_APPROACH));
     }
 }
