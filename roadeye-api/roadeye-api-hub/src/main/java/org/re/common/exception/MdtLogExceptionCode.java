@@ -9,6 +9,8 @@ public enum MdtLogExceptionCode implements AppExceptionCode {
     Success("000", "Success"),
     TUID_ERROR("108", "TUID error"),
     IGNITION_ALREADY_ON("400", "Ignition is already on"),
+    DATA_PROCESSING_ERROR("400", "An error occurred while processing the data"),
+    INTERNAL_SERVER_ERROR("500", "Internal server error"),
     ;
     // @formatter:on
 
