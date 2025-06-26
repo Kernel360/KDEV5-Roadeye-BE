@@ -86,5 +86,9 @@ public class Car extends BaseEntity {
             profile.setImageUrl(command.imageUrl());
         }
     }
+
+    public boolean isIgnitionOn() {
+        return mdtStatus.getIgnition() == CarIgnitionStatus.ON;
+    }
 }
 
