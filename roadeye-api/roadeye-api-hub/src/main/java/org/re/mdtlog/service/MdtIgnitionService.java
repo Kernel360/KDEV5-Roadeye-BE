@@ -12,6 +12,8 @@ import org.re.mdtlog.dto.MdtIgnitionOnMessage;
 import org.re.mdtlog.messaging.MdtLogMessagingService;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class MdtIgnitionService {
 
     public void ignitionOff(TransactionUUID tuid, MdtIgnitionOffMessage dto, MdtLogRequestTimeInfo timeInfo) {
         var car = carDomainService.getCarById(dto.carId());
-        if (!car.getMdtStatus().getActiveTuid().equals(tuid)) {
+        if (Objects.equals(car.getMdtStatus().getActiveTuid(), tuid)) {
             throw new AppException(MdtLogExceptionCode.TUID_ERROR);
         }
 
