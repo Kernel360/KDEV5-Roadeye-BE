@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.re.common.exception.AppException;
 import org.re.common.exception.MdtLogExceptionCode;
-import org.re.test.api.TestController;
+import org.re.test.api.TestApi;
 import org.re.test.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(TestController.class)
+@WebMvcTest(TestApi.class)
 public class MdtExceptionAdviceTest {
     @Autowired
     MockMvc mvc;

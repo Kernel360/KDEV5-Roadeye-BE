@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
-public class TestController {
+public class TestApi {
     private final TestService testService;
 
-    public TestController(TestService testService) {
+    public TestApi(TestService testService) {
         this.testService = testService;
     }
 
