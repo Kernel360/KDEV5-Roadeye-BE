@@ -12,6 +12,8 @@ import org.re.mdtlog.dto.MdtIgnitionOnMessage;
 import org.re.mdtlog.messaging.MdtLogMessagingService;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,15 @@ public class MdtIgnitionService {
     private final MdtLogMessagingService mdtLogMessagingService;
 
     public void ignitionOn(TransactionUUID tuid, MdtIgnitionOnMessage dto, MdtLogRequestTimeInfo timeInfo) {
+        var car = carDomainService.getCarById(dto.carId());
+        if (car.isIgnitionOn()) {
+            if (Objects.equals(car.getMdtStatus().getActiveTuid(), tuid)) {
+                log.warn("Ignition is already on for carId: {}, TUID: {}", dto.carId(), tuid);
+                return; // no need to send a message again.
+            }
+            throw new AppException(MdtLogExceptionCode.IGNITION_ALREADY_ON);
+        }
+        
         mdtLogMessagingService.send(tuid, dto, timeInfo);
     }
 
