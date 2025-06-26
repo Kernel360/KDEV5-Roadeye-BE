@@ -1,9 +1,9 @@
 import http from 'k6/http';
-import {Options} from 'k6/options';
-import {getCar, getEndStation, getRandomStation, getStartStation} from '../lib/shared.ts';
+import { Options } from 'k6/options';
+import { getCar, getEndStation, getRandomStation, getStartStation } from '../lib/shared.ts';
 import * as utils from '../lib/utils.ts';
 import type CarType from '../data/car.example.json';
-import {sleep} from 'k6';
+import { sleep } from 'k6';
 
 enum Phase {
     INIT,
@@ -29,6 +29,7 @@ type Context = {
     transactionId: string | null;
     onTime: Date | null;
     offTime: Date | null;
+    logs: MdtLog[];
     prev: MdtLog | null;
 }
 
@@ -97,6 +98,7 @@ function init(ctx: Context) {
     ctx.transactionId = null;
     ctx.onTime = null;
     ctx.offTime = null;
+    ctx.logs = [];
     ctx.prev = null;
 }
 
@@ -151,7 +153,7 @@ function driving(ctx: Context, data: ReturnType<typeof setup>) {
         const spd = utils.nextCarSpd(ctx.prev!.spd);
         const ang = hd.heading;
         const sum = ctx.prev.sum + spd;
-        const {lat, lon} = utils.moveTo(ctx.prev, {heading: hd.heading, distance: hd.distance});
+        const { lat, lon } = utils.moveTo(ctx.prev, { heading: hd.heading, distance: hd.distance });
 
         const log: MdtLog = {
             sec: s,
@@ -169,6 +171,7 @@ function driving(ctx: Context, data: ReturnType<typeof setup>) {
         ctx.car.spd = spd;
         ctx.car.bat = ctx.car.bat - 0.01;
 
+        ctx.logs.push(log);
         ctx.prev = log;
     }
 
@@ -181,8 +184,8 @@ function driving(ctx: Context, data: ReturnType<typeof setup>) {
             pv: 1,
             did: `DID`,
             oTime: utils.dateFormat(now, "yyyymmddHHMM"),
-            cCnt: 60,
-            cList: ctx.prev
+            cCnt: ctx.logs.length,
+            cList: ctx.logs
         }),
         {
             headers: {
