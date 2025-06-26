@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":roadeye-domain:roadeye-domain-core"))
     implementation(project(":roadeye-monitoring"))
 
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-json")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     runtimeOnly("com.mysql:mysql-connector-j")
