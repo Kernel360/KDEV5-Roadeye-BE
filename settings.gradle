@@ -20,4 +20,3 @@ include 'roadeye-domain:roadeye-domain-common'
 include 'roadeye-domain:roadeye-domain-core'
 
 include 'roadeye-monitoring'
-include 'roadeye-notification'
