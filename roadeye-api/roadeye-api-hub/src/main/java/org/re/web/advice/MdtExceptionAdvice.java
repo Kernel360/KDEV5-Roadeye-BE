@@ -8,6 +8,7 @@ import org.re.common.exception.MdtLogExceptionCode;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -55,5 +56,13 @@ public class MdtExceptionAdvice {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(new BaseMdtResponse(MdtLogExceptionCode.WRONG_APPROACH));
+    }
+
+    @Priority(Ordered.HIGHEST_PRECEDENCE)
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public Object handleMediaTypeNotSupportedException() {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(new BaseMdtResponse(MdtLogExceptionCode.CONTENT_TYPE_NOT_SUPPORTED));
     }
 }
