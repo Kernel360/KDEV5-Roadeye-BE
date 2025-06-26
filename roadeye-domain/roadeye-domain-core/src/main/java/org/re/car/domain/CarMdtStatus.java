@@ -18,6 +18,7 @@ import org.re.mdtlog.domain.TransactionUUID;
 import org.re.util.Integers;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Embeddable
 @Getter
@@ -83,7 +84,7 @@ public class CarMdtStatus {
     }
 
     public void turnOffIgnition(TransactionUUID transactionId) {
-        if (!this.activeTuid.equals(transactionId)) {
+        if (!Objects.equals(this.activeTuid, transactionId)) {
             throw new DomainException(CarDomainException.TRANSACTION_ID_MISMATCH);
         }
         this.ignition = CarIgnitionStatus.OFF;
