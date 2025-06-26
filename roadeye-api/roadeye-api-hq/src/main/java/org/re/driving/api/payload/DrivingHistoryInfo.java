@@ -18,10 +18,13 @@ public record DrivingHistoryInfo(
     Integer nextMileageSum,
     LocalDateTime driveEndedAt,
     BigDecimal nextLatitude,
-    BigDecimal nextLongitude
+    BigDecimal nextLongitude,
+    String carName,
+    String licenseNumber
 ){
     public static DrivingHistoryInfo from(DrivingHistory history) {
         var endDrivingSnapShot = history.getEndDrivingSnapShot();
+        var car = history.getCar();
         return new DrivingHistoryInfo(
             history.getId(),
             history.getStatus(),
@@ -33,7 +36,9 @@ public record DrivingHistoryInfo(
             endDrivingSnapShot != null ? endDrivingSnapShot.mileageSum() : null,
             endDrivingSnapShot != null ? endDrivingSnapShot.datetime() : null,
             endDrivingSnapShot != null ? endDrivingSnapShot.location().getLatitude() : null,
-            endDrivingSnapShot != null ? endDrivingSnapShot.location().getLongitude() : null
+            endDrivingSnapShot != null ? endDrivingSnapShot.location().getLongitude() : null,
+            car.getProfile().getName(),
+            car.getProfile().getLicenseNumber()
         );
     }
 }
