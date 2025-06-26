@@ -1,4 +1,4 @@
-package org.re.common.api;
+package org.re.web.advice;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,6 +7,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.re.common.exception.AppException;
 import org.re.common.exception.MdtLogExceptionCode;
+import org.re.test.api.TestController;
+import org.re.test.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -17,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TestController.class)
-public class ApiResponseTest {
+public class MdtExceptionAdviceTest {
     @Autowired
     MockMvc mvc;
 

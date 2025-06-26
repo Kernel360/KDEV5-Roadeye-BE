@@ -1,5 +1,6 @@
-package org.re.common.api;
+package org.re.test.api;
 
+import org.re.test.service.TestService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
