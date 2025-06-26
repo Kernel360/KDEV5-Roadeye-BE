@@ -1,10 +1,8 @@
 package org.re.driving.service;
 
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.re.car.domain.Car;
 import org.re.common.stereotype.DomainService;
 import org.re.driving.domain.DrivingHistory;
@@ -16,7 +14,11 @@ import org.re.tenant.TenantId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+import java.util.List;
 
+
+@Slf4j
 @DomainService
 @Transactional
 @RequiredArgsConstructor
@@ -24,6 +26,11 @@ public class DrivingHistoryDomainService {
     private final DrivingHistoryRepository drivingHistoryRepository;
 
     public void createNew(Car car, LocalDateTime driveStartAt) {
+        if (drivingHistoryRepository.existsByCarAndTxUid(car, car.getMdtStatus().getActiveTuid())) {
+            log.warn("Driving history already exists for car: {}, TUID: {}. It may be duplicated message", car.getId(), car.getMdtStatus().getActiveTuid());
+            return;
+        }
+
         var drivingHistory = DrivingHistory.createNew(car, driveStartAt);
         drivingHistoryRepository.save(drivingHistory);
     }
