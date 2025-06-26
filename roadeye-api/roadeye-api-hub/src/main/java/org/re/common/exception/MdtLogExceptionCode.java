@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 public enum MdtLogExceptionCode implements AppExceptionCode {
     // @formatter:off
     Success("000", "Success"),
+    INVALID_ACCESS_PATH("100", "Invalid access path"),
+    WRONG_APPROACH("101", "Wrong approach"),
+    CONTENT_TYPE_NOT_SUPPORTED("102", "Content type not supported"),
     TUID_ERROR("108", "TUID error"),
     IGNITION_ALREADY_ON("400", "Ignition is already on"),
     DATA_PROCESSING_ERROR("400", "An error occurred while processing the data"),
