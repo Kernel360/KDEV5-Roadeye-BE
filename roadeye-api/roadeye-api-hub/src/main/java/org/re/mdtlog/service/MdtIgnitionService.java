@@ -30,13 +30,13 @@ public class MdtIgnitionService {
             }
             throw new AppException(MdtLogExceptionCode.IGNITION_ALREADY_ON);
         }
-        
+
         mdtLogMessagingService.send(tuid, dto, timeInfo);
     }
 
     public void ignitionOff(TransactionUUID tuid, MdtIgnitionOffMessage dto, MdtLogRequestTimeInfo timeInfo) {
         var car = carDomainService.getCarById(dto.carId());
-        if (Objects.equals(car.getMdtStatus().getActiveTuid(), tuid)) {
+        if (!Objects.equals(car.getMdtStatus().getActiveTuid(), tuid)) {
             throw new AppException(MdtLogExceptionCode.TUID_ERROR);
         }
 
