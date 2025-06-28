@@ -5,6 +5,6 @@ plugins {
 rootProject.name = 'Roadeye'
 
 include 'core'
-include 'roadeye-api-hq'
+include 'web-api'
 include 'roadeye-api-hub'
 include 'roadeye-consumer'

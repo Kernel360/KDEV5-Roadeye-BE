@@ -51,7 +51,7 @@ jobs:
         id: build
         run: |
           ./gradlew --quiet --build-cache \
-            :roadeye-api:roadeye-api-hq:jibDockerBuild \
+            :roadeye-api:api-web:jibDockerBuild \
             :roadeye-api-hub:jibDockerBuild \
             :roadeye-consumer:jibDockerBuild \
               -Djib.to.tags=latest
@@ -68,7 +68,7 @@ jobs:
 
       - name: Push API-HQ image to ECR
         run: |
-          docker tag roadeye-api-hq:latest ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hq:latest
+          docker tag api-web:latest ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hq:latest
           docker push ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hq:latest
 
       - name: Push API-Hub image to ECR

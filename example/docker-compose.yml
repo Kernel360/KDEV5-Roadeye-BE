@@ -4,7 +4,7 @@ name: "roadeye"
 
 services:
   api-web:
-    image: roadeye-api-hq:latest
+    image: api-web:latest
     ports:
       - "8080:8080"
     env_file:

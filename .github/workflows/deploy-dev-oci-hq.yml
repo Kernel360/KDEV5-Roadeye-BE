@@ -38,7 +38,7 @@ jobs:
             ~/.gradle/wrapper
 
       - name: Build the project
-        run: ./gradlew --build-cache :roadeye-api:roadeye-api-hq:build
+        run: ./gradlew --build-cache :roadeye-api:api-web:build
 
       - name: Verify SSH host
         env:
@@ -54,7 +54,7 @@ jobs:
           HOST: ${{ secrets.REMOTE_HOST }}
           USERNAME: ${{ secrets.REMOTE_USER }}
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          JAR_PATH: roadeye-api/roadeye-api-hq/build/libs/app.jar
+          JAR_PATH: roadeye-api/api-web/build/libs/app.jar
         run: |
           echo "${{ env.PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
