@@ -1,4 +1,4 @@
-name: Deploy Dev
+name: Deploy dev branch
 
 on:
   workflow_dispatch:
@@ -13,6 +13,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        module: [ 'api', 'hub', 'consumer' ]
+    env:
+      DOCKER_IMAGE: ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/${{ matrix.module }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,27 +39,8 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
 
-      - name: Caching Jib layers
-        uses: actions/cache@v4
-        with:
-          key: ${{ runner.os }}-jib-${{ hashFiles('**/build.gradle*', '**/settings.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-jib-
-          path: |
-            ~/.cache/google-cloud-tools-java/jib/images
-            ~/.cache/google-cloud-tools-java/jib/layers
-
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
-
-      - name: Build Projects
-        id: build
-        run: |
-          ./gradlew --quiet --build-cache \
-            :roadeye-api:api-web:jibDockerBuild \
-            :roadeye-api-hub:jibDockerBuild \
-            :roadeye-consumer:jibDockerBuild \
-              -Djib.to.tags=latest
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -66,17 +52,10 @@ jobs:
       - name: Login to AWS
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Push API-HQ image to ECR
+      - name: Build Module
+        id: build
         run: |
-          docker tag api-web:latest ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hq:latest
-          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hq:latest
-
-      - name: Push API-Hub image to ECR
-        run: |
-          docker tag roadeye-api-hub:latest ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hub:latest
-          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/api-hub:latest
-
-      - name: Push Consumer image to ECR
-        run: |
-          docker tag roadeye-consumer:latest ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/consumer:latest
-          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/consumer:latest
+          ./gradlew --quiet --build-cache \
+            :${{ matrix.module }}:bootBuildImage \
+            --imageName=${{ env.DOCKER_IMAGE }}:latest-test \
+            --publishImage

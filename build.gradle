@@ -45,4 +45,22 @@ subprojects {
     bootJar.enabled = true
     jar.enabled = true
     dependencies {}
+
+    tasks.named("bootBuildImage") {
+        buildWorkspace {
+            bind {
+                source = "/tmp/cache-${project.name}.work"
+            }
+        }
+        buildCache {
+            bind {
+                source = "/tmp/cache-${project.name}.build"
+            }
+        }
+        launchCache {
+            bind {
+                source = "/tmp/cache-${project.name}.launch"
+            }
+        }
+    }
 }
