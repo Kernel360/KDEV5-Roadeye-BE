@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.re.security.api.payload.AuthenticationSuccessResponse;
 import org.re.security.userdetails.CompanyUserDetails;
 import org.re.security.userdetails.PlatformAdminUserDetails;
+import org.re.web.method.support.CompanyIdArgumentResolver;
 import org.re.web.method.support.CompanyUserDetailsArgumentResolver;
 import org.re.web.method.support.PlatformAdminUserDetailsArgumentResolver;
-import org.re.web.method.support.TenantIdArgumentResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -37,14 +37,17 @@ public class RoadeyeAuthenticationSuccessHandler implements AuthenticationSucces
                 var session = request.getSession(true);
 
                 if (userDetails instanceof CompanyUserDetails companyUserDetails) {
-                    session.setAttribute(TenantIdArgumentResolver.TENANT_ID_SESSION_ATTRIBUTE_NAME, companyUserDetails.getTenantId());
+                    session.setAttribute(CompanyIdArgumentResolver.COMPANY_ID_SESSION_ATTRIBUTE_NAME, companyUserDetails.getCompanyId());
                     session.setAttribute(CompanyUserDetailsArgumentResolver.COMPANY_USER_DETAILS_SESSION_ATTR_NAME, companyUserDetails);
-                } else if (userDetails instanceof PlatformAdminUserDetails) {
+                }
+                else if (userDetails instanceof PlatformAdminUserDetails) {
                     session.setAttribute(PlatformAdminUserDetailsArgumentResolver.PLATFORM_ADMIN_USER_DETAILS_SESSION_ATTR_NAME, userDetails);
-                } else {
+                }
+                else {
                     throw new IllegalStateException("Unsupported user details type: " + userDetails.getClass().getName());
                 }
-            } else {
+            }
+            else {
                 throw new IllegalStateException("Authentication details is not an instance of UserDetails");
             }
 

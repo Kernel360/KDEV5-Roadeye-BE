@@ -4,13 +4,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.re.common.domain.EntityLifecycleStatus;
+import org.re.company.domain.CompanyId;
 import org.re.employee.api.payload.AccountStatus;
 import org.re.employee.domain.Employee;
 import org.re.employee.domain.EmployeeCredentials;
 import org.re.employee.domain.EmployeeMetadata;
 import org.re.employee.dto.UpdateEmployeeCommand;
 import org.re.security.userdetails.CompanyUserDetails;
-import org.re.tenant.TenantId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,35 +25,35 @@ public class EmployeeService {
     private final PasswordEncoder passwordEncoder;
 
     public Employee getMyInfo(CompanyUserDetails userDetails) {
-        return read(userDetails.getTenantId(), userDetails.getUserId());
+        return read(userDetails.getCompanyId(), userDetails.getUserId());
     }
 
-    public Long createRoot(TenantId tenantId, EmployeeCredentials credentials, EmployeeMetadata metadata) {
-        employeeDomainService.validateExistsRootAccount(tenantId.value());
+    public Long createRoot(CompanyId companyId, EmployeeCredentials credentials, EmployeeMetadata metadata) {
+        employeeDomainService.validateExistsRootAccount(companyId.value());
 
         var employee = Employee.createRoot(
-            tenantId.value(),
+            companyId.value(),
             credentials.withPassword(passwordEncoder.encode(credentials.password())),
             metadata
         );
         return employeeDomainService.create(employee);
     }
 
-    public Long createNormal(TenantId tenantId, EmployeeCredentials credentials, EmployeeMetadata metadata) {
+    public Long createNormal(CompanyId companyId, EmployeeCredentials credentials, EmployeeMetadata metadata) {
         var employee = Employee.createNormal(
-            tenantId.value(),
+            companyId.value(),
             credentials.withPassword(passwordEncoder.encode(credentials.password())),
             metadata
         );
         return employeeDomainService.create(employee);
     }
 
-    public Employee read(TenantId tenantId, Long employeeId) {
-        return employeeDomainService.read(tenantId.value(), employeeId);
+    public Employee read(CompanyId companyId, Long employeeId) {
+        return employeeDomainService.read(companyId.value(), employeeId);
     }
 
-    public void changeStatus(TenantId tenantId, Long employeeId, @NonNull AccountStatus status) {
-        var employee = employeeDomainService.read(tenantId.value(), employeeId);
+    public void changeStatus(CompanyId companyId, Long employeeId, @NonNull AccountStatus status) {
+        var employee = employeeDomainService.read(companyId.value(), employeeId);
 
         switch (status) {
             case ENABLE -> employee.enable();
@@ -61,24 +61,25 @@ public class EmployeeService {
         }
     }
 
-    public void delete(TenantId tenantId, Long employeeId) {
-        employeeDomainService.delete(tenantId.value(), employeeId);
+    public void delete(CompanyId companyId, Long employeeId) {
+        employeeDomainService.delete(companyId.value(), employeeId);
     }
 
-    public Page<Employee> readAll(TenantId tenantId, Pageable pageable) {
-        return employeeDomainService.readAll(tenantId.value(), pageable);
+    public Page<Employee> readAll(CompanyId companyId, Pageable pageable) {
+        return employeeDomainService.readAll(companyId.value(), pageable);
     }
 
-    public Page<Employee> readByStatus(TenantId tenantId, Pageable pageable, String status) {
-        if (status == null) return employeeDomainService.readAll(tenantId.value(), pageable);
-        return employeeDomainService.readByStatus(tenantId.value(), pageable, EntityLifecycleStatus.valueOf(status));
+    public Page<Employee> readByStatus(CompanyId companyId, Pageable pageable, String status) {
+        if (status == null)
+            return employeeDomainService.readAll(companyId.value(), pageable);
+        return employeeDomainService.readByStatus(companyId.value(), pageable, EntityLifecycleStatus.valueOf(status));
     }
 
-    public void update(TenantId tenantId, Long employeeId, UpdateEmployeeCommand command, AccountStatus status) {
-        employeeDomainService.updateMetadata(tenantId.value(), employeeId, command);
+    public void update(CompanyId companyId, Long employeeId, UpdateEmployeeCommand command, AccountStatus status) {
+        employeeDomainService.updateMetadata(companyId.value(), employeeId, command);
         switch (status) {
-            case ENABLE -> employeeDomainService.enable(tenantId.value(), employeeId);
-            case DISABLE -> employeeDomainService.disable(tenantId.value(), employeeId);
+            case ENABLE -> employeeDomainService.enable(companyId.value(), employeeId);
+            case DISABLE -> employeeDomainService.disable(companyId.value(), employeeId);
         }
     }
 }

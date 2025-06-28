@@ -16,7 +16,7 @@ import org.re.util.Integers;
 public class Employee extends BaseEntity {
 
     @Column(nullable = false)
-    private Long tenantId;
+    private Long companyId;
 
     private int tryCount;
 
@@ -30,22 +30,22 @@ public class Employee extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private EmployeeRole role;
 
-    private Employee(Long tenantId, int tryCount, EmployeeCredentials credentials, EmployeeMetadata metadata, EmployeeRole role) {
-        this.tenantId = tenantId;
+    private Employee(Long companyId, int tryCount, EmployeeCredentials credentials, EmployeeMetadata metadata, EmployeeRole role) {
+        this.companyId = companyId;
         this.tryCount = tryCount;
         this.credentials = credentials;
         this.metadata = metadata;
         this.role = role;
     }
 
-    public static Employee of(Long tenantId, EmployeeCredentials authentication, EmployeeMetadata metadata) {
+    public static Employee of(Long companyId, EmployeeCredentials authentication, EmployeeMetadata metadata) {
         throw new UnsupportedOperationException();
-        //return new Employee(tenantId, 0, authentication, metadata);
+        //return new Employee(companyId, 0, authentication, metadata);
     }
 
-    public static Employee createNormal(Long tenantId, EmployeeCredentials authentication, EmployeeMetadata metadata) {
+    public static Employee createNormal(Long companyId, EmployeeCredentials authentication, EmployeeMetadata metadata) {
         return new Employee(
-            tenantId,
+            companyId,
             Integers.ZERO,
             authentication,
             metadata,
@@ -53,9 +53,9 @@ public class Employee extends BaseEntity {
         );
     }
 
-    public static Employee createRoot(Long tenantId, EmployeeCredentials authentication, EmployeeMetadata metadata) {
+    public static Employee createRoot(Long companyId, EmployeeCredentials authentication, EmployeeMetadata metadata) {
         return new Employee(
-            tenantId,
+            companyId,
             Integers.ZERO,
             authentication,
             metadata,

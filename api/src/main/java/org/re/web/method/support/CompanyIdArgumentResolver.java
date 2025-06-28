@@ -1,23 +1,23 @@
 package org.re.web.method.support;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.re.tenant.TenantId;
+import org.re.company.domain.CompanyId;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-public class TenantIdArgumentResolver implements HandlerMethodArgumentResolver {
-    public final static String TENANT_ID_SESSION_ATTRIBUTE_NAME = "tenantId";
+public class CompanyIdArgumentResolver implements HandlerMethodArgumentResolver {
+    public final static String COMPANY_ID_SESSION_ATTRIBUTE_NAME = "companyId";
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(TenantId.class);
+        return parameter.getParameterType().equals(CompanyId.class);
     }
 
     @Override
-    public TenantId resolveArgument(
+    public CompanyId resolveArgument(
         MethodParameter parameter,
         ModelAndViewContainer mavContainer,
         NativeWebRequest webRequest,
@@ -28,6 +28,6 @@ public class TenantIdArgumentResolver implements HandlerMethodArgumentResolver {
         if (session == null) {
             return null;
         }
-        return (TenantId) session.getAttribute(TENANT_ID_SESSION_ATTRIBUTE_NAME);
+        return (CompanyId) session.getAttribute(COMPANY_ID_SESSION_ATTRIBUTE_NAME);
     }
 }

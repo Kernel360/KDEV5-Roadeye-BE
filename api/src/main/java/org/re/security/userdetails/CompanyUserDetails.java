@@ -2,10 +2,10 @@ package org.re.security.userdetails;
 
 import lombok.Getter;
 import org.jspecify.annotations.NonNull;
+import org.re.company.domain.CompanyId;
 import org.re.employee.domain.Employee;
 import org.re.employee.domain.EmployeeRole;
 import org.re.security.domain.AuthMemberType;
-import org.re.tenant.TenantId;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -22,7 +22,7 @@ public class CompanyUserDetails implements UserDetails, CredentialsContainer {
         = Collections.unmodifiableCollection(AuthorityUtils.createAuthorityList(AuthMemberType.USER.getValue()));
 
     @NonNull
-    private final TenantId tenantId;
+    private final CompanyId companyId;
     private final Long userId;
 
     private final String username;
@@ -36,7 +36,7 @@ public class CompanyUserDetails implements UserDetails, CredentialsContainer {
     private final boolean enabled;
 
     private CompanyUserDetails(
-        @NonNull TenantId tenantId,
+        @NonNull CompanyId companyId,
         Long userId,
         String username,
         String password,
@@ -46,7 +46,7 @@ public class CompanyUserDetails implements UserDetails, CredentialsContainer {
         boolean credentialsNonExpired,
         boolean enabled
     ) {
-        this.tenantId = tenantId;
+        this.companyId = companyId;
         this.userId = userId;
         this.username = username;
         this.password = password;
@@ -58,9 +58,9 @@ public class CompanyUserDetails implements UserDetails, CredentialsContainer {
     }
 
     public static UserDetails from(Employee user) {
-        var tenantId = new TenantId(user.getTenantId());
+        var companyId = new CompanyId(user.getCompanyId());
         return new CompanyUserDetails(
-            tenantId,
+            companyId,
             user.getId(),
             user.getCredentials().loginId(),
             user.getCredentials().password(),

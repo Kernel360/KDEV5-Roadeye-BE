@@ -8,7 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.re.employee.domain.EmployeeCredentials;
 import org.re.employee.service.EmployeeDomainService;
-import org.re.web.filter.TenantIdContextFilter;
+import org.re.web.filter.CompanyIdContextFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,12 +51,12 @@ public class CompanyLoginTest {
         @DisplayName("루트 계정으로 로그인할 수 있어야 한다.")
         void rootAccountLoginTest() throws Exception {
             // given
-            var tenantId = 123L;
+            var companyId = 123L;
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
 
-            employeeDomainService.createRootAccount(tenantId, credential, name, position);
+            employeeDomainService.createRootAccount(companyId, credential, name, position);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -65,7 +65,7 @@ public class CompanyLoginTest {
             ));
             var req = post("/api/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                 .session(new MockHttpSession())
                 .content(body);
 
@@ -79,12 +79,12 @@ public class CompanyLoginTest {
         @ValueSource(strings = {"invalidUsername", " ", ""})
         void invalidUsernameLoginTest(String username) throws Exception {
             // given
-            var tenantId = 123L;
+            var companyId = 123L;
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
 
-            employeeDomainService.createRootAccount(tenantId, credential, name, position);
+            employeeDomainService.createRootAccount(companyId, credential, name, position);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -93,7 +93,7 @@ public class CompanyLoginTest {
             ));
             var req = post("/api/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                 .content(body);
 
             // then
@@ -106,12 +106,12 @@ public class CompanyLoginTest {
         @ValueSource(strings = {"invalidPassword", " ", ""})
         void invalidPasswordLoginTest(String password) throws Exception {
             // given
-            var tenantId = 123L;
+            var companyId = 123L;
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
 
-            employeeDomainService.createRootAccount(tenantId, credential, name, position);
+            employeeDomainService.createRootAccount(companyId, credential, name, position);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -120,7 +120,7 @@ public class CompanyLoginTest {
             ));
             var req = post("/api/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                 .content(body);
 
             // then
@@ -132,12 +132,12 @@ public class CompanyLoginTest {
         @DisplayName("루트 계정으로 가입한 게정이 플랫폼 관리자 계정으로 로그인할 수 있으면 안된다.")
         void rootAccountLoginAsAdminTest() throws Exception {
             // given
-            var tenantId = 123L;
+            var companyId = 123L;
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
 
-            employeeDomainService.createRootAccount(tenantId, credential, name, position);
+            employeeDomainService.createRootAccount(companyId, credential, name, position);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -146,7 +146,7 @@ public class CompanyLoginTest {
             ));
             var req = post("/api/admin/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                 .content(body);
 
             // then
@@ -162,12 +162,12 @@ public class CompanyLoginTest {
         @DisplayName("일반 계정으로 로그인할 수 있어야 한다.")
         void normalAccountLoginTest() throws Exception {
             // given
-            var tenantId = 123L;
+            var companyId = 123L;
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
 
-            employeeDomainService.createNormalAccount(tenantId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, name, position);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -176,7 +176,7 @@ public class CompanyLoginTest {
             ));
             var req = post("/api/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                 .content(body);
 
             // then
@@ -189,12 +189,12 @@ public class CompanyLoginTest {
         @ValueSource(strings = {"invalidUsername", " ", ""})
         void invalidUsernameLoginTest(String username) throws Exception {
             // given
-            var tenantId = 123L;
+            var companyId = 123L;
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
 
-            employeeDomainService.createNormalAccount(tenantId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, name, position);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -203,7 +203,7 @@ public class CompanyLoginTest {
             ));
             var req = post("/api/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                 .content(body);
 
             // then
@@ -216,12 +216,12 @@ public class CompanyLoginTest {
         @ValueSource(strings = {"invalidPassword", " ", ""})
         void invalidPasswordLoginTest(String password) throws Exception {
             // given
-            var tenantId = 123L;
+            var companyId = 123L;
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
 
-            employeeDomainService.createNormalAccount(tenantId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, name, position);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -230,7 +230,7 @@ public class CompanyLoginTest {
             ));
             var req = post("/api/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                 .content(body);
 
             // then
@@ -242,12 +242,12 @@ public class CompanyLoginTest {
         @DisplayName("일반 계정으로 가입한 게정이 플랫폼 관리자 계정으로 로그인할 수 있으면 안된다.")
         void normalAccountLoginAsAdminTest() throws Exception {
             // given
-            var tenantId = 123L;
+            var companyId = 123L;
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
 
-            employeeDomainService.createNormalAccount(tenantId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, name, position);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -256,7 +256,7 @@ public class CompanyLoginTest {
             ));
             var req = post("/api/admin/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                 .content(body);
 
             // then
@@ -268,12 +268,12 @@ public class CompanyLoginTest {
         @DisplayName("일반 계정으로 로그인한 후, 세션ID를 사용해 내 정보를 조회할 수 있어야 한다.")
         void normalAccountGetMyInfoTest() throws Exception {
             // given
-            var tenantId = 123L;
+            var companyId = 123L;
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
 
-            employeeDomainService.createNormalAccount(tenantId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, name, position);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -286,7 +286,7 @@ public class CompanyLoginTest {
             mvc.perform(
                     post("/api/auth/sign-in")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                        .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                         .session(mockSession)
                         .content(body)
                 )
@@ -296,7 +296,7 @@ public class CompanyLoginTest {
             mvc.perform(
                     get("/api/employees/my")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(TenantIdContextFilter.TENANT_ID_HEADER_NAME, tenantId)
+                        .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                         .session(mockSession)
                 )
                 .andExpect(status().isOk());

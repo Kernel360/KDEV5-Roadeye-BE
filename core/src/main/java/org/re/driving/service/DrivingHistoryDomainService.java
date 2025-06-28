@@ -5,12 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.re.car.domain.Car;
 import org.re.common.stereotype.DomainService;
+import org.re.company.domain.CompanyId;
 import org.re.driving.domain.DrivingHistory;
 import org.re.driving.domain.DrivingHistoryStatus;
 import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.repository.DrivingHistoryRepository;
 import org.re.mdtlog.domain.TransactionUUID;
-import org.re.tenant.TenantId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -39,8 +39,8 @@ public class DrivingHistoryDomainService {
         return drivingHistoryRepository.findByCarAndTxUidAndStatus(car, transactionUUID, DrivingHistoryStatus.DRIVING);
     }
 
-    public Page<DrivingHistory> findAll(TenantId tenantId, Pageable pageable) {
-        return drivingHistoryRepository.findDrivingHistoryByCompanyId(tenantId.value(), pageable);
+    public Page<DrivingHistory> findAll(CompanyId companyId, Pageable pageable) {
+        return drivingHistoryRepository.findDrivingHistoryByCompanyId(companyId.value(), pageable);
     }
 
     public List<DrivingHistoryMonthlyCountResult> getMonthlyCount() {

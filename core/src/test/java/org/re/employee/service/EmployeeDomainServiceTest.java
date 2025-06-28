@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest(properties = {"spring.jpa.show-sql=true"})
@@ -42,7 +42,7 @@ class EmployeeDomainServiceTest {
         var credentials = new EmployeeCredentials("root", "root");
         var employee = employeeDomainService.createNormalAccount(1L, credentials, "root", "root");
 
-        employeeDomainService.disable(employee.getTenantId(), employee.getId());
+        employeeDomainService.disable(employee.getCompanyId(), employee.getId());
 
         System.out.println(employee.getUpdatedAt());
         assertAll(
@@ -57,8 +57,8 @@ class EmployeeDomainServiceTest {
         var credentials = new EmployeeCredentials("root", "root");
         var employee = employeeDomainService.createNormalAccount(1L, credentials, "root", "root");
 
-        employeeDomainService.disable(employee.getTenantId(), employee.getId());
-        employeeDomainService.enable(employee.getTenantId(), employee.getId());
+        employeeDomainService.disable(employee.getCompanyId(), employee.getId());
+        employeeDomainService.enable(employee.getCompanyId(), employee.getId());
 
         assertAll(
             () -> assertThat(employee.getStatus()).isEqualTo(EntityLifecycleStatus.ACTIVE),

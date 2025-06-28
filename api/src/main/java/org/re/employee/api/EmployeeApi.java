@@ -1,13 +1,13 @@
 package org.re.employee.api;
 
 import lombok.RequiredArgsConstructor;
+import org.re.company.domain.CompanyId;
 import org.re.employee.api.payload.EmployeeCreateRequest;
 import org.re.employee.api.payload.EmployeeSearchResponse;
 import org.re.employee.api.payload.EmployeeStatusChangeRequest;
 import org.re.employee.api.payload.EmployeeUpdateRequest;
 import org.re.employee.service.EmployeeService;
 import org.re.security.userdetails.CompanyUserDetails;
-import org.re.tenant.TenantId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.web.bind.annotation.*;
@@ -25,32 +25,32 @@ public class EmployeeApi {
     }
 
     @PostMapping
-    public void create(TenantId tenantId, @RequestBody EmployeeCreateRequest employeeCreateRequest) {
+    public void create(CompanyId companyId, @RequestBody EmployeeCreateRequest employeeCreateRequest) {
         employeeService.createNormal(
-            tenantId,
+            companyId,
             employeeCreateRequest.toCredentials(),
             employeeCreateRequest.toMetadata()
         );
     }
 
     @PutMapping("/{employeeId}")
-    public void update(TenantId tenantId, @PathVariable Long employeeId, @RequestBody EmployeeUpdateRequest employeeUpdateRequest) {
-        employeeService.update(tenantId, employeeId, employeeUpdateRequest.toCommand(), employeeUpdateRequest.status());
+    public void update(CompanyId companyId, @PathVariable Long employeeId, @RequestBody EmployeeUpdateRequest employeeUpdateRequest) {
+        employeeService.update(companyId, employeeId, employeeUpdateRequest.toCommand(), employeeUpdateRequest.status());
     }
 
     @PatchMapping("/{employeeId}/status")
-    public void changeStatus(TenantId tenantId, @PathVariable Long employeeId, @RequestBody EmployeeStatusChangeRequest request) {
-        employeeService.changeStatus(tenantId, employeeId, request.status());
+    public void changeStatus(CompanyId companyId, @PathVariable Long employeeId, @RequestBody EmployeeStatusChangeRequest request) {
+        employeeService.changeStatus(companyId, employeeId, request.status());
     }
 
     @DeleteMapping("/{employeeId}")
-    public void delete(TenantId tenantId, @PathVariable Long employeeId) {
-        employeeService.delete(tenantId, employeeId);
+    public void delete(CompanyId companyId, @PathVariable Long employeeId) {
+        employeeService.delete(companyId, employeeId);
     }
 
     @GetMapping
-    public PagedModel<EmployeeSearchResponse> getAll(TenantId tenantId, Pageable pageable, @RequestParam(required = false) String status) {
-        return new PagedModel<>(employeeService.readByStatus(tenantId, pageable, status)
+    public PagedModel<EmployeeSearchResponse> getAll(CompanyId companyId, Pageable pageable, @RequestParam(required = false) String status) {
+        return new PagedModel<>(employeeService.readByStatus(companyId, pageable, status)
             .map(EmployeeSearchResponse::from)
         );
     }

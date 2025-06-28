@@ -1,10 +1,10 @@
 package org.re.config;
 
 import lombok.RequiredArgsConstructor;
-import org.re.web.filter.TenantIdContextFilter;
+import org.re.web.filter.CompanyIdContextFilter;
+import org.re.web.method.support.CompanyIdArgumentResolver;
 import org.re.web.method.support.CompanyUserDetailsArgumentResolver;
 import org.re.web.method.support.PlatformAdminUserDetailsArgumentResolver;
-import org.re.web.method.support.TenantIdArgumentResolver;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,14 +19,14 @@ import java.util.List;
 public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new TenantIdArgumentResolver());
+        resolvers.add(new CompanyIdArgumentResolver());
         resolvers.add(new CompanyUserDetailsArgumentResolver());
         resolvers.add(new PlatformAdminUserDetailsArgumentResolver());
     }
 
     @Bean
-    public FilterRegistrationBean<TenantIdContextFilter> tenantIdContextFilterRegistration() {
-        var registration = new FilterRegistrationBean<>(new TenantIdContextFilter());
+    public FilterRegistrationBean<CompanyIdContextFilter> companyIdContextFilterRegistration() {
+        var registration = new FilterRegistrationBean<>(new CompanyIdContextFilter());
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
         registration.addUrlPatterns("/*");
         return registration;

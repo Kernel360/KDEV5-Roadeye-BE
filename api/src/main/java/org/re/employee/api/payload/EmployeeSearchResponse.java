@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public record EmployeeSearchResponse(
     Long employeeId,
-    Long tenantId,
+    Long companyId,
     String loginId,
     String name,
     EmployeeRole role,
@@ -19,7 +19,7 @@ public record EmployeeSearchResponse(
     public static EmployeeSearchResponse from(Employee employee) {
         return new EmployeeSearchResponse(
             employee.getId(),
-            employee.getTenantId(),
+            employee.getCompanyId(),
             employee.getCredentials().loginId(),
             employee.getMetadata().getName(),
             employee.getRole(),

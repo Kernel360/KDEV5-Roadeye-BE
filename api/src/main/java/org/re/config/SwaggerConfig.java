@@ -12,8 +12,8 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import org.re.tenant.TenantId;
-import org.re.web.filter.TenantIdContextFilter;
+import org.re.company.domain.CompanyId;
+import org.re.web.filter.CompanyIdContextFilter;
 import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class SwaggerConfig {
     static {
         SpringDocUtils.getConfig()
-            .addRequestWrapperToIgnore(TenantId.class)
+            .addRequestWrapperToIgnore(CompanyId.class)
             .addRequestWrapperToIgnore(UserDetails.class);
     }
 
@@ -51,7 +51,7 @@ public class SwaggerConfig {
             .summary("로그인")
             .description("업체 사용자 로그인")
             .addParametersItem(new Parameter()
-                .name(TenantIdContextFilter.TENANT_ID_HEADER_NAME)
+                .name(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME)
                 .in("header")
                 .description("업체 코드")
                 .required(true)
@@ -60,7 +60,8 @@ public class SwaggerConfig {
             .requestBody(new RequestBody()
                 .description("로그인 폼 데이터")
                 .required(true)
-                .content(new Content().addMediaType("application/json",
+                .content(new Content().addMediaType(
+                    "application/json",
                     new MediaType().schema(
                         new Schema<>()
                             .addProperty("username", new Schema<>().type("string"))
