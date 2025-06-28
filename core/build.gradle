@@ -15,7 +15,6 @@ dependencies {
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
 
-    runtimeOnly("com.h2database:h2:2.2.220")
-
+    testRuntimeOnly("com.h2database:h2:2.2.220")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
