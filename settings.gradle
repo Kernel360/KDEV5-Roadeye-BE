@@ -10,7 +10,5 @@ include 'roadeye-api:roadeye-api-hub'
 
 include 'roadeye-consumer'
 
-include 'roadeye-test-bootstrapper'
-
 include 'roadeye-domain:roadeye-domain-common'
 include 'roadeye-domain:roadeye-domain-core'
