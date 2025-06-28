@@ -13,7 +13,7 @@ services:
       - mysql
       - rabbitmq
     healthcheck:
-      test: [ "CMD", "curl" , "http://localhost:8080/actuator/health" ]
+      test: [ "CMD", "/workspace/health-check" ]
       timeout: 10s
       retries: 5
       start_period: 10s
@@ -27,7 +27,7 @@ services:
       - mysql
       - rabbitmq
     healthcheck:
-      test: [ "CMD", "curl" , "http://localhost:8080/actuator/health" ]
+      test: [ "CMD", "/workspace/health-check" ]
       timeout: 10s
       retries: 5
       start_period: 10s
@@ -39,7 +39,7 @@ services:
     env_file:
       - local.env
     healthcheck:
-      test: [ "CMD", "curl" , "http://localhost:8080/actuator/health" ]
+      test: [ "CMD", "/workspace/health-check" ]
       timeout: 10s
       retries: 5
       start_period: 10s

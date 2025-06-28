@@ -71,11 +71,13 @@ subprojects {
 		buildpacks.set(
 			listOf(
 				"paketobuildpacks/java",
+				"paketobuildpacks/health-checker",
 				"paketobuildpacks/opentelemetry"
 			)
 		)
 		environment.set(
 			mapOf(
+				"BP_HEALTH_CHECKER_ENABLED" to "true",
 				"BP_OPENTELEMETRY_ENABLED" to "true"
 			)
 		)
