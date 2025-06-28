@@ -6,6 +6,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     runtimeOnly("com.mysql:mysql-connector-j")
 
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+
     testImplementation("org.springframework.amqp:spring-rabbit-test")
 
     testFixturesImplementation(project(":core"))
