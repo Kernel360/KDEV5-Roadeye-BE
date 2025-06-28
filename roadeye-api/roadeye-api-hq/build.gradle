@@ -1,7 +1,3 @@
-plugins {
-    id("roadeye-jib")
-}
-
 dependencies {
     implementation(project(":roadeye-api:roadeye-api-common"))
     implementation(project(":roadeye-domain:roadeye-domain-core"))
@@ -21,10 +17,4 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 
     testImplementation(testFixtures(project(":roadeye-domain:roadeye-domain-core")))
-}
-
-jib {
-    container {
-        mainClass = "org.re.RoadEyeApiApplication"
-    }
 }

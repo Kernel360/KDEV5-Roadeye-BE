@@ -1,7 +1,3 @@
-plugins {
-    id("roadeye-jib")
-}
-
 dependencies {
     implementation(project(":roadeye-domain:roadeye-domain-core"))
 
@@ -10,10 +6,4 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
 
     implementation(testFixtures(project(":roadeye-domain:roadeye-domain-core")))
-}
-
-jib {
-    container {
-        mainClass = "org.re.RoadEyeBootstrapperApplication"
-    }
 }
