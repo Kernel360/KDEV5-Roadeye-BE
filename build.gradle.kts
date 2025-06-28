@@ -64,6 +64,10 @@ subprojects {
 	dependencies {}
 
 	tasks.withType<BootBuildImage> {
+		// https://docs.spring.io/spring-boot/gradle-plugin/packaging-oci-image.html
+		// https://buildpacks.io/docs/
+		// https://hub.docker.com/u/paketobuildpacks
+
 		imageName = "roadeye/${project.name}"
 		builder = "paketobuildpacks/builder-jammy-base"
 	}
