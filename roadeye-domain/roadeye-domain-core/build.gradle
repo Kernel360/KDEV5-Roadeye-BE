@@ -1,6 +1,4 @@
 dependencies {
-    api(project(":roadeye-domain:roadeye-domain-common"))
-
     implementation("com.fasterxml.jackson.core:jackson-annotations")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("jakarta.validation:jakarta.validation-api")

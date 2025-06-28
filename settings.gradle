@@ -9,5 +9,4 @@ include 'roadeye-api-hub'
 
 include 'roadeye-consumer'
 
-include 'roadeye-domain:roadeye-domain-common'
 include 'roadeye-domain:roadeye-domain-core'
