@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project(":roadeye-domain:roadeye-domain-core"))
+    implementation(project("::roadeye-domain-core"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
 
@@ -15,5 +15,5 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
 
-    testImplementation(testFixtures(project(":roadeye-domain:roadeye-domain-core")))
+    testImplementation(testFixtures(project("::roadeye-domain-core")))
 }

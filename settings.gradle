@@ -4,9 +4,7 @@ plugins {
 
 rootProject.name = 'Roadeye'
 
+include 'roadeye-domain-core'
 include 'roadeye-api-hq'
 include 'roadeye-api-hub'
-
 include 'roadeye-consumer'
-
-include 'roadeye-domain:roadeye-domain-core'

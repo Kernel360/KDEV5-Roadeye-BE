@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project(":roadeye-domain:roadeye-domain-core"))
+    implementation(project("::roadeye-domain-core"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -9,8 +9,8 @@ dependencies {
 
     testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation(testFixtures(project(":roadeye-domain:roadeye-domain-core")))
+    testImplementation(testFixtures(project("::roadeye-domain-core")))
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
 
-    testFixturesImplementation(project(":roadeye-domain:roadeye-domain-core"))
+    testFixturesImplementation(project("::roadeye-domain-core"))
 }
