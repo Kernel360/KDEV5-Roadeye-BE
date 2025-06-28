@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project("::roadeye-domain-core"))
+    implementation(project("::roadeye-core"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-json")
@@ -8,5 +8,5 @@ dependencies {
 
     testImplementation("org.springframework.amqp:spring-rabbit-test")
 
-    testFixturesImplementation(project("::roadeye-domain-core"))
+    testFixturesImplementation(project("::roadeye-core"))
 }
