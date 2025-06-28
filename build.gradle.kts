@@ -1,5 +1,4 @@
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
-import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
 	java
@@ -58,9 +57,6 @@ allprojects {
 subprojects {
 	plugins.apply("org.springframework.boot")
 
-	tasks.withType<BootJar> {
-		enabled = true
-	}
 	tasks.withType<Jar> {
 		enabled = true
 	}
@@ -68,20 +64,15 @@ subprojects {
 	dependencies {}
 
 	tasks.withType<BootBuildImage> {
-		buildWorkspace {
-			bind {
-				source = "/tmp/cache-${project.name}.work"
-			}
-		}
-		buildCache {
-			bind {
-				source = "/tmp/cache-${project.name}.build"
-			}
-		}
-		launchCache {
-			bind {
-				source = "/tmp/cache-${project.name}.launch"
-			}
-		}
+		imageName = "roadeye/${project.name}"
 	}
+}
+
+tasks.register("bootBuildImageAll") {
+	group = "build"
+
+	val springBootProjects = subprojects.filter {
+		it.tasks.any { task -> task.name == "bootJar" && task.enabled }
+	}
+	dependsOn(springBootProjects.map { it.tasks.named("bootBuildImage") })
 }
