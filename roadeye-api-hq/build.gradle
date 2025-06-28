@@ -1,5 +1,4 @@
 dependencies {
-    implementation(project(":roadeye-api:roadeye-api-common"))
     implementation(project(":roadeye-domain:roadeye-domain-core"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -12,6 +11,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
+    testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
 
