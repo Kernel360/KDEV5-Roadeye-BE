@@ -52,7 +52,7 @@ jobs:
         run: |
           ./gradlew --quiet --build-cache \
             :roadeye-api:roadeye-api-hq:jibDockerBuild \
-            :roadeye-api:roadeye-api-hub:jibDockerBuild \
+            :roadeye-api-hub:jibDockerBuild \
             :roadeye-consumer:jibDockerBuild \
               -Djib.to.tags=latest
 
