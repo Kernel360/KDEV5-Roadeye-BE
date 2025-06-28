@@ -68,6 +68,18 @@ subprojects {
 		// https://buildpacks.io/docs/
 		// https://hub.docker.com/u/paketobuildpacks
 
+		buildpacks.set(
+			listOf(
+				"paketobuildpacks/java",
+				"paketobuildpacks/opentelemetry"
+			)
+		)
+		environment.set(
+			mapOf(
+				"BP_OPENTELEMETRY_ENABLED" to "true"
+			)
+		)
+
 		imageName = "roadeye/${project.name}"
 		builder = "paketobuildpacks/builder-jammy-base"
 	}
