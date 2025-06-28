@@ -1,7 +1,6 @@
 dependencies {
     implementation(project(":roadeye-api:roadeye-api-common"))
     implementation(project(":roadeye-domain:roadeye-domain-core"))
-    implementation(project(":roadeye-monitoring"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
 
