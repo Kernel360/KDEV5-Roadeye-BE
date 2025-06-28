@@ -13,6 +13,7 @@ allprojects {
 	plugins.apply("java")
 	plugins.apply("java-library")
 	plugins.apply("java-test-fixtures")
+	plugins.apply("io.spring.dependency-management")
 
 	group = "org.re"
 	version = "0.0.1"
@@ -36,6 +37,12 @@ allprojects {
 		testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	}
 
+	dependencyManagement {
+		dependencies {
+			dependency("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
+		}
+	}
+
 	tasks.named<Test>("test") {
 		jvmArgs(
 			"-Xshare:off",
@@ -50,7 +57,6 @@ allprojects {
 
 subprojects {
 	plugins.apply("org.springframework.boot")
-	plugins.apply("io.spring.dependency-management")
 
 	tasks.withType<BootJar> {
 		enabled = true
