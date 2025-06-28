@@ -10,7 +10,7 @@ dependencies {
     testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(testFixtures(project(":core")))
-    testImplementation 'org.springframework.amqp:spring-rabbit-test'
+    testImplementation("org.springframework.amqp:spring-rabbit-test")
 
     testFixturesImplementation(project(":core"))
 }
