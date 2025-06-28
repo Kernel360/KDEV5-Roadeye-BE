@@ -3,7 +3,7 @@ package org.re.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Priority;
 import lombok.RequiredArgsConstructor;
-import org.re.security.domain.AuthMemberType;
+import org.re.security.AuthMemberType;
 import org.re.security.userdetails.CompanyUserDetailsService;
 import org.re.security.userdetails.PlatformAdminUserDetailsService;
 import org.re.security.web.authentication.JsonUsernamePasswordAuthenticationFilter;

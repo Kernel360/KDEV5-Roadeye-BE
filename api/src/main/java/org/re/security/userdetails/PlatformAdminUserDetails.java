@@ -2,7 +2,7 @@ package org.re.security.userdetails;
 
 import lombok.Getter;
 import org.re.admin.domain.PlatformAdmin;
-import org.re.security.domain.AuthMemberType;
+import org.re.security.AuthMemberType;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;

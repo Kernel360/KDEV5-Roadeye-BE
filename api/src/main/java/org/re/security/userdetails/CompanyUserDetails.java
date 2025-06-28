@@ -5,7 +5,7 @@ import org.jspecify.annotations.NonNull;
 import org.re.company.domain.CompanyId;
 import org.re.employee.domain.Employee;
 import org.re.employee.domain.EmployeeRole;
-import org.re.security.domain.AuthMemberType;
+import org.re.security.AuthMemberType;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
