@@ -6,5 +6,5 @@ rootProject.name = 'Roadeye'
 
 include 'core'
 include 'web-api'
-include 'roadeye-api-hub'
+include 'hub'
 include 'roadeye-consumer'
