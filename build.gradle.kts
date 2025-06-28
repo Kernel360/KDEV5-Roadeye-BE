@@ -65,6 +65,7 @@ subprojects {
 
 	tasks.withType<BootBuildImage> {
 		imageName = "roadeye/${project.name}"
+		builder = "paketobuildpacks/builder-jammy-base"
 	}
 }
 
