@@ -1,8 +1,8 @@
-import React, {useCallback, useEffect, useRef} from 'react';
-import {produce} from 'immer';
-import type {CycleLogPayload, DriveData, IgnitionPayload, SimulatorState} from '../types/vehicle';
-import {COMMON_FIELDS, createLogEntry, formatTime, getDistance, VEHICLE_ID} from '../utils/vehicleUtils';
-import {sendCycleLog, sendIgnitionOff, sendIgnitionOn} from '../services/apiService';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { produce } from 'immer';
+import type { CycleLogPayload, DriveData, IgnitionPayload, SimulatorState } from '../types/vehicle';
+import { COMMON_FIELDS, createLogEntry, formatTime, getDistance, VEHICLE_ID } from '../utils/vehicleUtils';
+import { sendCycleLog, sendIgnitionOff, sendIgnitionOn } from '../lib/api';
 import './VehicleSimulator.css';
 
 const VehicleSimulator: React.FC = () => {
