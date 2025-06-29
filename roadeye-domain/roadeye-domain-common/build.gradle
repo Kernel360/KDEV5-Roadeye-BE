@@ -1,5 +1,0 @@
-dependencies {
-    implementation("jakarta.persistence:jakarta.persistence-api")
-
-    implementation("com.fasterxml.jackson.core:jackson-annotations")
-}
