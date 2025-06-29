@@ -18,6 +18,5 @@ rootProject.name = "Roadeye"
 include("application")
 include("commons")
 include("core")
-include("api")
 include("hub")
 include("consumer")
