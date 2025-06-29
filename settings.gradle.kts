@@ -16,7 +16,6 @@ plugins {
 rootProject.name = "Roadeye"
 
 include("application")
-include("commons")
 include("core")
 include("hub")
 include("consumer")
