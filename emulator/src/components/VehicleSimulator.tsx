@@ -77,7 +77,7 @@ const VehicleSimulator: React.FC = () => {
 
         const result = await sendIgnitionOn(state.hostUrl, payload, newTuid);
         addLog(`POST to ${state.hostUrl}/api/ignition/on:\n${JSON.stringify(payload, null, 2)}`);
-        addLog(`응답 상태: ${result.status}`);
+        addLog(`응답 상태: ${result.data}`);
         addLog("🔑 시동 ON");
     }, [state.ignitionTime, state.lastShutdownData, state.lastLat, state.lastLon, state.cumulativeDistance, state.gpsStatus, state.hostUrl, addLog]);
 
@@ -110,7 +110,7 @@ const VehicleSimulator: React.FC = () => {
                 };
                 const result = await sendCycleLog(state.hostUrl, body, state.globalTuid!);
                 addLog(`POST to ${state.hostUrl}/api/cycle-log:\n${JSON.stringify(body, null, 2)}`);
-                addLog(`응답 상태: ${result.status}`);
+                addLog(`응답 상태: ${result.data}`);
 
                 setState(produce(draft => {
                     draft.driveData = [];
@@ -141,7 +141,7 @@ const VehicleSimulator: React.FC = () => {
 
         const result = await sendIgnitionOff(state.hostUrl, payload, state.globalTuid!);
         addLog(`POST to ${state.hostUrl}/api/ignition/off:\n${JSON.stringify(payload, null, 2)}`);
-        addLog(`응답 상태: ${result.status}`);
+        addLog(`응답 상태: ${result.data}`);
 
         setState(produce(draft => {
             draft.ignitionTime = null;
@@ -203,7 +203,7 @@ const VehicleSimulator: React.FC = () => {
 
                     sendCycleLog(draft.hostUrl, body, draft.globalTuid!).then(result => {
                         addLog(`POST to ${draft.hostUrl}/api/cycle-log:\n${JSON.stringify(body, null, 2)}`);
-                        addLog(`응답 상태: ${result.status}`);
+                        addLog(`응답 상태: ${result.data}`);
                     });
 
                     draft.driveData = [];
