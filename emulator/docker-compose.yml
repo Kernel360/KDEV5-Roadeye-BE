@@ -1,0 +1,8 @@
+name: roadeye-emulator
+services:
+  navigation:
+    image: israelhikingmap/graphhopper
+    command: [ "--url", "https://download.geofabrik.de/asia/south-korea-latest.osm.pbf", "--host", "0.0.0.0" ]
+    ports:
+      - 8989:8989
+      - 8990:8990
