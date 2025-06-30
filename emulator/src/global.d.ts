@@ -1,11 +1,16 @@
 declare module "https://*.js" {
-    const content: any;
+    const content: unknown;
     export default content;
 }
 
 declare global {
-    export type Station = {
-        region: string;
+    export type CarType = {
+        id: unknown,
+        latitude: number,
+        longitude: number
+    }
+
+    export type StationType = {
         name: string;
         lat: number;
         lng: number;

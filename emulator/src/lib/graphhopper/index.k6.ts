@@ -1,10 +1,12 @@
+import { k6Fetch } from "../k6utils";
 import { GraphHopperRouting } from "./routing";
 
 const instance = {
     routing: new GraphHopperRouting({
         host: import.meta.env.VITE_GRAPH_HOPPER_BASE_URL,
         key: import.meta.env.VITE_GRAPH_HOPPER_API_KEY,
-        endpoint: "/route"
+        endpoint: "/route",
+        httpClient: k6Fetch
     })
 } as const;
 

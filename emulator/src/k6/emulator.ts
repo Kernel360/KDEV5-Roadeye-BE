@@ -1,9 +1,11 @@
+import dateFormat from 'dateformat';
+import { distanceTo } from 'geolocation-utils';
+import { sleep } from 'k6';
 import http from 'k6/http';
-import type {Options} from 'k6/options';
-import {getCar, getEndStation, getRandomStation, getStartStation} from '../lib/shared.ts';
-import * as utils from '../lib/utils.ts';
-import type CarType from '../data/car.example.json';
-import {sleep} from 'k6';
+import type { Options } from 'k6/options';
+import * as uuid from 'uuid';
+import { emulateCarPath } from '../lib/emulator/index.ts';
+import { getCar, getEndStation, getRandomStation, getStartStation } from '../lib/shared.ts';
 
 enum Phase {
     INIT,
@@ -15,7 +17,10 @@ enum Phase {
 
 type Context = {
     phase: Phase
-    car: typeof CarType & {
+    car: {
+        id: unknown;
+        latitude: number;
+        longitude: number;
         ang: number;
         spd: number;
         sum: number;
@@ -26,11 +31,10 @@ type Context = {
         current: GpsCoord;
         end: GpsCoord;
     };
+    emulator: Awaited<ReturnType<typeof emulateCarPath>>
     transactionId: string | null;
     onTime: Date | null;
     offTime: Date | null;
-    logs: MdtLog[];
-    prev: MdtLog | null;
 }
 
 // @ts-expect-error: INIT PHASE에서 초기화 될 것임.
@@ -55,34 +59,36 @@ export function teardown() {
 
 }
 
-export default function (data: ReturnType<typeof setup>) {
+export default async function (data: ReturnType<typeof setup>) {
     switch (ctx.phase) {
         case Phase.INIT:
-            init(ctx);
+            await init(ctx);
             ctx.phase = Phase.IGNITION_ON;
             break;
         case Phase.IGNITION_ON:
-            ignitionOn(ctx, data);
+            await ignitionOn(ctx, data);
             ctx.phase = Phase.DRIVING;
             break;
         case Phase.DRIVING:
-            driving(ctx, data);
-            if (utils.distanceTo(ctx.location.current, ctx.location.end) < 10) {
+            await driving(ctx, data);
+            if (distanceTo(ctx.location.current, ctx.location.end) < 10) {
                 ctx.phase = Phase.IGNITION_OFF;
             }
             break;
         case Phase.IGNITION_OFF:
-            ignitionOff(ctx, data);
+            await ignitionOff(ctx, data);
             ctx.phase = Phase.IDLE;
             break;
         case Phase.IDLE:
-            idle(ctx);
+            await idle(ctx);
             ctx.phase = Phase.IGNITION_ON;
             break;
     }
 }
 
-function init(ctx: Context) {
+async function init(ctx: Context) {
+    console.log(`[VU-${__VU}] init`);
+
     ctx.car = {
         ...getCar(),
         ang: 0,
@@ -98,15 +104,21 @@ function init(ctx: Context) {
     ctx.transactionId = null;
     ctx.onTime = null;
     ctx.offTime = null;
-    ctx.logs = [];
-    ctx.prev = null;
 }
 
-function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
+async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
     ctx.onTime = new Date();
-    ctx.transactionId = utils.uuid().v4();
+    ctx.transactionId = uuid.v4();
+    ctx.emulator = await emulateCarPath({
+        start: ctx.location.start,
+        end: ctx.location.end,
+        initSpdKmh: 10,
+        maxSpdKmh: 80,
+        acc: 0.5,
+    })
 
-    http.post(
+    await http.asyncRequest(
+        "POST",
         `${data.API_HUB_URL}/api/ignition/on`,
         JSON.stringify({
             mdn: ctx.car.id,
@@ -114,7 +126,7 @@ function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
             mid: "MID",
             pv: 1,
             did: "DID",
-            onTime: utils.dateFormat(ctx.onTime, "yyyymmddHHMMss"),
+            onTime: dateFormat(ctx.onTime, "yyyymmddHHMMss"),
             gcd: 'A',
             lat: ctx.location.current.lat,
             lon: ctx.location.current.lng,
@@ -126,56 +138,47 @@ function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
             headers: {
                 "Content-Type": "application/json",
                 'X-TUID': ctx.transactionId!,
-                'X-Timestamp': utils.dateFormat(ctx.onTime, "yyyy-mm-dd HH:MM:ss.l")
+                'X-Timestamp': dateFormat(ctx.onTime, "yyyy-mm-dd HH:MM:ss.l")
             }
         }
     )
 }
 
-function driving(ctx: Context, data: ReturnType<typeof setup>) {
+async function driving(ctx: Context, data: ReturnType<typeof setup>) {
+    const nLogs = 60;
+
     const now = new Date();
 
-    if (ctx.prev == null) {
-        ctx.prev = {
-            sec: 0,
+    const logs: MdtLog[] = [];
+    const i = 0;
+    while (i < nLogs) {
+        const next = ctx.emulator.next();
+        if (next.done) break;
+        const route = next.value;
+
+        const log: MdtLog = {
+            sec: i,
             gcd: 'A',
-            lat: ctx.location.current.lat,
-            lng: ctx.location.current.lng,
-            ang: ctx.car.ang,
-            spd: ctx.car.spd,
+            lat: route.current.lat,
+            lng: route.current.lng,
+            ang: route.ang,
+            spd: route.spd,
             sum: ctx.car.sum,
             bat: ctx.car.bat
         }
+        logs.push(log);
+
+        ctx.car.latitude = route.current.lat;
+        ctx.car.longitude = route.current.lng;
+        ctx.car.sum = ctx.car.sum + route.spd;
+        ctx.car.ang = route.ang;
+        ctx.car.spd = route.spd;
+
+        sleep(1);
     }
 
-    for (let s = 0; s < 60; s++) {
-        const hd = utils.headingDistanceTo(ctx.prev!, ctx.location.end);
-        const spd = utils.nextCarSpd(ctx.prev!.spd);
-        const ang = hd.heading;
-        const sum = ctx.prev.sum + spd;
-        const {lat, lon} = utils.moveTo(ctx.prev, {heading: hd.heading, distance: hd.distance});
-
-        const log: MdtLog = {
-            sec: s,
-            gcd: 'A',
-            lat: lat,
-            lng: lon,
-            ang: ang,
-            spd: spd,
-            sum: sum,
-            bat: ctx.car.bat
-        }
-
-        ctx.car.sum = sum;
-        ctx.car.ang = ang;
-        ctx.car.spd = spd;
-        ctx.car.bat = ctx.car.bat - 0.01;
-
-        ctx.logs.push(log);
-        ctx.prev = log;
-    }
-
-    http.post(
+    await http.asyncRequest(
+        "POST",
         `${data.API_HUB_URL}/api/cycle-log`,
         JSON.stringify({
             mdn: ctx.car.id,
@@ -183,28 +186,27 @@ function driving(ctx: Context, data: ReturnType<typeof setup>) {
             mid: `MID`,
             pv: 1,
             did: `DID`,
-            oTime: utils.dateFormat(now, "yyyymmddHHMM"),
-            cCnt: ctx.logs.length,
-            cList: ctx.logs
+            oTime: dateFormat(now, "yyyymmddHHMM"),
+            cCnt: logs.length,
+            cList: logs
         }),
         {
             headers: {
                 "Content-Type": "application/json",
                 'X-TUID': ctx.transactionId!,
-                'X-Timestamp': utils.dateFormat(now, "yyyy-mm-dd HH:MM:ss.l")
+                'X-Timestamp': dateFormat(now, "yyyy-mm-dd HH:MM:ss.l")
             }
         }
     )
-
-    sleep(60);
 }
 
-function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
+async function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
     const now = new Date();
 
     ctx.offTime = now;
 
-    http.post(
+    await http.asyncRequest(
+        "POST",
         `${data.API_HUB_URL}/api/ignition/off`,
         JSON.stringify({
             mdn: ctx.car.id,
@@ -212,8 +214,8 @@ function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
             mid: "MID",
             pv: 1,
             did: "DID",
-            onTime: utils.dateFormat(ctx.onTime!, "yyyymmddHHMMss"),
-            offTime: utils.dateFormat(ctx.offTime, "yyyymmddHHMMss"),
+            onTime: dateFormat(ctx.onTime!, "yyyymmddHHMMss"),
+            offTime: dateFormat(ctx.offTime, "yyyymmddHHMMss"),
             gcd: 'A',
             lat: ctx.location.current.lat,
             lon: ctx.location.current.lng,
@@ -225,22 +227,21 @@ function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
             headers: {
                 "Content-Type": "application/json",
                 'X-TUID': ctx.transactionId!,
-                'X-Timestamp': utils.dateFormat(now, "yyyy-mm-dd HH:MM:ss.l")
+                'X-Timestamp': dateFormat(now, "yyyy-mm-dd HH:MM:ss.l")
             }
         }
     )
 }
 
-function idle(ctx: Context) {
+async function idle(ctx: Context) {
     while (true) {
         const st = getRandomStation();
-        if (utils.distanceTo(ctx.location.current, st) > 1000) {
+        if (distanceTo(ctx.location.current, st) > 1000) {
             ctx.location.end = st;
             break;
         }
     }
 
-    ctx.prev = null;
     ctx.onTime = null;
     ctx.offTime = null;
     ctx.transactionId = null;

@@ -64,6 +64,13 @@ export interface GraphHopperArgs {
     endpoint?: string;
     timeout?: number;
     turn_sign_map?: { [key: string]: string };
+    httpClient?: (url: string, init: {
+        method: string,
+        body?: string,
+        headers?: {
+            [key: string]: string;
+        }
+    }) => Promise<Response>;
 }
 
 export class GraphHopperRouting {
@@ -73,6 +80,7 @@ export class GraphHopperRouting {
     private timeout: number;
     public defaults: GraphHopperRoutingDefaultConfig;
     public turn_sign_map: { [key: string]: string };
+    private httpClient: GraphHopperArgs['httpClient'];
 
     constructor(args: GraphHopperArgs, requestDefaults?: GraphHopperRoutingDefaultConfig) {
         this.defaults = {
@@ -109,6 +117,7 @@ export class GraphHopperRouting {
             5: "reached via point",
             6: "enter roundabout"
         };
+        this.httpClient = args.httpClient || ((url, init) => fetch(url, init));
     }
 
     private pointArrToObj(points: number[][]): GpsCoord[] {
@@ -117,7 +126,7 @@ export class GraphHopperRouting {
 
     async doRequest(reqArgs: GraphHopperRequestArgs): Promise<GraphHopperResponse> {
         Object.keys(this.defaults).forEach(key => {
-            if (!reqArgs[key as keyof GraphHopperRequestArgs]) {
+            if (reqArgs[key as keyof GraphHopperRequestArgs]) {
                 // @ts-ignore
                 reqArgs[key] = this.defaults[key];
             }
@@ -126,14 +135,13 @@ export class GraphHopperRouting {
         const url = this.host + this.endpoint + "?key=" + this.key;
 
         try {
-            const response = await fetch(url, {
+            const response = await this.httpClient!(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...reqArgs,
                     points: reqArgs.points.map(p => [p.lng, p.lat])
-                }),
-                signal: AbortSignal.timeout(this.timeout)
+                })
             });
 
             if (!response.ok) {
@@ -151,16 +159,25 @@ export class GraphHopperRouting {
                         const tmpArray = decodePath(path.points as string, reqArgs.elevation);
                         path.points = {
                             "type": "LineString",
-                            "coordinates": this.pointArrToObj(tmpArray)
+                            // @ts-ignore
+                            "coordinates": tmpArray
                         };
 
                         // @ts-ignore
                         const tmpSnappedArray = decodePath(path.snapped_waypoints as string, reqArgs.elevation);
                         path.snapped_waypoints = {
                             "type": "LineString",
-                            "coordinates": this.pointArrToObj(tmpSnappedArray)
+                            // @ts-ignore
+                            "coordinates": tmpSnappedArray
                         };
                     }
+
+                    // @ts-ignore
+                    path.points.coordinates = this.pointArrToObj(path.points.coordinates as number[][]);
+
+                    // @ts-ignore
+                    path.snapped_waypoints.coordinates = this.pointArrToObj(path.snapped_waypoints.coordinates as number[][]);
+
 
                     if (path.instructions) {
                         for (let j = 0; j < path.instructions.length; j++) {
@@ -176,7 +193,7 @@ export class GraphHopperRouting {
 
             return data as GraphHopperResponse;
         } catch (error: any) {
-            throw extractError(error.response || error, url);
+            throw extractError(error, url);
         }
     }
 }
