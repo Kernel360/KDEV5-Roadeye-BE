@@ -3,9 +3,9 @@ import { produce } from 'immer';
 import type { CycleLogPayload, DriveData, IgnitionPayload, SimulatorState } from '../types/vehicle';
 import { COMMON_FIELDS, createLogEntry, formatTime, getDistance, VEHICLE_ID } from '../utils/vehicleUtils';
 import { sendCycleLog, sendIgnitionOff, sendIgnitionOn } from '../lib/api';
-import './VehicleSimulator.css';
+import './emulator.css';
 
-const VehicleSimulator: React.FC = () => {
+const Emulator: React.FC = () => {
     const [state, setState] = React.useState<SimulatorState>({
         hostUrl: 'http://localhost:8080',
         ignitionTime: null,
@@ -273,4 +273,4 @@ const VehicleSimulator: React.FC = () => {
     );
 };
 
-export default VehicleSimulator;
+export default Emulator;

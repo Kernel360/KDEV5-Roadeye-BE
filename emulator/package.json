@@ -17,12 +17,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.11",
     "geolocation-utils": "^1.2.6",
     "immer": "^10.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-kakao-maps-sdk": "^1.2.0",
     "react-router-dom": "^7.6.3",
     "uuid": "^3.4.0"
   },
