@@ -1,276 +1,285 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { produce } from 'immer';
-import type { CycleLogPayload, DriveData, IgnitionPayload, SimulatorState } from '../types/vehicle';
-import { COMMON_FIELDS, createLogEntry, formatTime, getDistance, VEHICLE_ID } from '../utils/vehicleUtils';
-import { sendCycleLog, sendIgnitionOff, sendIgnitionOn } from '../lib/api';
-import './emulator.css';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
+import useKakaoMap from "../hooks/useKakaoMap"
+import { CustomOverlayMap, Map, MapMarker, MapTypeControl, Polyline, ZoomControl } from "react-kakao-maps-sdk"
+import ArrowBox from "../components/arrowBox"
+import { MapPin } from "lucide-react"
+import { useImmer } from "use-immer"
 
-const Emulator: React.FC = () => {
-    const [state, setState] = React.useState<SimulatorState>({
-        hostUrl: 'http://localhost:8080',
-        ignitionTime: null,
-        cumulativeDistance: 0,
-        gpsStatus: 'A',
-        driving: false,
-        driveData: [],
-        lastLat: 37.5665,
-        lastLon: 126.9780,
-        logs: [],
-        lastShutdownData: null,
-        globalTuid: null
-    });
+import MapPinRed from "../assets/map-pin-red.png"
+import MapPinBlue from "../assets/map-pin-blue.png"
+import { findRoute } from "../lib/graphhopper"
 
-    const drivingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+type EmulatorContextType = {
+    state: EmulatorContextState;
+    actions: EmulatorContextAction;
+}
+type EmulatorContextState = {
+    mapCenter: GpsCoord
+    startPoint: GpsCoord | null;
+    currentPoint: GpsCoord | null;
+    endPoint: GpsCoord | null;
+    pathRoute: GpsCoord[]
+}
+type EmulatorContextAction = {
+    setStartPoint: (point: GpsCoord) => void;
+    setEndPoint: (point: GpsCoord) => void;
+    setMapCenter: (point: GpsCoord) => void;
+    setPathRoute: (route: GpsCoord[]) => void;
+}
 
-    const addLog = useCallback((message: string) => {
-        const logEntry = createLogEntry(message);
-        setState(produce(draft => {
-            draft.logs.push(logEntry);
-        }));
-    }, []);
-
-    const handleIgnitionOn = useCallback(async () => {
-        const now = new Date();
-        const onTime = formatTime(now);
-
-        if (state.ignitionTime) {
-            addLog("⚠️ 이미 시동이 켜져 있습니다.");
-            return;
+function createDefaultContext(): EmulatorContextType {
+    return {
+        state: {
+            mapCenter: {
+                lat: 37.499225,
+                lng: 127.031477
+            },
+            startPoint: null,
+            currentPoint: null,
+            endPoint: null,
+            pathRoute: []
+        },
+        actions: {
+            setStartPoint: () => { },
+            setEndPoint: () => { },
+            setMapCenter: () => { },
+            setPathRoute: () => { }
         }
+    }
+}
 
-        const newTuid = crypto.randomUUID();
+const EmulatorContext = createContext<EmulatorContextType>(createDefaultContext());
+const useEmulatorContext = () => useContext(EmulatorContext);
 
-        let newCumulativeDistance = state.cumulativeDistance;
-
-        if (state.lastShutdownData) {
-            const distanceFromLast = getDistance(
-                state.lastShutdownData.lat,
-                state.lastShutdownData.lon,
-                state.lastLat,
-                state.lastLon
-            );
-
-            if (distanceFromLast < 80) {
-                newCumulativeDistance = state.lastShutdownData.sum + distanceFromLast;
-            } else {
-                addLog(`🟡 시동 ON 거리 (${Math.round(distanceFromLast)}m)가 80m 초과로 무시됨`);
-                newCumulativeDistance = state.lastShutdownData.sum;
-            }
+function Emulator() {
+    const [state, updateState] = useImmer<EmulatorContextState>({
+        mapCenter: {
+            lat: 37.499225,
+            lng: 127.031477
+        },
+        startPoint: null,
+        currentPoint: null,
+        endPoint: null,
+        pathRoute: []
+    })
+    const actions = useMemo<EmulatorContextAction>(() => {
+        return {
+            setStartPoint: (point: GpsCoord) => updateState((draft) => {
+                draft.startPoint = point
+            }),
+            setEndPoint: (point: GpsCoord) => updateState((draft) => {
+                draft.endPoint = point
+            }),
+            setMapCenter: (point: GpsCoord) => updateState((draft) => {
+                draft.mapCenter = point
+            }),
+            setPathRoute: (route: GpsCoord[]) => updateState((draft) => {
+                draft.pathRoute = route
+            })
         }
+    }, [updateState])
 
-        setState(produce(draft => {
-            draft.ignitionTime = onTime;
-            draft.cumulativeDistance = newCumulativeDistance;
-            draft.globalTuid = newTuid;
-        }));
-
-        const payload: IgnitionPayload = {
-            ...COMMON_FIELDS,
-            mdn: VEHICLE_ID,
-            onTime: onTime,
-            offTime: '',
-            gcd: state.gpsStatus,
-            lat: state.lastLat.toFixed(6),
-            lon: state.lastLon.toFixed(6),
-            sum: Math.floor(newCumulativeDistance)
-        };
-
-        const result = await sendIgnitionOn(state.hostUrl, payload, newTuid);
-        addLog(`POST to ${state.hostUrl}/api/ignition/on:\n${JSON.stringify(payload, null, 2)}`);
-        addLog(`응답 상태: ${result.data}`);
-        addLog("🔑 시동 ON");
-    }, [state.ignitionTime, state.lastShutdownData, state.lastLat, state.lastLon, state.cumulativeDistance, state.gpsStatus, state.hostUrl, addLog]);
-
-    const handleIgnitionOff = useCallback(async () => {
-        const now = new Date();
-        const offTime = formatTime(now);
-
-        if (!state.ignitionTime) {
-            addLog("⚠️ 시동이 꺼져 있습니다. OFF 요청 불가.");
-            return;
-        }
-
-        if (state.driving) {
-            if (drivingIntervalRef.current) {
-                clearInterval(drivingIntervalRef.current);
-                drivingIntervalRef.current = null;
-            }
-
-            setState(produce(draft => {
-                draft.driving = false;
-            }));
-
-            if (state.driveData.length > 0) {
-                const body: CycleLogPayload = {
-                    ...COMMON_FIELDS,
-                    mdn: VEHICLE_ID,
-                    oTime: formatTime(now).slice(0, 12),
-                    cCnt: state.driveData.length,
-                    cList: state.driveData
-                };
-                const result = await sendCycleLog(state.hostUrl, body, state.globalTuid!);
-                addLog(`POST to ${state.hostUrl}/api/cycle-log:\n${JSON.stringify(body, null, 2)}`);
-                addLog(`응답 상태: ${result.data}`);
-
-                setState(produce(draft => {
-                    draft.driveData = [];
-                }));
-            }
-
-            setState(produce(draft => {
-                draft.lastShutdownData = {
-                    lat: state.lastLat,
-                    lon: state.lastLon,
-                    sum: state.cumulativeDistance
-                };
-            }));
-
-            addLog("주행 종료 (시동 OFF로 종료)");
-        }
-
-        const payload: IgnitionPayload = {
-            ...COMMON_FIELDS,
-            mdn: VEHICLE_ID,
-            onTime: state.ignitionTime,
-            offTime: offTime,
-            gcd: state.gpsStatus,
-            lat: state.lastLat.toFixed(6),
-            lon: state.lastLon.toFixed(6),
-            sum: Math.floor(state.cumulativeDistance)
-        };
-
-        const result = await sendIgnitionOff(state.hostUrl, payload, state.globalTuid!);
-        addLog(`POST to ${state.hostUrl}/api/ignition/off:\n${JSON.stringify(payload, null, 2)}`);
-        addLog(`응답 상태: ${result.data}`);
-
-        setState(produce(draft => {
-            draft.ignitionTime = null;
-            draft.globalTuid = null;
-        }));
-
-        addLog("🛑 시동 OFF");
-    }, [state.ignitionTime, state.driving, state.driveData, state.lastLat, state.lastLon, state.cumulativeDistance, state.gpsStatus, state.hostUrl, state.globalTuid, addLog]);
-
-    const startDriving = useCallback(() => {
-        if (!state.ignitionTime) {
-            addLog("⚠️ 시동이 먼저 켜져야 합니다.");
-            return;
-        }
-
-        if (state.driving) {
-            addLog("⚠️ 이미 주행 중입니다.");
-            return;
-        }
-
-        setState(produce(draft => {
-            draft.driving = true;
-            draft.driveData = [];
-        }));
-
-        addLog("🚗 주행 시작");
-
-        drivingIntervalRef.current = setInterval(() => {
-            const now = new Date();
-            const sec = now.getSeconds().toString().padStart(2, '0');
-
-            setState(produce(draft => {
-                draft.lastLat += 0.0001;
-                draft.lastLon += 0.0001;
-
-                const spd = Math.floor(Math.random() * 20) + 30;
-                const distance = (spd * 1000 / 3600);
-                draft.cumulativeDistance += distance;
-
-                const newDriveData: DriveData = {
-                    sec: sec,
-                    gcd: draft.gpsStatus,
-                    lat: draft.lastLat.toFixed(6),
-                    lon: draft.lastLon.toFixed(6),
-                    spd: spd,
-                    sum: Math.floor(draft.cumulativeDistance)
-                };
-
-                draft.driveData.push(newDriveData);
-
-                if (draft.driveData.length === 60) {
-                    const body: CycleLogPayload = {
-                        ...COMMON_FIELDS,
-                        mdn: VEHICLE_ID,
-                        oTime: formatTime(now).slice(0, 12),
-                        cCnt: 60,
-                        cList: [...draft.driveData]
-                    };
-
-                    sendCycleLog(draft.hostUrl, body, draft.globalTuid!).then(result => {
-                        addLog(`POST to ${draft.hostUrl}/api/cycle-log:\n${JSON.stringify(body, null, 2)}`);
-                        addLog(`응답 상태: ${result.data}`);
-                    });
-
-                    draft.driveData = [];
-                }
-            }));
-        }, 1000);
-    }, [state.ignitionTime, state.driving, state.gpsStatus, state.hostUrl, state.globalTuid, addLog]);
-
-    useEffect(() => {
-        return () => {
-            if (drivingIntervalRef.current) {
-                clearInterval(drivingIntervalRef.current);
-            }
-        };
-    }, []);
+    const context: EmulatorContextType = {
+        state,
+        actions
+    }
 
     return (
-        <div className="vehicle-simulator">
-            <h1>차량 데이터 시뮬레이터</h1>
-
-            <div className="input-group">
-                <label htmlFor="host-url">API 서버 주소:</label>
-                <input
-                    type="text"
-                    id="host-url"
-                    value={state.hostUrl}
-                    onChange={(e) => setState(produce(draft => {
-                        draft.hostUrl = e.target.value;
-                    }))}
-                    className="host-input"
-                />
+        <EmulatorContext.Provider value={context}>
+            <div className="flex w-screen h-screen gap-2 p-2">
+                <SideBar />
+                <div className="flex-1 flex flex-row gap-2">
+                    <CarView />
+                    <MapView />
+                </div>
             </div>
+            <RouteAPI />
+        </EmulatorContext.Provider>
+    )
 
-            <div className="button-group">
-                <button
-                    onClick={handleIgnitionOn}
-                    disabled={state.ignitionTime !== null}
-                    className="btn btn-ignition-on"
-                >
-                    시동 ON
-                </button>
-                <button
-                    onClick={startDriving}
-                    disabled={state.ignitionTime === null || state.driving}
-                    className="btn btn-drive"
-                >
-                    주행 시작
-                </button>
-                <button
-                    onClick={handleIgnitionOff}
-                    disabled={state.ignitionTime === null}
-                    className="btn btn-ignition-off"
-                >
-                    시동 OFF
-                </button>
-            </div>
+}
 
-            <div className="log-container">
-                <textarea
-                    value={state.logs.map(log => `[${log.timestamp}] ${log.message}`).join('\n')}
-                    readOnly
-                    className="log-area"
-                    placeholder="로그가 여기에 표시됩니다..."
-                />
+function SideBar() {
+    return <div className="min-w-40">Side Bar</div>
+}
+
+function CarView() {
+    return (
+        <div className="flex flex-col gap-2 min-w-60">
+            <CarStatus />
+            <CarControl />
+            <CarLogList />
+        </div>
+    )
+}
+
+function CarStatus() {
+    const { state, actions } = useEmulatorContext();
+
+    return (
+        <div>
+            <div>차량 상태</div>
+            <div>
+                <div className="flex flex-row gap-2">
+                    <span className="select-none">출발지: </span>
+                    <span>{state.startPoint ? `${state.startPoint.lat.toFixed(4)}, ${state.startPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <div
+                        className="cursor-pointer select-none"
+                        onClick={() => {
+                            if (state.startPoint) {
+                                actions.setMapCenter(state.startPoint)
+                            }
+                        }}>
+                        이동
+                    </div>
+                </div>
+                <div className="flex flex-row gap-2">
+                    <span className="select-none">도착지: </span>
+                    <span>{state.endPoint ? `${state.endPoint.lat.toFixed(4)}, ${state.endPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <div
+                        className="cursor-pointer select-none"
+                        onClick={() => {
+                            if (state.endPoint) {
+                                actions.setMapCenter(state.endPoint)
+                            }
+                        }}>
+                        이동
+                    </div>
+                </div>
             </div>
         </div>
-    );
-};
+    )
+}
+
+const carStatusGraph = {
+    '시동OFF': ['시동ON'] as const,
+    '시동ON': ['주행', '시동OFF'] as const,
+    '주행': ['정지'] as const,
+    '정지': ['주행', '시동OFF'] as const
+} as const
+
+function CarControl() {
+    const [state, setState] = useState<keyof typeof carStatusGraph>('시동OFF');
+
+    const graph = carStatusGraph[state as keyof typeof carStatusGraph];
+
+    return (
+        <div>
+            <div className="flex flex-row gap-2">
+                {graph.map((state) => (
+                    <button key={state} onClick={() => setState(state)}>{state}</button>
+                ))}
+            </div>
+        </div>
+    )
+}
+
+function CarLogList() {
+    return (
+        <div>
+            <ul>
+                <li>Car Log 1</li>
+                <li>Car Log 2</li>
+                <li>Car Log 3</li>
+            </ul>
+        </div>
+    )
+}
+
+function MapView() {
+    useKakaoMap();
+
+    const { state, actions } = useEmulatorContext();
+
+    const [contextMenuCoord, setContextMenuCoord] = useState<GpsCoord | null>(null);
+
+    const handleRightClick = useCallback((_: unknown, MouseEvent: kakao.maps.event.MouseEvent) => {
+        setContextMenuCoord({
+            lat: MouseEvent.latLng.getLat(),
+            lng: MouseEvent.latLng.getLng()
+        })
+    }, [])
+
+    return (
+        <Map
+            style={{ width: '100%', height: '100%' }}
+            level={3}
+            center={state.mapCenter}
+            onRightClick={handleRightClick}
+        >
+            <MapTypeControl position={"TOPRIGHT"} />
+            <ZoomControl position={"BOTTOMRIGHT"} />
+
+            {state.startPoint && <MapMarker
+                image={{
+                    src: MapPinBlue,
+                    size: { width: 31.2, height: 40 }
+                }}
+                position={state.startPoint}
+            />}
+            {state.endPoint && <MapMarker
+                image={{
+                    src: MapPinRed,
+                    size: { width: 31.2, height: 40 }
+                }}
+                position={state.endPoint}
+            />}
+
+            {contextMenuCoord && (
+                <CustomOverlayMap
+                    position={contextMenuCoord}
+                    yAnchor={1.3}
+                >
+                    <ArrowBox width="130px" height="80px">
+                        <div className="flex flex-col gap-2 select-none">
+                            <div className="flex flex-row cursor-pointer" onClick={() => {
+                                actions.setStartPoint(contextMenuCoord)
+                                setContextMenuCoord(null)
+                            }}>
+                                <MapPin color="blue" />
+                                <div>출발지 설정</div>
+                            </div>
+                            <div className="flex flex-row cursor-pointer" onClick={() => {
+                                actions.setEndPoint(contextMenuCoord)
+                                setContextMenuCoord(null)
+                            }}>
+                                <MapPin color="red" />
+                                <div className="inline-block w-fit">
+                                    도착지 설정
+                                </div>
+                            </div>
+                        </div>
+                    </ArrowBox>
+                </CustomOverlayMap>
+            )}
+
+            {state.pathRoute && (
+                <Polyline
+                    path={state.pathRoute}
+                    strokeWeight={5}
+                    endArrow={true}
+                />
+            )}
+        </Map>
+    )
+}
+
+function RouteAPI() {
+    const { state, actions } = useEmulatorContext();
+
+    useEffect(() => {
+        if (state.startPoint && state.endPoint) {
+            findRoute("car", state.startPoint, state.endPoint)
+                .then((res) => {
+                    actions.setPathRoute(res.paths[0].points.coordinates)
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+        }
+    }, [state.startPoint, state.endPoint, actions])
+
+    return <></>
+}
 
 export default Emulator;
