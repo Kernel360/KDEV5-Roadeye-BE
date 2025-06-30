@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { Options } from 'k6/options';
+import type { Options } from 'k6/options';
 import { getCar, getEndStation, getRandomStation, getStartStation } from '../lib/shared.ts';
 import * as utils from '../lib/utils.ts';
 import type CarType from '../data/car.example.json';
@@ -33,7 +33,7 @@ type Context = {
     prev: MdtLog | null;
 }
 
-// @ts-ignore
+// @ts-expect-error: INIT PHASE에서 초기화 될 것임.
 const initialContext: Context = {
     phase: Phase.INIT,
 }
@@ -76,7 +76,7 @@ export default function (data: ReturnType<typeof setup>) {
             ctx.phase = Phase.IDLE;
             break;
         case Phase.IDLE:
-            idle(ctx, data);
+            idle(ctx);
             ctx.phase = Phase.IGNITION_ON;
             break;
     }
@@ -231,7 +231,7 @@ function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
     )
 }
 
-function idle(ctx: Context, data: ReturnType<typeof setup>) {
+function idle(ctx: Context) {
     while (true) {
         const st = getRandomStation();
         if (utils.distanceTo(ctx.location.current, st) > 1000) {

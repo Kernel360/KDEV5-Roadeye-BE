@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { Options } from 'k6/options';
+import type { Options } from 'k6/options';
 import { cars, getCar, getEndStation } from '../lib/shared.ts';
 
 import * as utils from '../lib/utils.ts';
@@ -36,16 +36,7 @@ export default function (data: ReturnType<typeof setup>) {
     const oTme = new Date();
 
     // generate logs
-    const logs = [] as {
-        sec: number;
-        gcd: string;
-        lat: number;
-        lon: number;
-        ang: number;
-        spd: number;
-        sum: number;
-        bat: number;
-    }[];
+    const logs = [] as MdtLog[]
 
     if (prev == null) {
         prev = {
@@ -109,8 +100,4 @@ export default function (data: ReturnType<typeof setup>) {
     )
 
     sleep(60);
-}
-
-export function teardown(data: ReturnType<typeof setup>) {
-
 }

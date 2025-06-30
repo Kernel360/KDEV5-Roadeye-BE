@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { Options } from 'k6/options';
+import type { Options } from 'k6/options';
 import { cars, getCar, getStartStation } from '../lib/shared.ts';
 import * as utils from '../lib/utils.ts';
 
@@ -46,8 +46,4 @@ export default function (data: ReturnType<typeof setup>) {
             }
         }
     )
-}
-
-export function teardown(data: ReturnType<typeof setup>) {
-
 }
