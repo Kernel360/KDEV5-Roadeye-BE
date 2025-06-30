@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepare": "node scripts/prepare.js",
+    "prepare": "node scripts/prepare.cjs",
     "k6:1": "k6 run src/k6/1.ignition-on.ts",
     "k6:2": "k6 run src/k6/2.cycle.ts",
     "k6:3": "k6 run src/k6/3.ignition-off.ts",
