@@ -1,9 +1,9 @@
 import http from 'k6/http';
-import type { Options } from 'k6/options';
-import { getCar, getEndStation, getRandomStation, getStartStation } from '../lib/shared.ts';
+import type {Options} from 'k6/options';
+import {getCar, getEndStation, getRandomStation, getStartStation} from '../lib/shared.ts';
 import * as utils from '../lib/utils.ts';
 import type CarType from '../data/car.example.json';
-import { sleep } from 'k6';
+import {sleep} from 'k6';
 
 enum Phase {
     INIT,
@@ -47,7 +47,7 @@ export const options: Options = {
 
 export function setup() {
     return {
-        API_HUB_URL: __ENV.API_HUB_URL || "https://api-hub.roadeye.my"
+        API_HUB_URL: __ENV.API_HUB_URL
     };
 }
 
@@ -153,7 +153,7 @@ function driving(ctx: Context, data: ReturnType<typeof setup>) {
         const spd = utils.nextCarSpd(ctx.prev!.spd);
         const ang = hd.heading;
         const sum = ctx.prev.sum + spd;
-        const { lat, lon } = utils.moveTo(ctx.prev, { heading: hd.heading, distance: hd.distance });
+        const {lat, lon} = utils.moveTo(ctx.prev, {heading: hd.heading, distance: hd.distance});
 
         const log: MdtLog = {
             sec: s,

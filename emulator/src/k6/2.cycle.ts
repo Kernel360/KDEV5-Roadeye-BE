@@ -1,9 +1,9 @@
 import http from 'k6/http';
-import type { Options } from 'k6/options';
-import { cars, getCar, getEndStation } from '../lib/shared.ts';
+import type {Options} from 'k6/options';
+import {cars, getCar, getEndStation} from '../lib/shared.ts';
 
 import * as utils from '../lib/utils.ts';
-import { sleep } from 'k6';
+import {sleep} from 'k6';
 
 export const options: Options = {
     vus: cars.length,
@@ -23,7 +23,7 @@ let prev: MdtLog | null = null;
 
 export function setup() {
     return {
-        API_HUB_URL: __ENV.API_HUB_URL || "http://localhost:8081"
+        API_HUB_URL: __ENV.API_HUB_URL
     };
 }
 
@@ -56,7 +56,7 @@ export default function (data: ReturnType<typeof setup>) {
         const spd = utils.nextCarSpd(prev!.spd);
         const ang = hd.heading;
         const sum = prev!.sum + spd;
-        const { lat, lon } = utils.moveTo(prev!, { heading: hd.heading, distance: hd.distance });
+        const {lat, lon} = utils.moveTo(prev!, {heading: hd.heading, distance: hd.distance});
 
         const log: MdtLog = {
             sec: s,
