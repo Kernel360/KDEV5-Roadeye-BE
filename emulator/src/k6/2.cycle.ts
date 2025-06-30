@@ -1,9 +1,9 @@
 import http from 'k6/http';
-import {Options} from 'k6/options';
-import {cars, getCar, getEndStation} from '../lib/shared.ts';
+import { Options } from 'k6/options';
+import { cars, getCar, getEndStation } from '../lib/shared.ts';
 
 import * as utils from '../lib/utils.ts';
-import {sleep} from 'k6';
+import { sleep } from 'k6';
 
 export const options: Options = {
     vus: cars.length,
@@ -52,7 +52,7 @@ export default function (data: ReturnType<typeof setup>) {
             sec: 0,
             gcd: 'A',
             lat: car.latitude,
-            lon: car.longitude,
+            lng: car.longitude,
             ang: 0,
             spd: 0,
             sum: 0,
@@ -65,13 +65,13 @@ export default function (data: ReturnType<typeof setup>) {
         const spd = utils.nextCarSpd(prev!.spd);
         const ang = hd.heading;
         const sum = prev!.sum + spd;
-        const {lat, lon} = utils.moveTo(prev!, {heading: hd.heading, distance: hd.distance});
+        const { lat, lon } = utils.moveTo(prev!, { heading: hd.heading, distance: hd.distance });
 
         const log: MdtLog = {
             sec: s,
             gcd: 'A',
             lat: lat,
-            lon: lon,
+            lng: lon,
             ang: ang,
             spd: spd,
             sum: sum,

@@ -19,7 +19,7 @@ export function dateFormat(date: Date, format: string) {
     return dateFormatjs(date, format);
 }
 
-export function headingDistanceTo(prev: GpsLocation, endStation: GpsLocation) {
+export function headingDistanceTo(prev: GpsCoord, endStation: GpsCoord) {
     const hd = geoUtils.headingDistanceTo(prev, endStation);
     return {
         heading: geoUtils.normalizeHeading(hd.heading),
@@ -29,14 +29,14 @@ export function headingDistanceTo(prev: GpsLocation, endStation: GpsLocation) {
     }
 }
 
-export function moveTo(prev: GpsLocation, {heading, distance}: { heading: number, distance: number }) {
-    const loc = geoUtils.moveTo(prev, {heading, distance});
+export function moveTo(prev: GpsCoord, { heading, distance }: { heading: number, distance: number }) {
+    const loc = geoUtils.moveTo(prev, { heading, distance });
     return {
         lat: geoUtils.normalizeLatitude(loc.lat),
         lon: geoUtils.normalizeLongitude(loc.lon)
     }
 }
 
-export function distanceTo(prev: GpsLocation, endStation: GpsLocation) {
+export function distanceTo(prev: GpsCoord, endStation: GpsCoord) {
     return geoUtils.distanceTo(prev, endStation);
 }

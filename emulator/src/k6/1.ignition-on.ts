@@ -1,6 +1,6 @@
 import http from 'k6/http';
-import {Options} from 'k6/options';
-import {cars, getCar, getStartStation} from '../lib/shared.ts';
+import { Options } from 'k6/options';
+import { cars, getCar, getStartStation } from '../lib/shared.ts';
 import * as utils from '../lib/utils.ts';
 
 export const options: Options = {
@@ -33,7 +33,7 @@ export default function (data: ReturnType<typeof setup>) {
             onTime: utils.dateFormat(onTime, "yyyymmddHHMMss"),
             gcd: 'A',
             lat: station.lat,
-            lon: station.lon,
+            lon: station.lng,
             ang: 0,
             spd: 0,
             sum: 0

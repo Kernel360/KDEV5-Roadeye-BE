@@ -22,9 +22,9 @@ type Context = {
         bat: number;
     };
     location: {
-        start: GpsLocation;
-        current: GpsLocation;
-        end: GpsLocation;
+        start: GpsCoord;
+        current: GpsCoord;
+        end: GpsCoord;
     };
     transactionId: string | null;
     onTime: Date | null;
@@ -117,7 +117,7 @@ function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
             onTime: utils.dateFormat(ctx.onTime, "yyyymmddHHMMss"),
             gcd: 'A',
             lat: ctx.location.current.lat,
-            lon: ctx.location.current.lon,
+            lon: ctx.location.current.lng,
             ang: ctx.car.ang,
             spd: ctx.car.spd,
             sum: ctx.car.sum
@@ -140,7 +140,7 @@ function driving(ctx: Context, data: ReturnType<typeof setup>) {
             sec: 0,
             gcd: 'A',
             lat: ctx.location.current.lat,
-            lon: ctx.location.current.lon,
+            lng: ctx.location.current.lng,
             ang: ctx.car.ang,
             spd: ctx.car.spd,
             sum: ctx.car.sum,
@@ -159,7 +159,7 @@ function driving(ctx: Context, data: ReturnType<typeof setup>) {
             sec: s,
             gcd: 'A',
             lat: lat,
-            lon: lon,
+            lng: lon,
             ang: ang,
             spd: spd,
             sum: sum,
@@ -216,7 +216,7 @@ function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
             offTime: utils.dateFormat(ctx.offTime, "yyyymmddHHMMss"),
             gcd: 'A',
             lat: ctx.location.current.lat,
-            lon: ctx.location.current.lon,
+            lon: ctx.location.current.lng,
             ang: ctx.car.ang,
             spd: ctx.car.spd,
             sum: ctx.car.sum

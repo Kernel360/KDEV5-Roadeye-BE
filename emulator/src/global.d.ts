@@ -8,15 +8,15 @@ declare global {
         region: string;
         name: string;
         lat: number;
-        lon: number;
+        lng: number;
     }
 
-    export type GpsLocation = {
+    export interface GpsCoord {
         lat: number;
-        lon: number;
+        lng: number;
     }
 
-    export type MdtLog = GpsLocation & {
+    export type MdtLog = GpsCoord & {
         sec: number;
         gcd: string;
         ang: number;
@@ -26,4 +26,4 @@ declare global {
     }
 }
 
-export {};
+export { };

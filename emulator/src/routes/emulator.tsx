@@ -20,7 +20,7 @@ const Emulator: React.FC = () => {
         globalTuid: null
     });
 
-    const drivingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const drivingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const addLog = useCallback((message: string) => {
         const logEntry = createLogEntry(message);
