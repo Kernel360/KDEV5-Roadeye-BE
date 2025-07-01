@@ -1,4 +1,4 @@
-import { useCarList } from '../../hooks/useCarList';
+import { useCarList } from '~/hooks/useCarList';
 import { FixedSizeList as List } from 'react-window';
 import { useEffect, useState } from 'react';
 

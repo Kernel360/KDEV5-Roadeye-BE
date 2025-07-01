@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import * as api from '../lib/api2';
+import * as api from '~/lib/api2';
 
 interface User {
     id: string;

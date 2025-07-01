@@ -1,4 +1,4 @@
-import { useAuthStore, useUser, useIsAuthenticated, useAuthLoading, useAuthError } from '../stores/authStore';
+import { useAuthStore, useUser, useIsAuthenticated, useAuthLoading, useAuthError } from '~/stores/authStore';
 
 export default function useAuth() {
     const user = useUser();

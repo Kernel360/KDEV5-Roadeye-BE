@@ -1,4 +1,4 @@
-import { authStore } from '../stores/authStore';
+import { authStore } from '~/stores/authStore';
 
 // React 외부에서 인증 상태 확인
 export const checkAuthStatus = () => {

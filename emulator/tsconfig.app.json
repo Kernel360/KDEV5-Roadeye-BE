@@ -26,7 +26,14 @@
     "noUncheckedSideEffectImports": true,
     "types": [
       "kakao.maps.d.ts"
-    ]
+    ],
+    /* Path mapping */
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [
+        "src/*"
+      ]
+    }
   },
   "include": [
     "src"

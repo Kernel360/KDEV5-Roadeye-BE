@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useCarStore, useCars, useCarLoading, useCarError } from '../stores/carStore';
+import { useCarStore, useCars, useCarLoading, useCarError } from '~/stores/carStore';
 
 export const useCarList = () => {
     const cars = useCars();

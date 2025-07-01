@@ -1,5 +1,5 @@
-import type { CycleLogPayload, IgnitionPayload } from '../types/vehicle';
-import { getFormattedTime } from '../utils/vehicleUtils';
+import type { CycleLogPayload, IgnitionPayload } from '~/types/vehicle';
+import { getFormattedTime } from '~/utils/vehicleUtils';
 
 type SuccessResponse<D = unknown> = {
     success: true;

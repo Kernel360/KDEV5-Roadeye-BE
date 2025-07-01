@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { findRoute } from "../../lib/graphhopper";
-import { useEmulatorStore } from "../../stores/emulatorStore";
+import { findRoute } from "~/lib/graphhopper";
+import { useEmulatorStore } from "~/stores/emulatorStore";
 
 function RouteAPI() {
     const { startPoint, endPoint, setPathRoute } = useEmulatorStore();

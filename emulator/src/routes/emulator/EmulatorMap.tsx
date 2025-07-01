@@ -1,11 +1,11 @@
 import { MapPin } from "lucide-react"
 import { useCallback, useState } from "react"
 import { CustomOverlayMap, Map, MapMarker, MapTypeControl, Polyline, ZoomControl } from "react-kakao-maps-sdk"
-import ArrowBox from "../../components/arrowBox"
-import useKakaoMap from "../../hooks/useKakaoMap"
-import MapPinBlue from "../../assets/map-pin-blue.png"
-import MapPinRed from "../../assets/map-pin-red.png"
-import { useEmulatorStore, type GpsCoord } from "../../stores/emulatorStore"
+import ArrowBox from "~/components/arrowBox"
+import useKakaoMap from "~/hooks/useKakaoMap"
+import MapPinBlue from "~/assets/map-pin-blue.png"
+import MapPinRed from "~/assets/map-pin-red.png"
+import { useEmulatorStore, type GpsCoord } from "~/stores/emulatorStore"
 
 function EmulatorMap() {
     useKakaoMap();

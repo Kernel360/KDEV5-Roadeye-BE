@@ -1,6 +1,6 @@
 import { useState } from "react";
 import CarLogList from "./CarLogList";
-import { useEmulatorStore } from "../../stores/emulatorStore";
+import { useEmulatorStore } from "~/stores/emulatorStore";
 
 function CarInfo() {
     return (

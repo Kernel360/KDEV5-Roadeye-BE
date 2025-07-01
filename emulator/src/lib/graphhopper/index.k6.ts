@@ -1,4 +1,4 @@
-import { k6Fetch } from "../k6utils";
+import { k6Fetch } from '../k6utils';
 import { GraphHopperRouting } from "./routing";
 
 const instance = {
