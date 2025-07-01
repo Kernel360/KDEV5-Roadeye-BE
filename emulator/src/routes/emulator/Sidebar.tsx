@@ -90,7 +90,7 @@ function CarListView() {
                             ? 'bg-blue-50 border-blue-300 shadow-md'
                             : 'bg-white border-gray-200'
                             }`}
-                        onClick={() => setSelectedCar(isSelected ? null : car)}
+                        onClick={() => setSelectedCar(car)}
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex-1">
