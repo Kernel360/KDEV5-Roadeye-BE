@@ -3,16 +3,21 @@ import { useCallback, useState } from "react"
 import { CustomOverlayMap, Map, MapMarker, MapTypeControl, Polyline, ZoomControl } from "react-kakao-maps-sdk"
 import ArrowBox from "../../components/arrowBox"
 import useKakaoMap from "../../hooks/useKakaoMap"
-
-
 import MapPinBlue from "../../assets/map-pin-blue.png"
 import MapPinRed from "../../assets/map-pin-red.png"
-import { useEmulatorContext } from "./context"
+import { useEmulatorStore, type GpsCoord } from "../../stores/emulatorStore"
 
 function EmulatorMap() {
     useKakaoMap();
 
-    const { state, actions } = useEmulatorContext();
+    const {
+        mapCenter,
+        startPoint,
+        endPoint,
+        pathRoute,
+        setStartPoint,
+        setEndPoint
+    } = useEmulatorStore();
 
     const [contextMenuCoord, setContextMenuCoord] = useState<GpsCoord | null>(null);
 
@@ -27,25 +32,25 @@ function EmulatorMap() {
         <Map
             style={{ width: '100%', height: '100%' }}
             level={3}
-            center={state.mapCenter}
+            center={mapCenter}
             onRightClick={handleRightClick}
         >
             <MapTypeControl position={"TOPRIGHT"} />
             <ZoomControl position={"BOTTOMRIGHT"} />
 
-            {state.startPoint && <MapMarker
+            {startPoint && <MapMarker
                 image={{
                     src: MapPinBlue,
                     size: { width: 31.2, height: 40 }
                 }}
-                position={state.startPoint}
+                position={startPoint}
             />}
-            {state.endPoint && <MapMarker
+            {endPoint && <MapMarker
                 image={{
                     src: MapPinRed,
                     size: { width: 31.2, height: 40 }
                 }}
-                position={state.endPoint}
+                position={endPoint}
             />}
 
             {contextMenuCoord && (
@@ -56,14 +61,14 @@ function EmulatorMap() {
                     <ArrowBox width="130px" height="80px">
                         <div className="flex flex-col gap-2 select-none">
                             <div className="flex flex-row cursor-pointer" onClick={() => {
-                                actions.setStartPoint(contextMenuCoord)
+                                setStartPoint(contextMenuCoord)
                                 setContextMenuCoord(null)
                             }}>
                                 <MapPin color="blue" />
                                 <div>출발지 설정</div>
                             </div>
                             <div className="flex flex-row cursor-pointer" onClick={() => {
-                                actions.setEndPoint(contextMenuCoord)
+                                setEndPoint(contextMenuCoord)
                                 setContextMenuCoord(null)
                             }}>
                                 <MapPin color="red" />
@@ -76,9 +81,9 @@ function EmulatorMap() {
                 </CustomOverlayMap>
             )}
 
-            {state.pathRoute && (
+            {pathRoute && (
                 <Polyline
-                    path={state.pathRoute}
+                    path={pathRoute}
                     strokeWeight={5}
                     endArrow={true}
                 />

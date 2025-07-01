@@ -1,6 +1,6 @@
 import { useState } from "react";
 import CarLogList from "./CarLogList";
-import { useEmulatorContext } from "./context";
+import { useEmulatorStore } from "../../stores/emulatorStore";
 
 function CarInfo() {
     return (
@@ -13,7 +13,7 @@ function CarInfo() {
 }
 
 function CarStatus() {
-    const { state, actions } = useEmulatorContext();
+    const { startPoint, endPoint, setMapCenter } = useEmulatorStore();
 
     return (
         <div>
@@ -21,12 +21,12 @@ function CarStatus() {
             <div>
                 <div className="flex flex-row gap-2">
                     <span className="select-none">출발지: </span>
-                    <span>{state.startPoint ? `${state.startPoint.lat.toFixed(4)}, ${state.startPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <span>{startPoint ? `${startPoint.lat.toFixed(4)}, ${startPoint.lng.toFixed(4)}` : '지정안됨'}</span>
                     <div
                         className="cursor-pointer select-none"
                         onClick={() => {
-                            if (state.startPoint) {
-                                actions.setMapCenter(state.startPoint)
+                            if (startPoint) {
+                                setMapCenter(startPoint)
                             }
                         }}>
                         이동
@@ -34,12 +34,12 @@ function CarStatus() {
                 </div>
                 <div className="flex flex-row gap-2">
                     <span className="select-none">도착지: </span>
-                    <span>{state.endPoint ? `${state.endPoint.lat.toFixed(4)}, ${state.endPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <span>{endPoint ? `${endPoint.lat.toFixed(4)}, ${endPoint.lng.toFixed(4)}` : '지정안됨'}</span>
                     <div
                         className="cursor-pointer select-none"
                         onClick={() => {
-                            if (state.endPoint) {
-                                actions.setMapCenter(state.endPoint)
+                            if (endPoint) {
+                                setMapCenter(endPoint)
                             }
                         }}>
                         이동
