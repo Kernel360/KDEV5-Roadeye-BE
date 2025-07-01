@@ -1,10 +1,11 @@
 import { MapPin } from "lucide-react"
-import { useCallback, useState } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { CustomOverlayMap, Map, MapMarker, MapTypeControl, Polyline, ZoomControl } from "react-kakao-maps-sdk"
 import ArrowBox from "~/components/arrowBox"
 import useKakaoMap from "~/hooks/useKakaoMap"
 import MapPinBlue from "~/assets/map-pin-blue.png"
 import MapPinRed from "~/assets/map-pin-red.png"
+import CarMarker from "~/assets/car-marker.svg"
 import { useEmulatorStore, type GpsCoord } from "~/stores/emulatorStore"
 
 function EmulatorMap() {
@@ -15,11 +16,23 @@ function EmulatorMap() {
         startPoint,
         endPoint,
         pathRoute,
+        selectedCar,
         setStartPoint,
-        setEndPoint
+        setEndPoint,
+        setMapCenter
     } = useEmulatorStore();
 
     const [contextMenuCoord, setContextMenuCoord] = useState<GpsCoord | null>(null);
+
+    // 선택된 차량이 변경되면 자동으로 지도 중심을 차량 위치로 이동
+    useEffect(() => {
+        if (selectedCar) {
+            setMapCenter({
+                lat: selectedCar.latitude,
+                lng: selectedCar.longitude
+            });
+        }
+    }, [selectedCar, setMapCenter]);
 
     const handleRightClick = useCallback((_: unknown, MouseEvent: kakao.maps.event.MouseEvent) => {
         setContextMenuCoord({
@@ -52,6 +65,19 @@ function EmulatorMap() {
                 }}
                 position={endPoint}
             />}
+
+            {selectedCar && (
+                <MapMarker
+                    image={{
+                        src: CarMarker,
+                        size: { width: 32, height: 32 }
+                    }}
+                    position={{
+                        lat: selectedCar.latitude,
+                        lng: selectedCar.longitude
+                    }}
+                />
+            )}
 
             {contextMenuCoord && (
                 <CustomOverlayMap

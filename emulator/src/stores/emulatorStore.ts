@@ -20,6 +20,7 @@ interface EmulatorState {
     setPathRoute: (route: GpsCoord[]) => void
     setCurrentPoint: (point: GpsCoord | null) => void
     setSelectedCar: (car: Car | null) => void
+    centerOnSelectedCar: () => void
 }
 
 export const useEmulatorStore = create<EmulatorState>((set) => ({
@@ -38,5 +39,11 @@ export const useEmulatorStore = create<EmulatorState>((set) => ({
     setMapCenter: (point: GpsCoord) => set({ mapCenter: point }),
     setPathRoute: (route: GpsCoord[]) => set({ pathRoute: route }),
     setCurrentPoint: (point: GpsCoord | null) => set({ currentPoint: point }),
-    setSelectedCar: (car: Car | null) => set({ selectedCar: car })
+    setSelectedCar: (car: Car | null) => set({ selectedCar: car }),
+    centerOnSelectedCar: () => set((state) => {
+        if (state.selectedCar) {
+            return { mapCenter: { lat: state.selectedCar.latitude, lng: state.selectedCar.longitude } }
+        }
+        return state
+    })
 }))
