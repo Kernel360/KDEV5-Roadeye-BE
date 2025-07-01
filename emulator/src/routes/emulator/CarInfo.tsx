@@ -1,6 +1,6 @@
 import { useCallback } from "react";
+import { useEmulatorStore, useSelectedEmulatorCar, useSelectedEmulatorDriving, useSelectedEmulatorEndPoint, useSelectedEmulatorIgnition, useSelectedEmulatorStartPoint } from "~/stores/emulatorStore";
 import CarLogList from "./CarLogList";
-import { useEmulatorStore, useSelectedEmulatorCar } from "~/stores/emulatorStore";
 
 function CarInfo() {
     return (
@@ -14,7 +14,10 @@ function CarInfo() {
 }
 
 function CarStatus() {
-    const { selectedCar, setMapCenter } = useEmulatorStore();
+    const { setMapCenter } = useEmulatorStore();
+
+    const startPoint = useSelectedEmulatorStartPoint();
+    const endPoint = useSelectedEmulatorEndPoint();
 
     return (
         <div>
@@ -22,12 +25,12 @@ function CarStatus() {
             <div>
                 <div className="flex flex-row gap-2">
                     <span className="select-none">출발지: </span>
-                    <span>{selectedCar?.emulator.startPoint ? `${selectedCar.emulator.startPoint.lat.toFixed(4)}, ${selectedCar.emulator.startPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <span>{startPoint ? `${startPoint.lat.toFixed(4)}, ${startPoint.lng.toFixed(4)}` : '지정안됨'}</span>
                     <div
                         className="cursor-pointer select-none"
                         onClick={() => {
-                            if (selectedCar?.emulator.startPoint) {
-                                setMapCenter(selectedCar.emulator.startPoint)
+                            if (startPoint) {
+                                setMapCenter(startPoint)
                             }
                         }}>
                         이동
@@ -35,12 +38,12 @@ function CarStatus() {
                 </div>
                 <div className="flex flex-row gap-2">
                     <span className="select-none">도착지: </span>
-                    <span>{selectedCar?.emulator.endPoint ? `${selectedCar.emulator.endPoint.lat.toFixed(4)}, ${selectedCar.emulator.endPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <span>{endPoint ? `${endPoint.lat.toFixed(4)}, ${endPoint.lng.toFixed(4)}` : '지정안됨'}</span>
                     <div
                         className="cursor-pointer select-none"
                         onClick={() => {
-                            if (selectedCar?.emulator.endPoint) {
-                                setMapCenter(selectedCar.emulator.endPoint)
+                            if (endPoint) {
+                                setMapCenter(endPoint)
                             }
                         }}>
                         이동
@@ -122,21 +125,30 @@ const drivingStateGraph: Record<DrivingState, DrivingState> = {
 }
 
 function CarControl() {
-    const { selectedCar } = useEmulatorStore();
+    const { selectedCar, turnOffIgnition, turnOnIgnition } = useEmulatorStore();
+
+    const ignition = useSelectedEmulatorIgnition();
+    const driving = useSelectedEmulatorDriving();
 
     const handleIgnitionStateChange = useCallback(() => {
-    }, [selectedCar?.emulator.ignition]);
+        if (!selectedCar) return;
+
+
+    }, [selectedCar]);
 
     const handleDrivingStateChange = useCallback(() => {
-        const newState = drivingStateGraph[selectedCar.emulator.driving];
-        if (!selectedCar?.emulator.pathRoute.length) {
-            alert('경로가 지정되지 않았습니다.');
-            return;
-        }
-    }, [selectedCar?.emulator.pathRoute]);
+        if (!selectedCar) return;
 
-    const ignitionButtonDisabled = !selectedCar || (selectedCar.emulator.ignition === '시동ON' && selectedCar.emulator.driving === '주행');
-    const drivingButtonDisabled = !selectedCar || (selectedCar.emulator.ignition === '시동OFF' && selectedCar.emulator.driving === '정지');
+        if (driving!.state === '주행') {
+            turnOnIgnition();
+        } else {
+            turnOffIgnition();
+        }
+
+    }, [selectedCar, driving, turnOnIgnition, turnOffIgnition]);
+
+    const ignitionButtonDisabled = !selectedCar || (ignition!.state === '시동ON' && driving!.state === '주행');
+    const drivingButtonDisabled = !selectedCar || (ignition!.state === '시동OFF' && driving!.state === '정지');
 
     return (
         <div className="flex flex-row gap-2">
@@ -150,7 +162,7 @@ function CarControl() {
                     }`
                 }
             >
-                {selectedCar ? ignitionStateGraph[selectedCar.emulator.ignition] : '시동 ON'}
+                {selectedCar ? ignitionStateGraph[ignition!.state] : '시동 ON'}
             </button>
             <button
                 onClick={handleDrivingStateChange}
@@ -162,7 +174,7 @@ function CarControl() {
                     }`
                 }
             >
-                {selectedCar ? drivingStateGraph[selectedCar.emulator.driving] : '정지'}
+                {selectedCar ? drivingStateGraph[driving!.state] : '정지'}
             </button>
         </div>
     )

@@ -1,39 +1,44 @@
 export interface CommonFields {
+    mdn: string;
     tid: string;
     mid: string;
     pv: string;
     did: string;
 }
 
-export interface DriveData {
+export type DriveData = {
     sec: string;
     gcd: string;
     lat: string;
     lon: string;
+    ang: number;
+    spd: number;
+    sum: number;
+    bat: number;
+}
+
+export type IgnitionOnPayload = CommonFields & {
+    onTime: string;
+    gcd: string;
+    lat: number;
+    lon: number;
+    ang: number;
     spd: number;
     sum: number;
 }
 
-export interface IgnitionPayload {
-    tid: string;
-    mid: string;
-    pv: string;
-    did: string;
-    mdn: string;
+export type IgnitionOffPayload = CommonFields & {
     onTime: string;
     offTime: string;
     gcd: string;
-    lat: string;
-    lon: string;
+    lat: number;
+    lon: number;
+    ang: number;
+    spd: number;
     sum: number;
 }
 
-export interface CycleLogPayload {
-    tid: string;
-    mid: string;
-    pv: string;
-    did: string;
-    mdn: string;
+export type CycleLogPayload = CommonFields & {
     oTime: string;
     cCnt: number;
     cList: DriveData[];

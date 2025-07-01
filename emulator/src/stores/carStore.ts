@@ -10,6 +10,7 @@ export interface Car {
     longitude: number;
     activeTransactionId?: string;
     ignitionStatus: "ON" | "OFF";
+    ignitionOnAt: string;
 }
 
 interface CarState {

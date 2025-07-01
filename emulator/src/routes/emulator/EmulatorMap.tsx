@@ -6,7 +6,7 @@ import useKakaoMap from "~/hooks/useKakaoMap"
 import MapPinBlue from "~/assets/map-pin-blue.png"
 import MapPinRed from "~/assets/map-pin-red.png"
 import CarMarker from "~/assets/car-marker.svg"
-import { useEmulatorStore, type GpsCoord } from "~/stores/emulatorStore"
+import { useEmulatorStore, useSelectedEmulatorEndPoint, useSelectedEmulatorStartPoint, type GpsCoord } from "~/stores/emulatorStore"
 
 function EmulatorMap() {
     useKakaoMap();
@@ -18,6 +18,9 @@ function EmulatorMap() {
         setEndPoint,
         setMapCenter
     } = useEmulatorStore();
+
+    const startPoint = useSelectedEmulatorStartPoint();
+    const endPoint = useSelectedEmulatorEndPoint();
 
     const [contextMenuCoord, setContextMenuCoord] = useState<GpsCoord | null>(null);
 
@@ -55,19 +58,19 @@ function EmulatorMap() {
             <MapTypeControl position={"TOPRIGHT"} />
             <ZoomControl position={"BOTTOMRIGHT"} />
 
-            {selectedCar?.emulator.startPoint && <MapMarker
+            {startPoint && <MapMarker
                 image={{
                     src: MapPinBlue,
                     size: { width: 31.2, height: 40 }
                 }}
-                position={selectedCar.emulator.startPoint}
+                position={startPoint}
             />}
-            {selectedCar?.emulator.endPoint && <MapMarker
+            {endPoint && <MapMarker
                 image={{
                     src: MapPinRed,
                     size: { width: 31.2, height: 40 }
                 }}
-                position={selectedCar.emulator.endPoint}
+                position={endPoint}
             />}
 
             {selectedCar && (

@@ -1,4 +1,4 @@
-import type { CycleLogPayload, IgnitionPayload } from '~/types/vehicle';
+import type { CycleLogPayload, IgnitionOffPayload, IgnitionOnPayload, IgnitionPayload } from '~/types/vehicle';
 import { getFormattedTime } from '~/utils/vehicleUtils';
 
 type SuccessResponse<D = unknown> = {
@@ -64,7 +64,7 @@ async function sendRequest(
 
 export async function sendIgnitionOn(
     baseUrl: string,
-    payload: IgnitionPayload,
+    payload: IgnitionOnPayload,
     tuid: string
 ): Promise<Response> {
     return sendRequest("POST", baseUrl, "/api/ignition/on", payload, tuid);
@@ -72,7 +72,7 @@ export async function sendIgnitionOn(
 
 export async function sendIgnitionOff(
     baseUrl: string,
-    payload: IgnitionPayload,
+    payload: IgnitionOffPayload,
     tuid: string
 ): Promise<Response> {
     return sendRequest("POST", baseUrl, "/api/ignition/off", payload, tuid);
