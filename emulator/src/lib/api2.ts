@@ -1,7 +1,7 @@
 
 ////
 
-export async function login(
+export function login(
     baseUrl: string,
     companyId: string,
     username: string,
@@ -12,7 +12,7 @@ export async function login(
         "X-Company-Id": companyId
     };
 
-    return await fetch(`${baseUrl}/api/auth/sign-in`, {
+    return fetch(`${baseUrl}/api/auth/sign-in`, {
         method: "POST",
         headers,
         body: JSON.stringify({ username, password }),
@@ -20,19 +20,19 @@ export async function login(
     });
 }
 
-export async function getMyInfo(
+export function getMyInfo(
     baseUrl: string,
 ) {
-    return await fetch(`${baseUrl}/api/employees/my`, {
+    return fetch(`${baseUrl}/api/employees/my`, {
         method: "GET",
         credentials: "include"
     });
 }
 
-export async function getAllCarList(
+export function getAllCarList(
     baseUrl: string,
 ) {
-    return await fetch(`${baseUrl}/api/cars/all`, {
+    return fetch(`${baseUrl}/api/cars/all`, {
         method: "GET",
         credentials: "include"
     });

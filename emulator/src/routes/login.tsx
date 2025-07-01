@@ -31,7 +31,6 @@ export default function Login() {
         }
     });
 
-    // 로그인 성공 시 자동으로 홈으로 이동
     useEffect(() => {
         if (isAuthenticated) {
             navigate('/');
@@ -40,11 +39,13 @@ export default function Login() {
 
     const onSubmit = async (data: LoginFormData) => {
         clearError();
-        const success = await login(data.companyId, data.username, data.password);
-
-        if (success) {
-            navigate('/');
-        }
+        login(data.companyId, data.username, data.password)
+            .then(() => {
+                navigate('/');
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     };
 
     return (

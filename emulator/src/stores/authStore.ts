@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
 import * as api from '~/lib/api2';
 
 interface User {
@@ -17,71 +16,29 @@ interface AuthState {
 }
 
 interface AuthActions {
-    login: (companyId: string, username: string, password: string) => Promise<boolean>;
+    login: (companyId: string, username: string, password: string) => Promise<void>;
     logout: () => void;
     clearError: () => void;
-    checkSession: () => void;
+    checkSession: () => Promise<boolean>;
 }
 
 type AuthStore = AuthState & AuthActions;
 
 export const useAuthStore = create<AuthStore>()(
-    persist(
-        (set) => ({
-            initialized: false,
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
+    (set) => ({
+        initialized: false,
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
 
-            login: async (companyId: string, username: string, password: string): Promise<boolean> => {
-                set({ isLoading: true, error: null });
+        login: (companyId: string, username: string, password: string) => {
+            set({ isLoading: true, error: null });
 
-                try {
-                    const baseUrl = import.meta.env.VITE_API_WEB_URL;
-                    await api.login(baseUrl, companyId, username, password);
-                    const res = await api.getMyInfo(baseUrl);
-                    const data = await res.json();
-
-                    set({
-                        initialized: true,
-                        user: data,
-                        isAuthenticated: true,
-                        isLoading: false,
-                        error: null
-                    });
-
-                    return true;
-                } catch (err) {
-                    const errorMessage = err instanceof Error ? err.message : '로그인에 실패했습니다.';
-                    set({
-                        initialized: true,
-                        isLoading: false,
-                        error: errorMessage
-                    });
-                    return false;
-                }
-            },
-
-            logout: () => {
-                set({
-                    initialized: true,
-                    user: null,
-                    isAuthenticated: false,
-                    isLoading: false,
-                    error: null
-                });
-            },
-
-            clearError: () => {
-                set({ error: null });
-            },
-
-            checkSession: () => {
-                set({ isLoading: true, error: null });
-
+            return new Promise((resolve, reject) => {
                 const baseUrl = import.meta.env.VITE_API_WEB_URL;
-                api.getMyInfo(baseUrl)
+                api.login(baseUrl, companyId, username, password)
+                    .then(() => api.getMyInfo(baseUrl))
                     .then((res) => res.json())
                     .then((data) => {
                         set({
@@ -91,6 +48,55 @@ export const useAuthStore = create<AuthStore>()(
                             isLoading: false,
                             error: null
                         });
+                        resolve();
+                    })
+                    .catch((err) => {
+                        set({
+                            initialized: true,
+                            isLoading: false,
+                            error: err instanceof Error ? err.message : '로그인에 실패했습니다.'
+                        });
+                        reject(err);
+                    });
+            })
+        },
+
+        logout: () => {
+            set({
+                initialized: true,
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                error: null
+            });
+        },
+
+        clearError: () => {
+            set({ error: null });
+        },
+
+        checkSession: () => {
+            set({ isLoading: true, error: null });
+
+            return new Promise((resolve, reject) => {
+                const baseUrl = import.meta.env.VITE_API_WEB_URL;
+                api.getMyInfo(baseUrl)
+                    .then((res) => {
+                        if (res.status === 200) {
+                            return res.json();
+                        } else {
+                            throw new Error("세션 확인에 실패했습니다.");
+                        }
+                    })
+                    .then((data) => {
+                        set({
+                            initialized: true,
+                            user: data,
+                            isAuthenticated: true,
+                            isLoading: false,
+                            error: null
+                        });
+                        resolve(true);
                     })
                     .catch((err) => {
                         set({
@@ -100,17 +106,11 @@ export const useAuthStore = create<AuthStore>()(
                             isLoading: false,
                             error: err instanceof Error ? err.message : '세션 확인에 실패했습니다.',
                         });
+                        reject(err);
                     });
-            },
-        }),
-        {
-            name: 'auth-storage',
-            storage: createJSONStorage(() => sessionStorage),
-            partialize: (state) => ({
-                user: state.user
-            }),
-        }
-    )
+            })
+        },
+    })
 );
 
 export const useUser = () => useAuthStore((state) => state.user);

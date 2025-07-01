@@ -2,6 +2,7 @@ import { useCarList } from '~/hooks/useCarList';
 import { FixedSizeList as List } from 'react-window';
 import { useEffect, useState } from 'react';
 import { useEmulatorStore } from '~/stores/emulatorStore';
+import { useNavigate } from 'react-router-dom';
 
 function SideBar() {
     return (

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import useAuth from '~/hooks/useAuth';
 
 interface ProtectedRouteProps {
@@ -8,13 +8,16 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { isAuthenticated, isInitialized, checkSession } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!isInitialized) {
-            checkSession();
+            checkSession()
+                .catch(() => {
+                    navigate('/login');
+                })
         }
-        console.log(isInitialized);
-    }, [isInitialized, checkSession]);
+    }, [isInitialized, checkSession, navigate]);
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
