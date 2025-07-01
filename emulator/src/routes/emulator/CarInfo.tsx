@@ -76,16 +76,20 @@ function CarDetails() {
                         {selectedCar ? selectedCar.longitude.toFixed(6) : '-'}
                     </span>
                 </div>
-                {selectedCar && (
-                    <div className="mt-3">
-                        <button
-                            onClick={centerOnSelectedCar}
-                            className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                        >
-                            차량 위치로 이동
-                        </button>
-                    </div>
-                )}
+                <div className="mt-3">
+                    <button
+                        onClick={centerOnSelectedCar}
+                        disabled={!selectedCar}
+                        className={`w-full px-3 py-2 text-sm rounded transition-colors 
+                            ${!selectedCar
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                : 'bg-blue-500 text-white hover:bg-blue-600'
+                            }`
+                        }
+                    >
+                        차량 위치로 이동
+                    </button>
+                </div>
             </div>
         </div>
     )
