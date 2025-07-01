@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import CarLogList from "./CarLogList";
 import { useEmulatorStore } from "~/stores/emulatorStore";
 
@@ -91,27 +91,64 @@ function CarDetails() {
     )
 }
 
-const carStatusGraph = {
-    '시동OFF': ['시동ON'] as const,
-    '시동ON': ['주행', '시동OFF'] as const,
-    '주행': ['정지'] as const,
-    '정지': ['주행', '시동OFF'] as const
-} as const
+type IgnitionState = '시동OFF' | '시동ON';
+type DrivingState = '주행' | '정지';
+
+const ignitionStateGraph: Record<IgnitionState, IgnitionState> = {
+    '시동OFF': '시동ON',
+    '시동ON': '시동OFF',
+};
+
+const drivingStateGraph: Record<DrivingState, DrivingState> = {
+    '주행': '정지',
+    '정지': '주행',
+}
 
 function CarControl() {
-    const [state, setState] = useState<keyof typeof carStatusGraph>('시동OFF');
+    const { selectedCar } = useEmulatorStore();
+    const [ignitionState, setIgnitionState] = useState<IgnitionState>('시동OFF');
+    const [drivingState, setDrivingState] = useState<DrivingState>('정지');
 
-    const graph = carStatusGraph[state as keyof typeof carStatusGraph];
+    const handleIgnitionStateChange = useCallback(() => {
+        setIgnitionState(ignitionStateGraph[ignitionState]);
+    }, [ignitionState]);
+
+    const handleDrivingStateChange = useCallback(() => {
+        setDrivingState(drivingStateGraph[drivingState]);
+    }, [drivingState]);
+
+    const ignitionButtonDisabled = !selectedCar || (ignitionState === '시동ON' && drivingState === '주행');
+    const drivingButtonDisabled = !selectedCar || (ignitionState === '시동OFF' && drivingState === '정지');
 
     return (
-        <div>
-            <div className="flex flex-row gap-2">
-                {graph.map((state) => (
-                    <button key={state} onClick={() => setState(state)}>{state}</button>
-                ))}
-            </div>
+        <div className="flex flex-row gap-2">
+            <button
+                onClick={handleIgnitionStateChange}
+                disabled={ignitionButtonDisabled}
+                className={`flex-1 px-3 py-2 text-sm rounded transition-colors 
+                    ${ignitionButtonDisabled
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-blue-500 text-white hover:bg-blue-600'
+                    }`
+                }
+            >
+                {ignitionStateGraph[ignitionState]}
+            </button>
+            <button
+                onClick={handleDrivingStateChange}
+                disabled={drivingButtonDisabled}
+                className={`flex-1 px-3 py-2 text-sm rounded transition-colors 
+                    ${drivingButtonDisabled
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-red-500 text-white hover:bg-red-600'
+                    }`
+                }
+            >
+                {drivingStateGraph[drivingState]}
+            </button>
         </div>
     )
 }
+
 
 export default CarInfo;
