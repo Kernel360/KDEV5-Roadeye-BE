@@ -1,9 +1,8 @@
 import { create } from 'zustand'
-import type { Car } from './carStore'
-import { emulateCarPath } from '~/lib/emulator'
-import { findRoute } from '~/lib/graphhopper'
-import type { DriveData } from '~/types/vehicle'
 import { immer } from 'zustand/middleware/immer'
+import { emulateCarPath } from '~/lib/emulator'
+import type { DriveData } from '~/types/vehicle'
+import type { Car } from './carStore'
 
 export type GpsCoord = {
     lat: number
@@ -28,26 +27,34 @@ export type CarEmulatorState = {
             current: GpsCoord
         }
         pathRoute: GpsCoord[],
+        timer: ReturnType<typeof setInterval> | null,
         driveLogs: DriveData[]
     }
 }
 
-export interface EmulatorState {
+export type EmulatorState = {
     mapCenter: GpsCoord
     selectedCar: CarEmulatorState | null
-    emulatorInstance: Map<Car['id'], ReturnType<typeof emulateCarPath>>
+    emulatorInstance: Map<Car['id'], Awaited<ReturnType<typeof emulateCarPath>>>
 
     setSelectedCar: (car: Car | null) => void
     setStartPoint: (point: GpsCoord) => void
     setCurrentPoint: (point: GpsCoord | null) => void
     setEndPoint: (point: GpsCoord) => void
     setMapCenter: (point: GpsCoord) => void
+    setCarPathRoute: (route: GpsCoord[]) => void
+    setCarEmulatorInstance: (instance: Awaited<ReturnType<typeof emulateCarPath>>) => void
     centerOnSelectedCar: () => void
-    findPathRoute: (start: GpsCoord, end: GpsCoord) => Promise<GpsCoord[]>
     addDriveLog: (log: DriveData) => void
     clearDriveLogs: () => void
-    turnOnIgnition: () => void
-    turnOffIgnition: () => void
+    turnOnIgnition: (onTime: Date, tuid: string) => void
+    turnOffIgnition: (offTime: Date) => void
+    getEmulatorInstance: (car: Car) => Awaited<ReturnType<typeof emulateCarPath>> | null
+    startDriving: (timer: ReturnType<typeof setInterval>) => void
+    stopDriving: () => void
+    getPathRoute: () => GpsCoord[]
+    getTimer: () => ReturnType<typeof setInterval> | null
+    getSelectedCar: () => CarEmulatorState | null
 }
 
 export const useEmulatorStore = create<EmulatorState>()(
@@ -58,7 +65,7 @@ export const useEmulatorStore = create<EmulatorState>()(
                 lng: 127.031477
             },
             selectedCar: null,
-            emulatorInstance: new Map<Car['id'], ReturnType<typeof emulateCarPath>>(),
+            emulatorInstance: new Map<Car['id'], Awaited<ReturnType<typeof emulateCarPath>>>(),
 
             setStartPoint: (point: GpsCoord) => set((state) => {
                 if (state.selectedCar) {
@@ -73,27 +80,6 @@ export const useEmulatorStore = create<EmulatorState>()(
             setMapCenter: (point: GpsCoord) => set((state) => {
                 state.mapCenter = point
             }),
-            findPathRoute: async (start: GpsCoord, end: GpsCoord) => {
-                const state = get();
-
-                if (!state.selectedCar) {
-                    throw new Error('Selected car not found')
-                }
-
-                const instance = state.emulatorInstance.get(state.selectedCar.car.id) || emulateCarPath({
-                    start: start,
-                    end: end,
-                    initSpdKmh: 0,
-                    maxSpdKmh: 0,
-                    acc: 0
-                })
-                state.emulatorInstance.set(state.selectedCar.car.id, instance)
-
-                return findRoute("car", start, end)
-                    .then((res) => {
-                        return res.paths[0].points.coordinates
-                    })
-            },
             setCurrentPoint: (point: GpsCoord | null) => set((state) => {
                 if (state.selectedCar) {
                     state.selectedCar.emulator.coord.current = point!
@@ -114,7 +100,10 @@ export const useEmulatorStore = create<EmulatorState>()(
                                 mileageSum: 0
                             },
                             coord: {
-                                start: null,
+                                start: {
+                                    lat: car.latitude,
+                                    lng: car.longitude
+                                },
                                 end: null,
                                 current: {
                                     lat: car.latitude,
@@ -122,11 +111,22 @@ export const useEmulatorStore = create<EmulatorState>()(
                                 }
                             },
                             pathRoute: [],
-                            driveLogs: []
+                            driveLogs: [],
+                            timer: null
                         }
                     }
                 } else {
                     state.selectedCar = null
+                }
+            }),
+            setCarPathRoute: (route: GpsCoord[]) => set((state) => {
+                if (state.selectedCar) {
+                    state.selectedCar.emulator.pathRoute = route
+                }
+            }),
+            setCarEmulatorInstance: (instance) => set((state) => {
+                if (state.selectedCar) {
+                    state.emulatorInstance.set(state.selectedCar.car.id, instance)
                 }
             }),
             centerOnSelectedCar: () => set((state) => {
@@ -135,33 +135,53 @@ export const useEmulatorStore = create<EmulatorState>()(
                         lat: state.selectedCar.emulator.coord.current.lat,
                         lng: state.selectedCar.emulator.coord.current.lng
                     }
-                    state.selectedCar.emulator.ignition.onTime = new Date()
-                    state.selectedCar.emulator.driveLogs = []
-                    state.selectedCar.emulator.pathRoute = []
                 }
             }),
             addDriveLog: (log: DriveData) => set((state) => {
                 if (state.selectedCar) {
                     state.selectedCar.emulator.driveLogs.push(log)
+                    state.selectedCar.emulator.coord.current = {
+                        lat: log.lat,
+                        lng: log.lon
+                    }
+                    console.log("addDriveLog", log)
+                    console.log("currentPoint", state.selectedCar.emulator.coord.current)
                 }
             }),
             clearDriveLogs: () => set((state) => {
                 if (state.selectedCar) {
-                    state.selectedCar.emulator.driveLogs = []
+                    state.selectedCar.emulator.driveLogs.length = 0;
                 }
             }),
-            turnOnIgnition: () => set((state) => {
+            turnOnIgnition: (onTime: Date, tuid: string) => set((state) => {
                 if (state.selectedCar) {
                     state.selectedCar.emulator.ignition.state = '시동ON'
-                    state.selectedCar.emulator.ignition.onTime = new Date()
+                    state.selectedCar.emulator.ignition.onTime = onTime
+                    state.selectedCar.car.activeTransactionId = tuid
                 }
             }),
-            turnOffIgnition: () => set((state) => {
+            turnOffIgnition: (offTime: Date) => set((state) => {
                 if (state.selectedCar) {
                     state.selectedCar.emulator.ignition.state = '시동OFF'
-                    state.selectedCar.emulator.ignition.offTime = new Date()
+                    state.selectedCar.emulator.ignition.offTime = offTime
                 }
-            })
+            }),
+            getEmulatorInstance: (car: Car) => get().emulatorInstance.get(car.id) || null,
+            startDriving: (timer: ReturnType<typeof setInterval>) => set((state) => {
+                if (state.selectedCar) {
+                    state.selectedCar.emulator.timer = timer
+                    state.selectedCar.emulator.driving.state = '주행'
+                }
+            }),
+            stopDriving: () => set((state) => {
+                if (state.selectedCar) {
+                    state.selectedCar.emulator.timer = null
+                    state.selectedCar.emulator.driving.state = '정지'
+                }
+            }),
+            getPathRoute: () => get().selectedCar?.emulator.pathRoute || [],
+            getTimer: () => get().selectedCar?.emulator.timer || null,
+            getSelectedCar: () => get().selectedCar || null,
         })
     )
 )
@@ -173,5 +193,6 @@ export const useSelectedEmulatorDriving = () => useEmulatorStore((state) => stat
 export const useSelectedEmulatorCoord = () => useEmulatorStore((state) => state.selectedCar?.emulator.coord);
 export const useSelectedEmulatorStartPoint = () => useEmulatorStore((state) => state.selectedCar?.emulator.coord.start);
 export const useSelectedEmulatorEndPoint = () => useEmulatorStore((state) => state.selectedCar?.emulator.coord.end);
+export const useSelectedEmulatorCurrentPoint = () => useEmulatorStore((state) => state.selectedCar?.emulator.coord.current);
 export const useSelectedEmulatorPathRoute = () => useEmulatorStore((state) => state.selectedCar?.emulator.pathRoute);
 export const useSelectedEmulatorDriveLogs = () => useEmulatorStore((state) => state.selectedCar?.emulator.driveLogs);

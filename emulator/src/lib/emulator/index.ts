@@ -6,6 +6,7 @@ export async function emulateCarPath(params: {
     end: GpsCoord;
     initSpdKmh: number;
     maxSpdKmh: number;
+    initMileage: number;
     acc: number;
 }) {
     const route = await findRoute("car", params.start, params.end);
@@ -17,6 +18,7 @@ export async function emulateCarPath(params: {
     let next = path.points.coordinates[pidx + 1];
     let spdKmh = params.initSpdKmh;
     let remainMeter = spdKmh / 3.6;
+    let mileage = params.initMileage;
 
     const getNext = () => {
         while (pidx < path.points.coordinates.length) {
@@ -42,11 +44,14 @@ export async function emulateCarPath(params: {
                 remainMeter = spdKmh;
             }
 
+            mileage += spdKmh / 3.6;
+
             return {
                 current,
                 next,
                 ang: normalizeHeading(hd.heading),
                 spd: spdKmh,
+                mileage,
             }
         }
         done = true;

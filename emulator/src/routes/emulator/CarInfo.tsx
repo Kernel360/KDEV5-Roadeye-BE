@@ -1,6 +1,8 @@
 import { useCallback } from "react";
 import { useEmulatorStore, useSelectedEmulatorCar, useSelectedEmulatorDriving, useSelectedEmulatorEndPoint, useSelectedEmulatorIgnition, useSelectedEmulatorStartPoint } from "~/stores/emulatorStore";
 import CarLogList from "./CarLogList";
+import { useMdtApi } from "~/hooks/useMdtApi";
+import { v4 as uuid } from 'uuid';
 
 function CarInfo() {
     return (
@@ -125,27 +127,128 @@ const drivingStateGraph: Record<DrivingState, DrivingState> = {
 }
 
 function CarControl() {
-    const { selectedCar, turnOffIgnition, turnOnIgnition } = useEmulatorStore();
+    const api = useMdtApi();
+
+    const {
+        selectedCar,
+        turnOffIgnition,
+        turnOnIgnition,
+        addDriveLog,
+        getEmulatorInstance,
+        startDriving,
+        stopDriving,
+        clearDriveLogs,
+        getPathRoute,
+        getTimer,
+        getSelectedCar
+    } = useEmulatorStore();
 
     const ignition = useSelectedEmulatorIgnition();
     const driving = useSelectedEmulatorDriving();
 
     const handleIgnitionStateChange = useCallback(() => {
+        const selectedCar = getSelectedCar();
         if (!selectedCar) return;
 
+        const nextState = ignitionStateGraph[ignition!.state];
 
-    }, [selectedCar]);
-
-    const handleDrivingStateChange = useCallback(() => {
-        if (!selectedCar) return;
-
-        if (driving!.state === '주행') {
-            turnOnIgnition();
+        if (nextState === '시동ON') {
+            const tuid = uuid();
+            api.sendIgnitionOn(selectedCar, tuid)
+                .then(({ onTime, tuid }) => {
+                    turnOnIgnition(onTime, tuid);
+                })
+                .catch(() => {
+                    alert("시동 켜기 실패");
+                })
         } else {
-            turnOffIgnition();
+            api.sendIgnitionOff(selectedCar)
+                .then(({ offTime }) => {
+                    turnOffIgnition(offTime);
+                })
+                .catch(() => {
+                    alert("시동 끄기 실패");
+                })
         }
 
-    }, [selectedCar, driving, turnOnIgnition, turnOffIgnition]);
+    }, [ignition]);
+
+    const handleDrivingStateChange = useCallback(() => {
+        const selectedCar = getSelectedCar();
+
+        if (!selectedCar) return;
+
+        const nextState = drivingStateGraph[driving!.state];
+
+        if (nextState === '주행') {
+            const prevTimer = getTimer();
+            if (prevTimer) {
+                clearInterval(prevTimer);
+            }
+
+            const pathRoute = getPathRoute();
+            if (!pathRoute.length) {
+                alert("경로가 지정되지 않았습니다.");
+                return;
+            }
+
+            const instance = getEmulatorInstance(selectedCar.car);
+            if (!instance) {
+                alert("Emulator instance not found");
+                return;
+            }
+
+            let sec = 0;
+            const timer = setInterval(() => {
+                const next = instance.next();
+                if (!next.done) {
+                    const value = next.value;
+                    addDriveLog({
+                        sec: sec,
+                        gcd: 'A',
+                        lat: value.current.lat,
+                        lon: value.current.lng,
+                        ang: value.ang,
+                        spd: value.spd,
+                        sum: value.mileage,
+                        bat: 100,
+                    })
+                }
+
+                if (next.done) {
+                    if (selectedCar.emulator.driveLogs.length > 0) {
+                        api.sendCycleLog(getSelectedCar()!)
+                            .then(() => api.sendIgnitionOff(getSelectedCar()!))
+                            .then(() => stopDriving())
+                    }
+                    else {
+                        api.sendIgnitionOff(getSelectedCar()!)
+                            .then(() => stopDriving())
+                    }
+                }
+
+                if (sec === 59) {
+                    api.sendCycleLog(getSelectedCar()!)
+                        .then(() => {
+                            clearDriveLogs()
+                            sec = 0;
+                        })
+                }
+
+                sec++;
+            }, 1000);
+
+            startDriving(timer);
+        }
+        else {
+            const timer = selectedCar.emulator.timer;
+            if (timer) {
+                clearInterval(timer);
+            }
+            stopDriving();
+        }
+
+    }, [driving]);
 
     const ignitionButtonDisabled = !selectedCar || (ignition!.state === '시동ON' && driving!.state === '주행');
     const drivingButtonDisabled = !selectedCar || (ignition!.state === '시동OFF' && driving!.state === '정지');

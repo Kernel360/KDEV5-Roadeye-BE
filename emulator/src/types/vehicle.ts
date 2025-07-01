@@ -2,15 +2,15 @@ export interface CommonFields {
     mdn: string;
     tid: string;
     mid: string;
-    pv: string;
+    pv: number;
     did: string;
 }
 
 export type DriveData = {
-    sec: string;
+    sec: number;
     gcd: string;
-    lat: string;
-    lon: string;
+    lat: number;
+    lon: number;
     ang: number;
     spd: number;
     sum: number;

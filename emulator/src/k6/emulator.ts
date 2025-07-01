@@ -114,6 +114,7 @@ async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
         end: ctx.location.end,
         initSpdKmh: 10,
         maxSpdKmh: 80,
+        initMileage: 0,
         acc: 0.5,
     })
 
