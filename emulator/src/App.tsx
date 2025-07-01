@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, NavLink } from 'react-router-dom'
 import Emulator from './routes/emulator'
 import Login from './routes/login'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -32,9 +32,7 @@ function App() {
                                 </div>
                             )}
                         </div>
-                        <div className="space-y-2">
-                            <div><a href="/emulator" className="text-blue-600 hover:underline">시뮬레이터로 이동</a></div>
-                        </div>
+                        <NavLink to="/emulator" className="text-blue-600 hover:underline">시뮬레이터로 이동</NavLink>
                     </div>
                 </ProtectedRoute>
             } />

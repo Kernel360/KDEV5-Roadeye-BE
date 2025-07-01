@@ -9,6 +9,7 @@ interface User {
 }
 
 interface AuthState {
+    initialized: boolean;
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
@@ -19,7 +20,7 @@ interface AuthActions {
     login: (companyId: string, username: string, password: string) => Promise<boolean>;
     logout: () => void;
     clearError: () => void;
-    setUser: (user: User | null) => void;
+    checkSession: () => void;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -27,6 +28,7 @@ type AuthStore = AuthState & AuthActions;
 export const useAuthStore = create<AuthStore>()(
     persist(
         (set) => ({
+            initialized: false,
             user: null,
             isAuthenticated: false,
             isLoading: false,
@@ -42,6 +44,7 @@ export const useAuthStore = create<AuthStore>()(
                     const data = await res.json();
 
                     set({
+                        initialized: true,
                         user: data,
                         isAuthenticated: true,
                         isLoading: false,
@@ -52,6 +55,7 @@ export const useAuthStore = create<AuthStore>()(
                 } catch (err) {
                     const errorMessage = err instanceof Error ? err.message : '로그인에 실패했습니다.';
                     set({
+                        initialized: true,
                         isLoading: false,
                         error: errorMessage
                     });
@@ -61,6 +65,7 @@ export const useAuthStore = create<AuthStore>()(
 
             logout: () => {
                 set({
+                    initialized: true,
                     user: null,
                     isAuthenticated: false,
                     isLoading: false,
@@ -72,25 +77,44 @@ export const useAuthStore = create<AuthStore>()(
                 set({ error: null });
             },
 
-            setUser: (user: User | null) => {
-                set({
-                    user,
-                    isAuthenticated: !!user
-                });
-            }
+            checkSession: () => {
+                set({ isLoading: true, error: null });
+
+                const baseUrl = import.meta.env.VITE_API_WEB_URL;
+                api.getMyInfo(baseUrl)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        set({
+                            initialized: true,
+                            user: data,
+                            isAuthenticated: true,
+                            isLoading: false,
+                            error: null
+                        });
+                    })
+                    .catch((err) => {
+                        set({
+                            initialized: true,
+                            user: null,
+                            isAuthenticated: false,
+                            isLoading: false,
+                            error: err instanceof Error ? err.message : '세션 확인에 실패했습니다.',
+                        });
+                    });
+            },
         }),
         {
             name: 'auth-storage',
             storage: createJSONStorage(() => sessionStorage),
             partialize: (state) => ({
-                user: state.user,
-                isAuthenticated: state.isAuthenticated
+                user: state.user
             }),
         }
     )
 );
 
 export const useUser = () => useAuthStore((state) => state.user);
+export const useAuthInitialized = () => useAuthStore((state) => state.initialized);
 export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated);
 export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
 export const useAuthError = () => useAuthStore((state) => state.error);
@@ -106,5 +130,5 @@ export const authStore = {
         useAuthStore.getState().login(companyId, username, password),
     logout: () => useAuthStore.getState().logout(),
     clearError: () => useAuthStore.getState().clearError(),
-    setUser: (user: User | null) => useAuthStore.getState().setUser(user)
+    getMyInfo: () => useAuthStore.getState().checkSession()
 }; 
