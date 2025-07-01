@@ -3,11 +3,11 @@ import { findRoute } from "~/lib/graphhopper";
 import { useEmulatorStore } from "~/stores/emulatorStore";
 
 function RouteAPI() {
-    const { startPoint, endPoint, setPathRoute } = useEmulatorStore();
+    const { selectedCar, setPathRoute } = useEmulatorStore();
 
     useEffect(() => {
-        if (startPoint && endPoint) {
-            findRoute("car", startPoint, endPoint)
+        if (selectedCar?.emulator.startPoint && selectedCar?.emulator.endPoint) {
+            findRoute("car", selectedCar.emulator.startPoint, selectedCar.emulator.endPoint)
                 .then((res) => {
                     setPathRoute(res.paths[0].points.coordinates)
                 })
@@ -15,7 +15,7 @@ function RouteAPI() {
                     console.error(err)
                 })
         }
-    }, [startPoint, endPoint, setPathRoute])
+    }, [selectedCar?.emulator.startPoint, selectedCar?.emulator.endPoint, setPathRoute])
 
     return <></>
 }

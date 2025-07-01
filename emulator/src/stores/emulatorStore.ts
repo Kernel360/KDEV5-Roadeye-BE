@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { produce } from 'immer'
 import type { Car } from './carStore'
 
 export type GpsCoord = {
@@ -10,16 +11,16 @@ type CarEmulatorState = {
     car: Car
     emulator: {
         ignition: '시동OFF' | '시동ON'
-        driving: '주행' | '정지'
+        driving: '주행' | '정지',
+        startPoint: GpsCoord | null,
+        endPoint: GpsCoord | null
+        currentPoint: GpsCoord | null
+        pathRoute: GpsCoord[]
     }
 }
 
 interface EmulatorState {
     mapCenter: GpsCoord
-    startPoint: GpsCoord | null
-    currentPoint: GpsCoord | null
-    endPoint: GpsCoord | null
-    pathRoute: GpsCoord[]
     selectedCar: CarEmulatorState | null
 
     setStartPoint: (point: GpsCoord) => void
@@ -36,38 +37,76 @@ export const useEmulatorStore = create<EmulatorState>((set) => ({
         lat: 37.499225,
         lng: 127.031477
     },
-    startPoint: null,
-    currentPoint: null,
-    endPoint: null,
-    pathRoute: [],
     selectedCar: null,
 
-    setStartPoint: (point: GpsCoord) => set({ startPoint: point }),
-    setEndPoint: (point: GpsCoord) => set({ endPoint: point }),
-    setMapCenter: (point: GpsCoord) => set({ mapCenter: point }),
-    setPathRoute: (route: GpsCoord[]) => set({ pathRoute: route }),
-    setCurrentPoint: (point: GpsCoord | null) => set({ currentPoint: point }),
-    setSelectedCar: (car: Car | null) => {
-        if (car) {
-            set({
-                selectedCar: {
+    setStartPoint: (point: GpsCoord) => set(
+        produce((state) => {
+            if (state.selectedCar) {
+                state.selectedCar.emulator.startPoint = point
+            }
+        })
+    ),
+    setEndPoint: (point: GpsCoord) => set(
+        produce((state) => {
+            if (state.selectedCar) {
+                state.selectedCar.emulator.endPoint = point
+            }
+        })
+    ),
+    setMapCenter: (point: GpsCoord) => set(
+        produce((state) => {
+            state.mapCenter = point
+        })
+    ),
+    setPathRoute: (route: GpsCoord[]) => set(
+        produce((state) => {
+            if (state.selectedCar) {
+                state.selectedCar.emulator.pathRoute = route
+            }
+        })
+    ),
+    setCurrentPoint: (point: GpsCoord | null) => set(
+        produce((state) => {
+            if (state.selectedCar) {
+                state.selectedCar.emulator.currentPoint = point
+            }
+        })
+    ),
+    setSelectedCar: (car: Car | null) => set(
+        produce((state) => {
+            if (car) {
+                state.selectedCar = {
                     car: car,
                     emulator: {
                         ignition: car.ignitionStatus === 'ON' ? '시동ON' : '시동OFF',
-                        driving: car.activeTransactionId ? '주행' : '정지'
+                        driving: car.activeTransactionId ? '주행' : '정지',
+                        startPoint: {
+                            lat: car.latitude,
+                            lng: car.longitude
+                        },
+                        endPoint: null,
+                        currentPoint: {
+                            lat: car.latitude,
+                            lng: car.longitude
+                        },
+                        pathRoute: []
                     }
                 }
-            })
-        } else {
-            set({ selectedCar: null })
-        }
-    },
-    centerOnSelectedCar: () => set((state) => {
-        if (state.selectedCar) {
-            return { mapCenter: { lat: state.selectedCar.car.latitude, lng: state.selectedCar.car.longitude } }
-        }
-        return state
-    })
+            } else {
+                state.selectedCar = null
+            }
+        })
+    ),
+    centerOnSelectedCar: () => set(
+        produce((state) => {
+            if (state.selectedCar) {
+                state.mapCenter = {
+                    lat: state.selectedCar.car.latitude,
+                    lng: state.selectedCar.car.longitude
+                }
+            }
+        })
+    )
 }))
 
 export const useSelectedEmulatorCar = () => useEmulatorStore((state) => state.selectedCar?.car);

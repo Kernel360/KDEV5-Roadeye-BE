@@ -13,9 +13,6 @@ function EmulatorMap() {
 
     const {
         mapCenter,
-        startPoint,
-        endPoint,
-        pathRoute,
         selectedCar,
         setStartPoint,
         setEndPoint,
@@ -25,13 +22,13 @@ function EmulatorMap() {
     const [contextMenuCoord, setContextMenuCoord] = useState<GpsCoord | null>(null);
 
     useEffect(() => {
-        if (selectedCar) {
+        if (selectedCar?.car) {
             setMapCenter({
                 lat: selectedCar.car.latitude,
                 lng: selectedCar.car.longitude
             });
         }
-    }, [selectedCar, setMapCenter]);
+    }, [selectedCar?.car, setMapCenter]);
 
     const handleRightClick = useCallback((_: unknown, MouseEvent: kakao.maps.event.MouseEvent) => {
         setContextMenuCoord({
@@ -58,19 +55,19 @@ function EmulatorMap() {
             <MapTypeControl position={"TOPRIGHT"} />
             <ZoomControl position={"BOTTOMRIGHT"} />
 
-            {startPoint && <MapMarker
+            {selectedCar?.emulator.startPoint && <MapMarker
                 image={{
                     src: MapPinBlue,
                     size: { width: 31.2, height: 40 }
                 }}
-                position={startPoint}
+                position={selectedCar.emulator.startPoint}
             />}
-            {endPoint && <MapMarker
+            {selectedCar?.emulator.endPoint && <MapMarker
                 image={{
                     src: MapPinRed,
                     size: { width: 31.2, height: 40 }
                 }}
-                position={endPoint}
+                position={selectedCar.emulator.endPoint}
             />}
 
             {selectedCar && (
@@ -114,9 +111,9 @@ function EmulatorMap() {
                 </CustomOverlayMap>
             )}
 
-            {pathRoute && (
+            {selectedCar?.emulator.pathRoute && (
                 <Polyline
-                    path={pathRoute}
+                    path={selectedCar.emulator.pathRoute}
                     strokeWeight={5}
                     endArrow={true}
                 />

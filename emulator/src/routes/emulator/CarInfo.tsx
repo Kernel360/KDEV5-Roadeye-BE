@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import CarLogList from "./CarLogList";
 import { useEmulatorStore, useSelectedEmulatorCar } from "~/stores/emulatorStore";
 
@@ -14,7 +14,7 @@ function CarInfo() {
 }
 
 function CarStatus() {
-    const { startPoint, endPoint, setMapCenter } = useEmulatorStore();
+    const { selectedCar, setMapCenter } = useEmulatorStore();
 
     return (
         <div>
@@ -22,12 +22,12 @@ function CarStatus() {
             <div>
                 <div className="flex flex-row gap-2">
                     <span className="select-none">출발지: </span>
-                    <span>{startPoint ? `${startPoint.lat.toFixed(4)}, ${startPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <span>{selectedCar?.emulator.startPoint ? `${selectedCar.emulator.startPoint.lat.toFixed(4)}, ${selectedCar.emulator.startPoint.lng.toFixed(4)}` : '지정안됨'}</span>
                     <div
                         className="cursor-pointer select-none"
                         onClick={() => {
-                            if (startPoint) {
-                                setMapCenter(startPoint)
+                            if (selectedCar?.emulator.startPoint) {
+                                setMapCenter(selectedCar.emulator.startPoint)
                             }
                         }}>
                         이동
@@ -35,12 +35,12 @@ function CarStatus() {
                 </div>
                 <div className="flex flex-row gap-2">
                     <span className="select-none">도착지: </span>
-                    <span>{endPoint ? `${endPoint.lat.toFixed(4)}, ${endPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <span>{selectedCar?.emulator.endPoint ? `${selectedCar.emulator.endPoint.lat.toFixed(4)}, ${selectedCar.emulator.endPoint.lng.toFixed(4)}` : '지정안됨'}</span>
                     <div
                         className="cursor-pointer select-none"
                         onClick={() => {
-                            if (endPoint) {
-                                setMapCenter(endPoint)
+                            if (selectedCar?.emulator.endPoint) {
+                                setMapCenter(selectedCar.emulator.endPoint)
                             }
                         }}>
                         이동
@@ -122,18 +122,18 @@ const drivingStateGraph: Record<DrivingState, DrivingState> = {
 }
 
 function CarControl() {
-    const { selectedCar, pathRoute } = useEmulatorStore();
+    const { selectedCar } = useEmulatorStore();
 
     const handleIgnitionStateChange = useCallback(() => {
     }, [selectedCar?.emulator.ignition]);
 
     const handleDrivingStateChange = useCallback(() => {
-        const newState = drivingStateGraph[drivingState];
-        if (!pathRoute.length) {
+        const newState = drivingStateGraph[selectedCar.emulator.driving];
+        if (!selectedCar?.emulator.pathRoute.length) {
             alert('경로가 지정되지 않았습니다.');
             return;
         }
-    }, [pathRoute]);
+    }, [selectedCar?.emulator.pathRoute]);
 
     const ignitionButtonDisabled = !selectedCar || (selectedCar.emulator.ignition === '시동ON' && selectedCar.emulator.driving === '주행');
     const drivingButtonDisabled = !selectedCar || (selectedCar.emulator.ignition === '시동OFF' && selectedCar.emulator.driving === '정지');
