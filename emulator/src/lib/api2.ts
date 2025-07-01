@@ -28,3 +28,12 @@ export async function getMyInfo(
         credentials: "include"
     });
 }
+
+export async function getAllCarList(
+    baseUrl: string,
+) {
+    return await fetch(`${baseUrl}/api/cars/all`, {
+        method: "GET",
+        credentials: "include"
+    });
+}
