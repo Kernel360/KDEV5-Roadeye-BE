@@ -1,6 +1,7 @@
 package org.re.driving.repository.impl;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -9,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.re.car.domain.QCar;
 import org.re.driving.domain.DrivingHistory;
+import org.re.driving.domain.DrivingHistoryStatus;
 import org.re.driving.domain.QDrivingHistory;
 import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.repository.DrivingHistoryCustomRepository;
@@ -53,11 +55,14 @@ public class DrivingHistoryCustomRepositoryImpl implements
         QDrivingHistory history = QDrivingHistory.drivingHistory;
         QCar car = QCar.car;
 
+        BooleanExpression condition = car.company.id.eq(companyId)
+            .and(history.status.eq(DrivingHistoryStatus.ENDED));
+
         Long total = queryFactory
             .select(history.count())
             .from(history)
             .join(history.car, car)
-            .where(car.company.id.eq(companyId))
+            .where(condition)
             .fetchOne();
 
         long count = total != null ? total : 0L;
@@ -65,7 +70,7 @@ public class DrivingHistoryCustomRepositoryImpl implements
         List<DrivingHistory> result = queryFactory
             .selectFrom(history)
             .join(history.car, car)
-            .where(car.company.id.eq(companyId))
+            .where(condition)
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
