@@ -86,6 +86,7 @@ done
 : "${CONFIG:=config-example.yml}"
 : "${JAVA_OPTS:=-Xmx1g -Xms1g}"
 : "${JAR:=$(find . -type f -name "*.jar")}"
+: "${FILE:=/graphhopper/data/data.pbf}"
 
 function download_files() {
     download_pbf "$1" "$2"
@@ -100,26 +101,28 @@ function download_md5() {
     wget -S -nv -O "$2" "$1"
 }
 
-if [ ! -f "$FILE" ] || [ ! -f "${FILE}.md5" ]; then
-    echo "PBF file does not exist, downloading..."
-    download_files "$URL" "$FILE"
-    echo "PBF file downloaded"
-elif [ -f "$FILE" ] && [ -f "${FILE}.md5" ]; then
-    echo "PBF file exists, checking md5..."
-    echo "Downloading remote MD5 file..."
-    download_md5 "$URL" "$FILE.md5.remote"
-    echo "RemoteMD5 file downloaded"
+if [ -f "$URL" ]; then
+    if [ ! -f "$FILE" ] || [ ! -f "${FILE}.md5" ]; then
+        echo "PBF file does not exist, downloading..."
+        download_files "$URL" "$FILE"
+        echo "PBF file downloaded"
+    elif [ -f "$FILE" ] && [ -f "${FILE}.md5" ]; then
+        echo "PBF file exists, checking md5..."
+        echo "Downloading remote MD5 file..."
+        download_md5 "$URL" "$FILE.md5.remote"
+        echo "RemoteMD5 file downloaded"
 
-    if [ "$(diff "${FILE}.md5" "${FILE}.md5.remote")" ]; then
-        echo "PBF file is outdated, downloading new files..."
-        download_files "$URL" "$FILE"
-        echo "PBF file downloaded."
-    elif ! md5sum -c "${FILE}.md5" &>/dev/null; then
-        echo "MD5 mismatch, download new pbf file..."
-        download_files "$URL" "$FILE"
-        echo "PBF file downloaded."
-    else
-        echo "PBF file is up to date."
+        if [ "$(diff "${FILE}.md5" "${FILE}.md5.remote")" ]; then
+            echo "PBF file is outdated, downloading new files..."
+            download_files "$URL" "$FILE"
+            echo "PBF file downloaded."
+        elif ! md5sum -c "${FILE}.md5" &>/dev/null; then
+            echo "MD5 mismatch, download new pbf file..."
+            download_files "$URL" "$FILE"
+            echo "PBF file downloaded."
+        else
+            echo "PBF file is up to date."
+        fi
     fi
 fi
 
