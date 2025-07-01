@@ -2,7 +2,6 @@ import { useCarList } from '~/hooks/useCarList';
 import { FixedSizeList as List } from 'react-window';
 import { useEffect, useState } from 'react';
 import { useEmulatorStore } from '~/stores/emulatorStore';
-import { useNavigate } from 'react-router-dom';
 
 function SideBar() {
     return (
@@ -82,6 +81,13 @@ function CarListView() {
         const CarItem = ({ index, style }: { index: number; style: React.CSSProperties }) => {
             const car = cars[index];
             const { selectedCar, setSelectedCar } = useEmulatorStore();
+
+            useEffect(() => {
+                if (cars && !cars.find(c => c.id === car.id)) {
+                    setSelectedCar(null);
+                }
+            }, [car.id, setSelectedCar]);
+
             const isSelected = selectedCar?.id === car.id;
 
             return (
