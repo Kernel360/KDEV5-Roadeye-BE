@@ -42,6 +42,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      - name: Build Module
+        id: build
+        run: |
+          ./gradlew --quiet --build-cache \
+            :${{ matrix.module }}:bootBuildImage \
+            --imageName=${{ env.DOCKER_IMAGE }}:latest
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -52,10 +59,6 @@ jobs:
       - name: Login to AWS
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Module
-        id: build
+      - name: Push Docker image
         run: |
-          ./gradlew --quiet --build-cache \
-            :${{ matrix.module }}:bootBuildImage \
-            --imageName=${{ env.DOCKER_IMAGE }}:latest-test \
-            --publishImage
+          docker push ${{ env.DOCKER_IMAGE }}:latest
