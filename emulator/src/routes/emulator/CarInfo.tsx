@@ -6,6 +6,7 @@ function CarInfo() {
     return (
         <div className="flex flex-col gap-2 min-w-60">
             <CarStatus />
+            <CarDetails />
             <CarControl />
             <CarLogList />
         </div>
@@ -44,6 +45,36 @@ function CarStatus() {
                         }}>
                         이동
                     </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function CarDetails() {
+    const { selectedCar } = useEmulatorStore();
+
+    return (
+        <div>
+            <div>차량 상세 정보</div>
+            <div className="mt-2 space-y-2">
+                <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">차량명:</span>
+                    <span className="text-sm font-medium">
+                        {selectedCar ? (selectedCar.name || `차량 ${selectedCar.id}`) : '-'}
+                    </span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">위도:</span>
+                    <span className="text-sm font-medium">
+                        {selectedCar ? selectedCar.latitude.toFixed(6) : '-'}
+                    </span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">경도:</span>
+                    <span className="text-sm font-medium">
+                        {selectedCar ? selectedCar.longitude.toFixed(6) : '-'}
+                    </span>
                 </div>
             </div>
         </div>

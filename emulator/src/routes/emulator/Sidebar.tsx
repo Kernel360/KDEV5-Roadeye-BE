@@ -1,6 +1,7 @@
 import { useCarList } from '~/hooks/useCarList';
 import { FixedSizeList as List } from 'react-window';
 import { useEffect, useState } from 'react';
+import { useEmulatorStore } from '~/stores/emulatorStore';
 
 function SideBar() {
     return (
@@ -79,14 +80,30 @@ function CarListView() {
 
         const CarItem = ({ index, style }: { index: number; style: React.CSSProperties }) => {
             const car = cars[index];
+            const { selectedCar, setSelectedCar } = useEmulatorStore();
+            const isSelected = selectedCar?.id === car.id;
+
             return (
                 <div style={style} className="px-4 py-2">
-                    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow h-full">
+                    <div
+                        className={`border rounded-lg p-4 hover:shadow-md transition-shadow h-full cursor-pointer ${isSelected
+                            ? 'bg-blue-50 border-blue-300 shadow-md'
+                            : 'bg-white border-gray-200'
+                            }`}
+                        onClick={() => setSelectedCar(isSelected ? null : car)}
+                    >
                         <div className="flex items-center justify-between">
                             <div className="flex-1">
-                                <h3 className="text-sm font-medium text-gray-900">
-                                    {car.name || `차량 ${car.id}`}
-                                </h3>
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-sm font-medium text-gray-900">
+                                        {car.name || `차량 ${car.id}`}
+                                    </h3>
+                                    {isSelected && (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            선택됨
+                                        </span>
+                                    )}
+                                </div>
                                 {car.plateNumber && (
                                     <p className="text-sm text-gray-500 mt-1">
                                         번호판: {car.plateNumber}

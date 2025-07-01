@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { Car } from './carStore'
 
 export type GpsCoord = {
     lat: number
@@ -11,12 +12,14 @@ interface EmulatorState {
     currentPoint: GpsCoord | null
     endPoint: GpsCoord | null
     pathRoute: GpsCoord[]
+    selectedCar: Car | null
 
     setStartPoint: (point: GpsCoord) => void
     setEndPoint: (point: GpsCoord) => void
     setMapCenter: (point: GpsCoord) => void
     setPathRoute: (route: GpsCoord[]) => void
     setCurrentPoint: (point: GpsCoord | null) => void
+    setSelectedCar: (car: Car | null) => void
 }
 
 export const useEmulatorStore = create<EmulatorState>((set) => ({
@@ -28,10 +31,12 @@ export const useEmulatorStore = create<EmulatorState>((set) => ({
     currentPoint: null,
     endPoint: null,
     pathRoute: [],
+    selectedCar: null,
 
     setStartPoint: (point: GpsCoord) => set({ startPoint: point }),
     setEndPoint: (point: GpsCoord) => set({ endPoint: point }),
     setMapCenter: (point: GpsCoord) => set({ mapCenter: point }),
     setPathRoute: (route: GpsCoord[]) => set({ pathRoute: route }),
-    setCurrentPoint: (point: GpsCoord | null) => set({ currentPoint: point })
+    setCurrentPoint: (point: GpsCoord | null) => set({ currentPoint: point }),
+    setSelectedCar: (car: Car | null) => set({ selectedCar: car })
 }))
