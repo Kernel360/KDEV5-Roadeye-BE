@@ -41,12 +41,20 @@ function EmulatorMap() {
         })
     }, [])
 
+    const handleCenterChanged = useCallback((map: kakao.maps.Map) => {
+        setMapCenter({
+            lat: map.getCenter().getLat(),
+            lng: map.getCenter().getLng()
+        })
+    }, [setMapCenter])
+
     return (
         <Map
             style={{ width: '100%', height: '100%' }}
             level={3}
             center={mapCenter}
             onRightClick={handleRightClick}
+            onCenterChanged={handleCenterChanged}
         >
             <MapTypeControl position={"TOPRIGHT"} />
             <ZoomControl position={"BOTTOMRIGHT"} />
