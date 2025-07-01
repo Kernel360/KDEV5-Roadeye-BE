@@ -109,7 +109,8 @@ const drivingStateGraph: Record<DrivingState, DrivingState> = {
 }
 
 function CarControl() {
-    const { selectedCar } = useEmulatorStore();
+    const { selectedCar, pathRoute } = useEmulatorStore();
+
     const [ignitionState, setIgnitionState] = useState<IgnitionState>('시동OFF');
     const [drivingState, setDrivingState] = useState<DrivingState>('정지');
 
@@ -118,8 +119,13 @@ function CarControl() {
     }, [ignitionState]);
 
     const handleDrivingStateChange = useCallback(() => {
-        setDrivingState(drivingStateGraph[drivingState]);
-    }, [drivingState]);
+        const newState = drivingStateGraph[drivingState];
+        if (!pathRoute.length) {
+            alert('경로가 지정되지 않았습니다.');
+            return;
+        }
+        setDrivingState(newState);
+    }, [drivingState, pathRoute]);
 
     const ignitionButtonDisabled = !selectedCar || (ignitionState === '시동ON' && drivingState === '주행');
     const drivingButtonDisabled = !selectedCar || (ignitionState === '시동OFF' && drivingState === '정지');
