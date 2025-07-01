@@ -88,7 +88,7 @@ function CarListView() {
                 }
             }, [car.id, setSelectedCar]);
 
-            const isSelected = selectedCar?.id === car.id;
+            const isSelected = selectedCar?.car.id === car.id;
 
             return (
                 <div style={style} className="px-4 py-2">

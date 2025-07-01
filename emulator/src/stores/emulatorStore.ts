@@ -6,13 +6,21 @@ export type GpsCoord = {
     lng: number
 }
 
+type CarEmulatorState = {
+    car: Car
+    emulator: {
+        ignition: '시동OFF' | '시동ON'
+        driving: '주행' | '정지'
+    }
+}
+
 interface EmulatorState {
     mapCenter: GpsCoord
     startPoint: GpsCoord | null
     currentPoint: GpsCoord | null
     endPoint: GpsCoord | null
     pathRoute: GpsCoord[]
-    selectedCar: Car | null
+    selectedCar: CarEmulatorState | null
 
     setStartPoint: (point: GpsCoord) => void
     setEndPoint: (point: GpsCoord) => void
@@ -39,11 +47,27 @@ export const useEmulatorStore = create<EmulatorState>((set) => ({
     setMapCenter: (point: GpsCoord) => set({ mapCenter: point }),
     setPathRoute: (route: GpsCoord[]) => set({ pathRoute: route }),
     setCurrentPoint: (point: GpsCoord | null) => set({ currentPoint: point }),
-    setSelectedCar: (car: Car | null) => set({ selectedCar: car }),
+    setSelectedCar: (car: Car | null) => {
+        if (car) {
+            set({
+                selectedCar: {
+                    car: car,
+                    emulator: {
+                        ignition: car.ignitionStatus === 'ON' ? '시동ON' : '시동OFF',
+                        driving: car.activeTransactionId ? '주행' : '정지'
+                    }
+                }
+            })
+        } else {
+            set({ selectedCar: null })
+        }
+    },
     centerOnSelectedCar: () => set((state) => {
         if (state.selectedCar) {
-            return { mapCenter: { lat: state.selectedCar.latitude, lng: state.selectedCar.longitude } }
+            return { mapCenter: { lat: state.selectedCar.car.latitude, lng: state.selectedCar.car.longitude } }
         }
         return state
     })
 }))
+
+export const useSelectedEmulatorCar = () => useEmulatorStore((state) => state.selectedCar?.car);

@@ -3,11 +3,13 @@ import * as api from '~/lib/api2';
 
 export interface Car {
     id: string;
-    latitude: number;
-    longitude: number;
     name?: string;
     plateNumber?: string;
     status?: string;
+    latitude: number;
+    longitude: number;
+    activeTransactionId?: string;
+    ignitionStatus: "ON" | "OFF";
 }
 
 interface CarState {

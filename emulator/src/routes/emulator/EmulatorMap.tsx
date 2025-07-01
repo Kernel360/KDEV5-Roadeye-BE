@@ -24,12 +24,11 @@ function EmulatorMap() {
 
     const [contextMenuCoord, setContextMenuCoord] = useState<GpsCoord | null>(null);
 
-    // 선택된 차량이 변경되면 자동으로 지도 중심을 차량 위치로 이동
     useEffect(() => {
         if (selectedCar) {
             setMapCenter({
-                lat: selectedCar.latitude,
-                lng: selectedCar.longitude
+                lat: selectedCar.car.latitude,
+                lng: selectedCar.car.longitude
             });
         }
     }, [selectedCar, setMapCenter]);
@@ -81,8 +80,8 @@ function EmulatorMap() {
                         size: { width: 32, height: 32 }
                     }}
                     position={{
-                        lat: selectedCar.latitude,
-                        lng: selectedCar.longitude
+                        lat: selectedCar.car.latitude,
+                        lng: selectedCar.car.longitude
                     }}
                 />
             )}
