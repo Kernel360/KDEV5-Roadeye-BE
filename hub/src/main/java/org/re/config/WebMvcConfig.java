@@ -15,4 +15,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
         resolvers.add(new MdtLogRequestTimeInfoResolver());
         resolvers.add(new TransactionUUIDResolver());
     }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+            .allowedOrigins("*")
+            .allowedMethods(
+                HttpMethod.GET.name(),
+                HttpMethod.HEAD.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.DELETE.name()
+            );
+    }
 }
