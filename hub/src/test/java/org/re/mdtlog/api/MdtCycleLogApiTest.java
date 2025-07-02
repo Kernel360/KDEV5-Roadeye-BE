@@ -9,9 +9,12 @@ import org.re.mdtlog.dto.MdtCycleLogMessageFixture;
 import org.re.mdtlog.messaging.MdtLogMessagingService;
 import org.re.mdtlog.service.MdtCycleLogService;
 import org.re.test.api.BaseWebMvcTest;
+import org.re.web.resolver.MdtLogRequestTimeInfoResolver;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,6 +39,7 @@ public class MdtCycleLogApiTest extends BaseWebMvcTest {
         @DisplayName("존재하지 않는 차량인 경우 rstCd==304를 반환해야 한다.")
         void testNonExistentVehicle() throws Exception {
             var tuid = UUID.randomUUID().toString();
+            var now = LocalDateTime.now();
             var carId = -1L;
             var body = objectMapper.writeValueAsString(MdtCycleLogMessageFixture.create(carId));
             var expectedCode = 304;
@@ -44,6 +48,7 @@ public class MdtCycleLogApiTest extends BaseWebMvcTest {
             var req = post("/api/cycle-log")
                 .contentType("application/json")
                 .header("X-TUID", tuid)
+                .header(MdtLogRequestTimeInfoResolver.TIMESTAMP_HEADER_NAME, now.format(DateTimeFormatter.ofPattern(MdtLogRequestTimeInfoResolver.TIMESTAMP_PATTERN)))
                 .content(body);
             mvc.perform(req)
                 .andExpect(status().isOk())

@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.re.common.exception.MdtLogExceptionCode;
 import org.re.test.service.TestService;
+import org.re.web.resolver.MdtLogRequestTimeInfoResolver;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -84,7 +85,7 @@ public class ApiResponseTest extends BaseWebMvcTest {
         var expectedCode = 107;
 
         mvc.perform(request(HttpMethod.POST, validPath)
-                .header("X-Timestamp", invalidTimestamp))
+                .header(MdtLogRequestTimeInfoResolver.TIMESTAMP_HEADER_NAME, invalidTimestamp))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(expectedCode));
     }

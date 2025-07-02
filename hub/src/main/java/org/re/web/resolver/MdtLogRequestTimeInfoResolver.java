@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class MdtLogRequestTimeInfoResolver implements HandlerMethodArgumentResolver {
-    private static final String TIMESTAMP_HEADER = "X-Timestamp";
+    public static final String TIMESTAMP_HEADER_NAME = "X-Timestamp";
     public static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN);
@@ -32,7 +32,7 @@ public class MdtLogRequestTimeInfoResolver implements HandlerMethodArgumentResol
         WebDataBinderFactory binderFactory
     ) {
         var servletRequest = (HttpServletRequest) webRequest.getNativeRequest();
-        var timestamp = servletRequest.getHeader(TIMESTAMP_HEADER);
+        var timestamp = servletRequest.getHeader(TIMESTAMP_HEADER_NAME);
         if (timestamp == null) {
             throw new AppException(MdtLogExceptionCode.TIMESTAMP_MISSING);
         }
