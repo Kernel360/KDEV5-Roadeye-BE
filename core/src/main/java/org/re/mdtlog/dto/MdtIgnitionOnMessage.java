@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.*;
 import org.re.car.domain.CarLocation;
+import org.re.mdtlog.constraints.ValidPacketVersion;
 import org.re.mdtlog.databind.MdtLogGpsConditionDeserializer;
 import org.re.mdtlog.databind.MdtLogGpsConditionSerializer;
 import org.re.mdtlog.domain.MdtLog;
@@ -27,8 +28,7 @@ public record MdtIgnitionOnMessage(
     String manufacturerId,
 
     @JsonProperty("pv")
-    @Min(0)
-    @Max(65535)
+    @ValidPacketVersion
     int packetVersion,
 
     @JsonProperty("did")

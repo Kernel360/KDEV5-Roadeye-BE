@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.re.common.api.payload.BaseMdtResponse;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.common.exception.MdtLogExceptionCode;
+import org.re.mdtlog.constraints.ValidPacketVersion;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.re.test.api.payload.TodoItem;
 import org.re.test.service.TestService;
@@ -73,5 +74,13 @@ public class TestApi {
         @Min(10) @RequestParam Integer value
     ) {
         return value;
+    }
+
+    @PostMapping("/test/field/packet-version")
+    public BaseMdtResponse packetVersion(
+        @RequestParam @ValidPacketVersion Integer packetVersion
+    ) {
+        System.out.println("packetVersion = " + packetVersion);
+        return new BaseMdtResponse(MdtLogExceptionCode.Success);
     }
 }
