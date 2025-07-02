@@ -4,7 +4,7 @@ import { sleep } from 'k6';
 import http from 'k6/http';
 import type { Options } from 'k6/options';
 import * as uuid from 'uuid';
-import { emulateCarPath } from '~/lib/emulator/index.ts';
+import { emulateCarPath } from '~/lib/emulator/index.k6';
 import { getCar, getEndStation, getRandomStation, getStartStation } from '~/lib/shared.ts';
 
 enum Phase {
@@ -114,9 +114,10 @@ async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
         end: ctx.location.end,
         initSpdKmh: 10,
         maxSpdKmh: 80,
-        initMileage: 0,
         acc: 0.5,
     })
+
+    sleep(10);
 
     await http.asyncRequest(
         "POST",
@@ -143,6 +144,8 @@ async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
             }
         }
     )
+
+    sleep(10);
 }
 
 async function driving(ctx: Context, data: ReturnType<typeof setup>) {
