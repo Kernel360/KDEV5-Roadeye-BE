@@ -96,10 +96,12 @@ async function init(ctx: Context) {
         sum: 0,
         bat: 20
     }
+    const start = getStartStation();
+    const end = getEndStation(start);
     ctx.location = {
-        start: getStartStation(),
-        current: getStartStation(),
-        end: getEndStation()
+        start,
+        current: start,
+        end
     };
     ctx.transactionId = null;
     ctx.onTime = null;
@@ -107,6 +109,8 @@ async function init(ctx: Context) {
 }
 
 async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
+    console.log(`[VU-${__VU}] ignitionOn`);
+
     ctx.onTime = new Date();
     ctx.transactionId = uuid.v4();
     ctx.emulator = await emulateCarPath({
@@ -116,8 +120,6 @@ async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
         maxSpdKmh: 80,
         acc: 0.5,
     })
-
-    sleep(10);
 
     await http.asyncRequest(
         "POST",
@@ -144,24 +146,24 @@ async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
             }
         }
     )
-
-    sleep(10);
 }
 
 async function driving(ctx: Context, data: ReturnType<typeof setup>) {
+    console.log(`[VU-${__VU}] driving`);
+
     const nLogs = 60;
 
     const now = new Date();
 
     const logs: MdtLog[] = [];
-    const i = 0;
+    let i = 0;
     while (i < nLogs) {
         const next = ctx.emulator.next();
         if (next.done) break;
         const route = next.value;
 
         const log: MdtLog = {
-            sec: i,
+            sec: i++,
             gcd: 'A',
             lat: route.current.lat,
             lng: route.current.lng,
@@ -180,6 +182,8 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
 
         sleep(1);
     }
+
+    console.log(`[VU-${__VU}] driving logs: ${logs.length}`);
 
     await http.asyncRequest(
         "POST",
@@ -205,6 +209,8 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
 }
 
 async function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
+    console.log(`[VU-${__VU}] ignitionOff`);
+
     const now = new Date();
 
     ctx.offTime = now;
@@ -238,6 +244,8 @@ async function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
 }
 
 async function idle(ctx: Context) {
+    console.log(`[VU-${__VU}] idle`);
+
     while (true) {
         const st = getRandomStation();
         if (distanceTo(ctx.location.current, st) > 1000) {

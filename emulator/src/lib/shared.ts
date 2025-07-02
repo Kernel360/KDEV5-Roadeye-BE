@@ -13,15 +13,23 @@ export function getCar() {
 }
 
 export function getStartStation() {
-    const carIdx = __VU;
-    const stationIdx = (carIdx) % stations.length;
+    const stationIdx = Math.floor(Math.random() * stations.length);
     return stations[stationIdx];
 }
 
-export function getEndStation() {
-    const carIdx = __VU;
-    const stationIdx = (carIdx * 2) % stations.length;
-    return stations[stationIdx];
+export function getEndStation(start: StationType) {
+    if (stations.length === 1) {
+        throw new Error("Only one station");
+    }
+
+    do {
+        const stationIdx = Math.floor(Math.random() * stations.length);
+        const station = stations[stationIdx];
+        if (station !== start) {
+            return station;
+        }
+        // eslint-disable-next-line no-constant-condition
+    } while (true);
 }
 
 export function getRandomStation() {
