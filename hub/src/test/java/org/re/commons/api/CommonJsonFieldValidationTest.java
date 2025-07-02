@@ -55,4 +55,21 @@ public class CommonJsonFieldValidationTest extends BaseWebMvcTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(code));
     }
+
+    @ParameterizedTest
+    @DisplayName("경도 테스트")
+    @CsvSource({
+        "-180.000001, 400",
+        "-180.0, 000",
+        "0.0, 000",
+        "180.0, 000",
+        "180.000001, 400",
+    })
+    public void testLongitude(Double longitude, String code) throws Exception {
+        var req = post("/test/field/longitude")
+            .param("longitude", String.valueOf(longitude));
+        mvc.perform(req)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(code));
+    }
 }

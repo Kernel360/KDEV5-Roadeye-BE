@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import org.re.car.domain.CarLocation;
 import org.re.mdtlog.constraints.ValidLatitude;
+import org.re.mdtlog.constraints.ValidLongitude;
 import org.re.mdtlog.constraints.ValidPacketVersion;
 import org.re.mdtlog.databind.MdtLogGpsConditionDeserializer;
 import org.re.mdtlog.databind.MdtLogGpsConditionSerializer;
@@ -104,8 +107,7 @@ public record MdtCycleLogMessage(
         BigDecimal gpsLatitude,
 
         @JsonProperty("lon")
-        @DecimalMin(value = "-180.0")
-        @DecimalMax(value = "180.0")
+        @ValidLongitude
         @NotNull
         BigDecimal gpsLongitude,
 

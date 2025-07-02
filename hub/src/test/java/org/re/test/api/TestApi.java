@@ -7,6 +7,7 @@ import org.re.common.api.payload.BaseMdtResponse;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.common.exception.MdtLogExceptionCode;
 import org.re.mdtlog.constraints.ValidLatitude;
+import org.re.mdtlog.constraints.ValidLongitude;
 import org.re.mdtlog.constraints.ValidPacketVersion;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.re.test.api.payload.TodoItem;
@@ -91,6 +92,14 @@ public class TestApi {
         @RequestParam @ValidLatitude BigDecimal latitude
     ) {
         System.out.println("latitude = " + latitude);
+        return new BaseMdtResponse(MdtLogExceptionCode.Success);
+    }
+
+    @PostMapping("/test/field/longitude")
+    public BaseMdtResponse longitude(
+        @RequestParam @ValidLongitude BigDecimal longitude
+    ) {
+        System.out.println("longitude = " + longitude);
         return new BaseMdtResponse(MdtLogExceptionCode.Success);
     }
 }
