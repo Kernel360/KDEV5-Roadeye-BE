@@ -1,6 +1,8 @@
 package org.re.web.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.re.common.exception.AppException;
+import org.re.common.exception.MdtLogExceptionCode;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -26,7 +28,7 @@ public class TransactionUUIDResolver implements HandlerMethodArgumentResolver {
         var servletRequest = (HttpServletRequest) webRequest.getNativeRequest();
         var tuid = servletRequest.getHeader(HEADER_NAME);
         if (tuid == null) {
-            return null;
+            throw new AppException(MdtLogExceptionCode.TUID_ERROR);
         }
         return TransactionUUID.from(tuid);
     }

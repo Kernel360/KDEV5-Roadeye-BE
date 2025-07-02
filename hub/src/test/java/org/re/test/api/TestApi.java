@@ -1,5 +1,6 @@
 package org.re.test.api;
 
+import org.re.mdtlog.domain.TransactionUUID;
 import org.re.test.service.TestService;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,5 +29,12 @@ public class TestApi {
     @PostMapping(value = "/content-type-test/json", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     public String contentTypeTestJson() {
         return "json";
+    }
+
+    @PostMapping("/test/tuid")
+    public Object tuidMissing(
+        TransactionUUID uuid
+    ) {
+        return uuid;
     }
 }
