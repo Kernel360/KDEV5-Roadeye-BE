@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.re.car.domain.CarLocation;
 import org.re.mdtlog.constraints.*;
@@ -63,8 +61,7 @@ public record MdtIgnitionOnMessage(
     int mdtSpeed,
 
     @JsonProperty("sum")
-    @Min(0)
-    @Max(9999999)
+    @ValidMileageSum
     int mdtMileageSum
 ) {
     public CarLocation getLocation() {

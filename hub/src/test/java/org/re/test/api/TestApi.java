@@ -116,4 +116,12 @@ public class TestApi {
         System.out.println("speed = " + speed);
         return new BaseMdtResponse(MdtLogExceptionCode.Success);
     }
+
+    @PostMapping("/test/field/mileageSum")
+    public BaseMdtResponse mileageSum(
+        @RequestParam @ValidMileageSum Long mileageSum
+    ) {
+        System.out.println("mileageSum = " + mileageSum);
+        return new BaseMdtResponse(MdtLogExceptionCode.Success);
+    }
 }

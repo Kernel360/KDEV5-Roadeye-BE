@@ -118,8 +118,7 @@ public record MdtCycleLogMessage(
         int mdtSpeed,
 
         @JsonProperty("sum")
-        @Min(0)
-        @Max(9999999)
+        @ValidMileageSum
         int mdtMileageSum,
 
         @JsonProperty("bat")

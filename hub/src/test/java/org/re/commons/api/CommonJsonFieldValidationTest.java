@@ -107,4 +107,20 @@ public class CommonJsonFieldValidationTest extends BaseWebMvcTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(code));
     }
+
+    @ParameterizedTest
+    @DisplayName("MileageSum 테스트")
+    @CsvSource({
+        "-1, 400",
+        "0, 000",
+        "9999999, 000",
+        "10000000, 400",
+    })
+    public void testMileageSum(Long mileageSum, String code) throws Exception {
+        var req = post("/test/field/mileageSum")
+            .param("mileageSum", String.valueOf(mileageSum));
+        mvc.perform(req)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(code));
+    }
 }
