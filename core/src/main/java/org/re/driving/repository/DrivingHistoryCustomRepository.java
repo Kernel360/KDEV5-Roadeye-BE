@@ -12,4 +12,6 @@ public interface DrivingHistoryCustomRepository {
     List<DrivingHistoryMonthlyCountResult> countByMonth(LocalDateTime startDate);
 
     Page<DrivingHistory> findDrivingHistoryByCompanyId(Long companyId, Pageable pageable);
+
+    List<DrivingHistory> findByDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

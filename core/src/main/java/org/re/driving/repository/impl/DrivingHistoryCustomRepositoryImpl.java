@@ -77,4 +77,15 @@ public class DrivingHistoryCustomRepositoryImpl implements
 
         return new PageImpl<>(result, pageable, count);
     }
+
+    @Override
+    public List<DrivingHistory> findByDateBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        QDrivingHistory history = QDrivingHistory.drivingHistory;
+
+        return queryFactory
+            .selectFrom(history)
+            .where(history.previousDrivingSnapShot.datetime.between(startDate, endDate)
+                .and(history.status.eq(DrivingHistoryStatus.ENDED)))
+            .fetch();
+    }
 }
