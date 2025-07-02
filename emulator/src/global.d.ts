@@ -13,12 +13,12 @@ declare global {
     export type StationType = {
         name: string;
         lat: number;
-        lng: number;
+        lon: number;
     }
 
     export interface GpsCoord {
         lat: number;
-        lng: number;
+        lon: number;
     }
 
     export type MdtLog = {

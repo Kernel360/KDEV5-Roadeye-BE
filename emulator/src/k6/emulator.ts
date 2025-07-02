@@ -147,7 +147,7 @@ async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
             onTime: dateFormat(ctx.onTime, "yyyymmddHHMMss"),
             gcd: 'A',
             lat: ctx.location.current.lat,
-            lon: ctx.location.current.lng,
+            lon: ctx.location.current.lon,
             ang: ctx.car.ang,
             spd: ctx.car.spd,
             sum: ctx.car.sum
@@ -181,7 +181,7 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
             sec: i++,
             gcd: 'A',
             lat: route.current.lat,
-            lon: route.current.lng,
+            lon: route.current.lon,
             ang: route.ang,
             spd: route.spd,
             sum: ctx.car.sum,
@@ -191,7 +191,7 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
 
         ctx.location.current = route.current;
         ctx.car.latitude = route.current.lat;
-        ctx.car.longitude = route.current.lng;
+        ctx.car.longitude = route.current.lon;
         ctx.car.sum = ctx.car.sum + route.spd;
         ctx.car.ang = route.ang;
         ctx.car.spd = route.spd;
@@ -250,7 +250,7 @@ async function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
             offTime: dateFormat(ctx.offTime, "yyyymmddHHMMss"),
             gcd: 'A',
             lat: ctx.location.current.lat,
-            lon: ctx.location.current.lng,
+            lon: ctx.location.current.lon,
             ang: ctx.car.ang,
             spd: ctx.car.spd,
             sum: ctx.car.sum

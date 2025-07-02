@@ -16,7 +16,7 @@ export function decodePath(encoded: string, is3D: boolean = false): number[][] {
     let index = 0;
     let array: number[][] = [];
     let lat = 0;
-    let lng = 0;
+    let lon = 0;
     let ele = 0;
 
     while (index < len) {
@@ -39,7 +39,7 @@ export function decodePath(encoded: string, is3D: boolean = false): number[][] {
             shift += 5;
         } while (b >= 0x20);
         let deltaLon = ((result & 1) ? ~(result >> 1) : (result >> 1));
-        lng += deltaLon;
+        lon += deltaLon;
 
         if (is3D) {
             // elevation
@@ -52,9 +52,9 @@ export function decodePath(encoded: string, is3D: boolean = false): number[][] {
             } while (b >= 0x20);
             let deltaEle = ((result & 1) ? ~(result >> 1) : (result >> 1));
             ele += deltaEle;
-            array.push([lng * 1e-5, lat * 1e-5, ele / 100]);
+            array.push([lon * 1e-5, lat * 1e-5, ele / 100]);
         } else
-            array.push([lng * 1e-5, lat * 1e-5]);
+            array.push([lon * 1e-5, lat * 1e-5]);
     }
     // let end = new Date().getTime();
     // console.log("decoded " + len + " coordinates in " + ((end - start) / 1000) + "s");

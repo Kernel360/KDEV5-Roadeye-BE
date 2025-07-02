@@ -121,7 +121,7 @@ export class GraphHopperRouting {
     }
 
     private pointArrToObj(points: number[][]): GpsCoord[] {
-        return points.map(p => ({ lat: p[1], lng: p[0] }));
+        return points.map(p => ({ lat: p[1], lon: p[0] }));
     }
 
     async doRequest(reqArgs: GraphHopperRequestArgs): Promise<GraphHopperResponse> {
@@ -140,7 +140,7 @@ export class GraphHopperRouting {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...reqArgs,
-                    points: reqArgs.points.map(p => [p.lng, p.lat])
+                    points: reqArgs.points.map(p => [p.lon, p.lat])
                 })
             });
 
@@ -185,7 +185,7 @@ export class GraphHopperRouting {
                             const interval = path.instructions[j].interval;
                             const coordinates = (path.points as LineString).coordinates;
                             // The second parameter of slice is non inclusive, therefore we have to add +1
-                            path.instructions[j].points = coordinates.slice(interval[0], interval[1] + 1).map(p => [p.lng, p.lat]);
+                            path.instructions[j].points = coordinates.slice(interval[0], interval[1] + 1).map(p => [p.lon, p.lat]);
                         }
                     }
                 }

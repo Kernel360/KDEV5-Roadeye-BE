@@ -29,7 +29,7 @@ function EmulatorMap() {
         if (selectedCar?.car) {
             setMapCenter({
                 lat: selectedCar.car.latitude,
-                lng: selectedCar.car.longitude
+                lon: selectedCar.car.longitude
             });
         }
     }, [selectedCar?.car, setMapCenter]);
@@ -37,14 +37,14 @@ function EmulatorMap() {
     const handleRightClick = useCallback((_: unknown, MouseEvent: kakao.maps.event.MouseEvent) => {
         setContextMenuCoord({
             lat: MouseEvent.latLng.getLat(),
-            lng: MouseEvent.latLng.getLng()
+            lon: MouseEvent.latLng.getLng()
         })
     }, [])
 
     const handleCenterChanged = useCallback((map: kakao.maps.Map) => {
         setMapCenter({
             lat: map.getCenter().getLat(),
-            lng: map.getCenter().getLng()
+            lon: map.getCenter().getLng()
         })
     }, [setMapCenter])
 
@@ -82,7 +82,7 @@ function EmulatorMap() {
                     }}
                     position={{
                         lat: currentPoint.lat,
-                        lng: currentPoint.lng
+                        lon: currentPoint.lon
                     }}
                 />
             )}

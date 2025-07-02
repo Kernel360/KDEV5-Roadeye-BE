@@ -6,7 +6,7 @@ import type { Car } from './carStore'
 
 export type GpsCoord = {
     lat: number
-    lng: number
+    lon: number
 }
 
 export type CarEmulatorState = {
@@ -62,7 +62,7 @@ export const useEmulatorStore = create<EmulatorState>()(
         (set, get) => ({
             mapCenter: {
                 lat: 37.499225,
-                lng: 127.031477
+                lon: 127.031477
             },
             selectedCar: null,
             emulatorInstance: new Map<Car['id'], Awaited<ReturnType<typeof emulateCarPath>>>(),
@@ -102,12 +102,12 @@ export const useEmulatorStore = create<EmulatorState>()(
                             coord: {
                                 start: {
                                     lat: car.latitude,
-                                    lng: car.longitude
+                                    lon: car.longitude
                                 },
                                 end: null,
                                 current: {
                                     lat: car.latitude,
-                                    lng: car.longitude
+                                    lon: car.longitude
                                 }
                             },
                             pathRoute: [],
@@ -133,7 +133,7 @@ export const useEmulatorStore = create<EmulatorState>()(
                 if (state.selectedCar) {
                     state.mapCenter = {
                         lat: state.selectedCar.emulator.coord.current.lat,
-                        lng: state.selectedCar.emulator.coord.current.lng
+                        lon: state.selectedCar.emulator.coord.current.lon
                     }
                 }
             }),
@@ -142,7 +142,7 @@ export const useEmulatorStore = create<EmulatorState>()(
                     state.selectedCar.emulator.driveLogs.push(log)
                     state.selectedCar.emulator.coord.current = {
                         lat: log.lat,
-                        lng: log.lon
+                        lon: log.lon
                     }
                     console.log("addDriveLog", log)
                     console.log("currentPoint", state.selectedCar.emulator.coord.current)

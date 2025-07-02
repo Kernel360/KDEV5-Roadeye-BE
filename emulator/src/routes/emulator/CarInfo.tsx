@@ -27,7 +27,7 @@ function CarStatus() {
             <div>
                 <div className="flex flex-row gap-2">
                     <span className="select-none">출발지: </span>
-                    <span>{startPoint ? `${startPoint.lat.toFixed(4)}, ${startPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <span>{startPoint ? `${startPoint.lat.toFixed(4)}, ${startPoint.lon.toFixed(4)}` : '지정안됨'}</span>
                     <div
                         className="cursor-pointer select-none"
                         onClick={() => {
@@ -40,7 +40,7 @@ function CarStatus() {
                 </div>
                 <div className="flex flex-row gap-2">
                     <span className="select-none">도착지: </span>
-                    <span>{endPoint ? `${endPoint.lat.toFixed(4)}, ${endPoint.lng.toFixed(4)}` : '지정안됨'}</span>
+                    <span>{endPoint ? `${endPoint.lat.toFixed(4)}, ${endPoint.lon.toFixed(4)}` : '지정안됨'}</span>
                     <div
                         className="cursor-pointer select-none"
                         onClick={() => {
@@ -207,7 +207,7 @@ function CarControl() {
                         sec: sec,
                         gcd: 'A',
                         lat: value.current.lat,
-                        lon: value.current.lng,
+                        lon: value.current.lon,
                         ang: value.ang,
                         spd: value.spd,
                         sum: value.mileage,

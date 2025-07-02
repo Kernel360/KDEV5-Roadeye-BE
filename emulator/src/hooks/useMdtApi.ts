@@ -18,7 +18,7 @@ export function useMdtApi() {
             onTime: dateFormat(onTime, "yyyymmddHHMMss"),
             gcd: "A",
             lat: car.emulator.coord.current.lat,
-            lon: car.emulator.coord.current.lng,
+            lon: car.emulator.coord.current.lon,
             ang: 0,
             spd: 0,
             sum: 0
@@ -43,7 +43,7 @@ export function useMdtApi() {
             offTime: dateFormat(offTime, "yyyymmddHHMMss"),
             gcd: "A",
             lat: car.emulator.coord.current.lat,
-            lon: car.emulator.coord.current.lng,
+            lon: car.emulator.coord.current.lon,
             ang: 0,
             spd: 0,
             sum: car.emulator.driving.mileageSum

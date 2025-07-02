@@ -27,7 +27,7 @@ export async function emulateCarPath(params: {
             if (hd.distance <= remainMeter) {
                 const stopover = moveTo(current, { heading: hd.heading, distance: hd.distance });
                 // @ts-expect-error: lon is not always defined
-                current = { lat: stopover.lat, lng: stopover.lon || stopover.lng }
+                current = { lat: stopover.lat, lon: stopover.lon || stopover.lon }
                 next = path.points.coordinates[++pidx];
                 remainMeter -= hd.distance;
                 continue;
@@ -36,7 +36,7 @@ export async function emulateCarPath(params: {
                 const spdMph = spdKmh / 3.6;
                 const nextPoint = moveTo(current, { heading: hd.heading, distance: spdMph });
                 // @ts-expect-error: lon is not always defined
-                current = { lat: nextPoint.lat, lng: nextPoint.lon || nextPoint.lng }
+                current = { lat: nextPoint.lat, lon: nextPoint.lon || nextPoint.lon }
 
                 const spdDiff = Math.random() * params.acc * 2 - params.acc * 0.6;
                 const nextSpd = Math.min(Math.max(0, spdKmh + spdDiff), params.maxSpdKmh);
