@@ -14,18 +14,18 @@ export async function emulateCarPath(params: {
     let done = false;
     let pidx = 0;
     let current = path.points.coordinates[0];
-    let next = path.points.coordinates[pidx];
+    let next = path.points.coordinates[1];
     let spdKmh = params.initSpdKmh;
 
     const getNext = () => {
         while (pidx < path.points.coordinates.length) {
             const hd = headingDistanceTo(current, next);
-            const distanceKm = hd.distance / 1000;
+            const distanceMeter = hd.distance;
 
             const spdMh = spdKmh / 3.6;
             let remainMeter = spdMh;
 
-            if (distanceKm <= remainMeter) {
+            if (distanceMeter <= remainMeter) {
                 const stopover = moveTo(current, { heading: hd.heading, distance: hd.distance });
                 // @ts-expect-error: lon is not always defined
                 current = { lat: stopover.lat, lng: stopover.lon || stopover.lng }
