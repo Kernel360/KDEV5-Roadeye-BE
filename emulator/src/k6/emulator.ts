@@ -4,7 +4,6 @@ import { check, sleep } from 'k6';
 import http, { type RefinedResponse } from 'k6/http';
 import type { Options } from 'k6/options';
 import * as uuid from 'uuid';
-import type { UnknownKeysParam } from 'zod';
 import { emulateCarPath } from '~/lib/emulator/index.k6';
 import { getCar, getEndStation, getRandomStation, getStartStation } from '~/lib/shared.ts';
 
