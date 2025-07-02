@@ -21,9 +21,11 @@ declare global {
         lng: number;
     }
 
-    export type MdtLog = GpsCoord & {
+    export type MdtLog = {
         sec: number;
         gcd: string;
+        lat: number;
+        lon: number;
         ang: number;
         spd: number;
         sum: number;

@@ -1,9 +1,10 @@
 import dateFormat from 'dateformat';
 import { distanceTo } from 'geolocation-utils';
-import { sleep } from 'k6';
-import http from 'k6/http';
+import { check, sleep } from 'k6';
+import http, { type RefinedResponse } from 'k6/http';
 import type { Options } from 'k6/options';
 import * as uuid from 'uuid';
+import type { UnknownKeysParam } from 'zod';
 import { emulateCarPath } from '~/lib/emulator/index.k6';
 import { getCar, getEndStation, getRandomStation, getStartStation } from '~/lib/shared.ts';
 
@@ -45,18 +46,31 @@ const initialContext: Context = {
 const ctx: Context = initialContext;
 
 export const options: Options = {
-    vus: Number(__ENV.VUS) || 1,
+    vus: 50,
     duration: "1000000h"
 }
 
 export function setup() {
-    return {
+    const config = {
         API_HUB_URL: __ENV.API_HUB_URL
     };
+    console.log(`CONFIG: ${JSON.stringify(config)}`);
+    return config;
 }
 
 export function teardown() {
 
+}
+
+function checkResponse(res: RefinedResponse<http.ResponseType | undefined>) {
+    check(res, {
+        'result success': (r) => {
+            if (r.json("rstCd") !== "000") {
+                console.log(`request failed: ${r.body?.toString() ?? "no body"}`)
+            };
+            return r.json("rstCd") === "000"
+        },
+    })
 }
 
 export default async function (data: ReturnType<typeof setup>) {
@@ -121,7 +135,7 @@ async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
         acc: 0.5,
     })
 
-    await http.asyncRequest(
+    const res = await http.asyncRequest(
         "POST",
         `${data.API_HUB_URL}/api/ignition/on`,
         JSON.stringify({
@@ -146,6 +160,7 @@ async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
             }
         }
     )
+    checkResponse(res);
 }
 
 async function driving(ctx: Context, data: ReturnType<typeof setup>) {
@@ -166,7 +181,7 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
             sec: i++,
             gcd: 'A',
             lat: route.current.lat,
-            lng: route.current.lng,
+            lon: route.current.lng,
             ang: route.ang,
             spd: route.spd,
             sum: ctx.car.sum,
@@ -174,6 +189,7 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
         }
         logs.push(log);
 
+        ctx.location.current = route.current;
         ctx.car.latitude = route.current.lat;
         ctx.car.longitude = route.current.lng;
         ctx.car.sum = ctx.car.sum + route.spd;
@@ -184,8 +200,13 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
     }
 
     console.log(`[VU-${__VU}] driving logs: ${logs.length}`);
+    if (logs.length === 0) {
+        console.log("no logs");
+        ctx.phase = Phase.IGNITION_OFF;
+        return;
+    }
 
-    await http.asyncRequest(
+    const res = await http.asyncRequest(
         "POST",
         `${data.API_HUB_URL}/api/cycle-log`,
         JSON.stringify({
@@ -206,6 +227,7 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
             }
         }
     )
+    checkResponse(res);
 }
 
 async function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
@@ -215,7 +237,7 @@ async function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
 
     ctx.offTime = now;
 
-    await http.asyncRequest(
+    const res = await http.asyncRequest(
         "POST",
         `${data.API_HUB_URL}/api/ignition/off`,
         JSON.stringify({
@@ -241,6 +263,7 @@ async function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
             }
         }
     )
+    checkResponse(res);
 }
 
 async function idle(ctx: Context) {
