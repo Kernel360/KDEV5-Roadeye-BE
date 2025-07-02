@@ -1,7 +1,9 @@
 package org.re.test.api;
 
 import org.re.test.service.TestService;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -21,5 +23,10 @@ public class TestApi {
     @GetMapping("/method-test/get")
     public String get() {
         return "get";
+    }
+
+    @PostMapping(value = "/content-type-test/json", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    public String contentTypeTestJson() {
+        return "json";
     }
 }

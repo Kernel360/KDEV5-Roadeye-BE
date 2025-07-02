@@ -50,4 +50,17 @@ public class ApiResponseTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(expected.getCode()));
     }
+
+    @ParameterizedTest
+    @DisplayName("지원하지 않는 Content-Type 으로 요청 시 rstCd==102 를 반환한다.")
+    @ValueSource(strings = {"application/xml", "text/plain"})
+    public void testUnsupportedContentTypeRequest(String contentType) throws Exception {
+        var validPath = "/content-type-test/json";
+        var expected = MdtLogExceptionCode.CONTENT_TYPE_NOT_SUPPORTED;
+
+        mvc.perform(request(HttpMethod.POST, validPath)
+                .contentType(contentType))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(expected.getCode()));
+    }
 }
