@@ -10,10 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import org.re.car.domain.CarLocation;
-import org.re.mdtlog.constraints.ValidAngle;
-import org.re.mdtlog.constraints.ValidLatitude;
-import org.re.mdtlog.constraints.ValidLongitude;
-import org.re.mdtlog.constraints.ValidPacketVersion;
+import org.re.mdtlog.constraints.*;
 import org.re.mdtlog.databind.MdtLogGpsConditionDeserializer;
 import org.re.mdtlog.databind.MdtLogGpsConditionSerializer;
 import org.re.mdtlog.domain.MdtLog;
@@ -117,8 +114,7 @@ public record MdtCycleLogMessage(
         int mdtAngle,
 
         @JsonProperty("spd")
-        @Min(0)
-        @Max(255)
+        @ValidSpeed
         int mdtSpeed,
 
         @JsonProperty("sum")

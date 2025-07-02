@@ -6,10 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.re.common.api.payload.BaseMdtResponse;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.common.exception.MdtLogExceptionCode;
-import org.re.mdtlog.constraints.ValidAngle;
-import org.re.mdtlog.constraints.ValidLatitude;
-import org.re.mdtlog.constraints.ValidLongitude;
-import org.re.mdtlog.constraints.ValidPacketVersion;
+import org.re.mdtlog.constraints.*;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.re.test.api.payload.TodoItem;
 import org.re.test.service.TestService;
@@ -109,6 +106,14 @@ public class TestApi {
         @RequestParam @ValidAngle BigDecimal angle
     ) {
         System.out.println("angle = " + angle);
+        return new BaseMdtResponse(MdtLogExceptionCode.Success);
+    }
+
+    @PostMapping("/test/field/speed")
+    public BaseMdtResponse speed(
+        @RequestParam @ValidSpeed Integer speed
+    ) {
+        System.out.println("speed = " + speed);
         return new BaseMdtResponse(MdtLogExceptionCode.Success);
     }
 }

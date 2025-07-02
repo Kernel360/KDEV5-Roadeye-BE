@@ -91,4 +91,20 @@ public class CommonJsonFieldValidationTest extends BaseWebMvcTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(code));
     }
+
+    @ParameterizedTest
+    @DisplayName("Speed 테스트")
+    @CsvSource({
+        "-1, 400",
+        "0, 000",
+        "255, 000",
+        "256, 400",
+    })
+    public void testSpeed(Integer speed, String code) throws Exception {
+        var req = post("/test/field/speed")
+            .param("speed", String.valueOf(speed));
+        mvc.perform(req)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(code));
+    }
 }
