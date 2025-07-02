@@ -15,8 +15,9 @@ import java.time.format.DateTimeFormatter;
 
 public class MdtLogRequestTimeInfoResolver implements HandlerMethodArgumentResolver {
     private static final String TIMESTAMP_HEADER = "X-Timestamp";
+    public static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN);
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
