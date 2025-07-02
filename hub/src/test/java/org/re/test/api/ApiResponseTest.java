@@ -36,4 +36,18 @@ public class ApiResponseTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(expected.getCode()));
     }
+
+    @ParameterizedTest
+    @DisplayName("존재하는 경로이나 지원하지 않는 메소드로 요청 시 rstCd==101 을 반환한다.")
+    @ValueSource(strings = {"POST", "PUT", "DELETE"})
+    public void testUnsupportedMethodRequest(String method) throws Exception {
+        var validPath = "/method-test/get";
+        var expected = MdtLogExceptionCode.WRONG_APPROACH;
+
+        var httpMethod = HttpMethod.valueOf(method);
+
+        mvc.perform(request(httpMethod, validPath))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(expected.getCode()));
+    }
 }

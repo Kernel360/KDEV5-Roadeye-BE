@@ -17,4 +17,9 @@ public class TestApi {
     public void testError1() {
         testService.invoke();
     }
+
+    @GetMapping("/method-test/get")
+    public String get() {
+        return "get";
+    }
 }
