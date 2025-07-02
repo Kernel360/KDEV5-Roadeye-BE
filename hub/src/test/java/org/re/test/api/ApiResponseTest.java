@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 import org.re.common.exception.MdtLogExceptionCode;
 import org.re.test.service.TestService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -106,6 +107,19 @@ public class ApiResponseTest extends BaseWebMvcTest {
         var req = request(HttpMethod.POST, validPath)
             .param("value", String.valueOf(invalidValue));
         mvc.perform(req)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(expectedCode));
+    }
+
+    @Test
+    @DisplayName("알 수 없는 예외가 발생한 경우 rstCd==500 을 반환한다.")
+    public void testUnknownException() throws Exception {
+        var validPath = "/api/test";
+        var expectedCode = 500;
+        Mockito.doThrow(new RuntimeException("Unknown error"))
+            .when(testService).invoke();
+
+        mvc.perform(request(HttpMethod.GET, validPath))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(expectedCode));
     }
