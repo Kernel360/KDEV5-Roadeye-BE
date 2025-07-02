@@ -123,6 +123,20 @@ public class ApiResponseTest extends BaseWebMvcTest {
     }
 
     @Test
+    @DisplayName("올바르지 않은 형태의 JSON 요청인 경우 rstCd==300을 반환한다.")
+    public void testInvalidJsonRequest() throws Exception {
+        var validPath = "/test/json";
+        var invalidJson = "{invalidJson}";
+        var expectedCode = 300;
+
+        mvc.perform(request(HttpMethod.POST, validPath)
+                .contentType("application/json")
+                .content(invalidJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(expectedCode));
+    }
+
+    @Test
     @DisplayName("Jakarta Validation 예외가 발생한 경우 rstCd==400 을 반환한다.")
     public void testJakartaValidationException() throws Exception {
         var validPath = "/test/validation";

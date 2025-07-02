@@ -1,11 +1,13 @@
 package org.re.web.advice;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.re.common.api.payload.BaseMdtResponse;
 import org.re.common.exception.AppException;
 import org.re.common.exception.MdtLogExceptionCode;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -54,6 +56,14 @@ public class MdtExceptionAdvice {
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public Object handleMediaTypeNotSupportedException() {
         return createErrorResponse(MdtLogExceptionCode.CONTENT_TYPE_NOT_SUPPORTED);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Object handleMessageNotReadableException(HttpMessageNotReadableException e) {
+        if (e.getCause() instanceof JsonParseException) {
+            return createErrorResponse(MdtLogExceptionCode.PROTOCOL_FORMAT_ERROR);
+        }
+        return createErrorResponse(MdtLogExceptionCode.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<?> createErrorResponse(MdtLogExceptionCode code) {

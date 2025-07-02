@@ -9,10 +9,9 @@ import org.re.common.exception.MdtLogExceptionCode;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.re.test.service.TestService;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Valid
@@ -37,6 +36,13 @@ public class TestApi {
     @PostMapping(value = "/content-type-test/json", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     public String contentTypeTestJson() {
         return "json";
+    }
+
+    @PostMapping("/test/json")
+    public Object testJson(
+        @RequestBody Map<String, Object> jsonRequest
+    ) {
+        return jsonRequest;
     }
 
     @PostMapping("/test/tuid")
