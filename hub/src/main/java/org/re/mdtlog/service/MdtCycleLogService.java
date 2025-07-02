@@ -2,7 +2,10 @@ package org.re.mdtlog.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.re.car.repository.CarRepository;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
+import org.re.common.exception.AppException;
+import org.re.common.exception.MdtLogExceptionCode;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.re.mdtlog.dto.MdtCycleLogMessage;
 import org.re.mdtlog.messaging.MdtLogMessagingService;
@@ -12,9 +15,18 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MdtCycleLogService {
+    private final CarRepository carRepository;
     private final MdtLogMessagingService mdtLogMessagingService;
 
     public void addCycleLogs(TransactionUUID tuid, MdtCycleLogMessage dto, MdtLogRequestTimeInfo timeInfo) {
+        validateDto(dto);
+
         mdtLogMessagingService.send(tuid, dto, timeInfo);
+    }
+
+    private void validateDto(MdtCycleLogMessage dto) {
+        if (!carRepository.existsById(dto.carId())) {
+            throw new AppException(MdtLogExceptionCode.MDN_MISMATCH);
+        }
     }
 }
