@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,6 +68,30 @@ public class ApiResponseTest extends BaseWebMvcTest {
         var validPath = "/test/tuid";
 
         mvc.perform(request(HttpMethod.POST, validPath))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(MdtLogExceptionCode.TUID_ERROR.getCode()));
+    }
+
+    @Test
+    @DisplayName("트랜잭션 ID 헤더가 UUID로 해석 가능한 경우 rstCd==000 을 반환한다.")
+    public void testValidTransactionIdHeader() throws Exception {
+        var validPath = "/test/tuid";
+        var validTuid = UUID.randomUUID().toString();
+
+        mvc.perform(request(HttpMethod.POST, validPath)
+                .header("X-TUID", validTuid))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(MdtLogExceptionCode.Success.getCode()));
+    }
+
+    @Test
+    @DisplayName("트랜잭션 ID 헤더가 UUID로 해석할 수 없는 경우 rstCd==108 을 반환한다.")
+    public void testInvalidTransactionIdHeader() throws Exception {
+        var validPath = "/test/tuid";
+        var invalidTuid = "invalid-uuid";
+
+        mvc.perform(request(HttpMethod.POST, validPath)
+                .header("X-TUID", invalidTuid))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(MdtLogExceptionCode.TUID_ERROR.getCode()));
     }

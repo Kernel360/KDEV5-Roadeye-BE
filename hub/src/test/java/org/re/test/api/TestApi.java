@@ -1,5 +1,7 @@
 package org.re.test.api;
 
+import org.re.common.api.payload.BaseMdtResponse;
+import org.re.common.exception.MdtLogExceptionCode;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.re.test.service.TestService;
 import org.springframework.util.MimeTypeUtils;
@@ -35,6 +37,6 @@ public class TestApi {
     public Object tuidMissing(
         TransactionUUID uuid
     ) {
-        return uuid;
+        return new BaseMdtResponse(MdtLogExceptionCode.Success);
     }
 }

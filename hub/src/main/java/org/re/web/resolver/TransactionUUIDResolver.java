@@ -30,6 +30,10 @@ public class TransactionUUIDResolver implements HandlerMethodArgumentResolver {
         if (tuid == null) {
             throw new AppException(MdtLogExceptionCode.TUID_ERROR);
         }
-        return TransactionUUID.from(tuid);
+        try {
+            return TransactionUUID.from(tuid);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(MdtLogExceptionCode.TUID_ERROR);
+        }
     }
 }
