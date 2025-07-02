@@ -75,6 +75,19 @@ public class ApiResponseTest extends BaseWebMvcTest {
             .andExpect(jsonPath("$.rstCd").value(expectedCode));
     }
 
+    @ParameterizedTest
+    @DisplayName("타임스탬프 헤더가 올바르지 않은 경우 rstCd==107 을 반환한다.")
+    @ValueSource(strings = {"invalid-timestamp", "1234567890"})
+    public void testInvalidTimestampHeader(String invalidTimestamp) throws Exception {
+        var validPath = "/test/timestamp";
+        var expectedCode = 107;
+
+        mvc.perform(request(HttpMethod.POST, validPath)
+                .header("X-Timestamp", invalidTimestamp))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(expectedCode));
+    }
+
     @Test
     @DisplayName("트랜잭션 ID 헤더가 누락된 경우 rstCd==108 을 반환한다.")
     public void testMissingTransactionIdHeader() throws Exception {

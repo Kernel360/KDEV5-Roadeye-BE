@@ -32,16 +32,15 @@ public class MdtLogRequestTimeInfoResolver implements HandlerMethodArgumentResol
     ) {
         var servletRequest = (HttpServletRequest) webRequest.getNativeRequest();
         var timestamp = servletRequest.getHeader(TIMESTAMP_HEADER);
-        var receivedAt = LocalDateTime.now();
         if (timestamp == null) {
             throw new AppException(MdtLogExceptionCode.TIMESTAMP_MISSING);
         }
         try {
             var occurredAt = LocalDateTime.parse(timestamp, formatter);
+            var receivedAt = LocalDateTime.now();
             return new MdtLogRequestTimeInfo(occurredAt, receivedAt);
         } catch (Exception e) {
-            // TODO: 무슨 에러를 던져줘야 하지?
-            throw new IllegalArgumentException("Invalid timestamp format", e);
+            throw new AppException(MdtLogExceptionCode.TIMESTAMP_INVALID);
         }
     }
 }
