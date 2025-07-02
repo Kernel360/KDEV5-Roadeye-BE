@@ -95,4 +95,18 @@ public class ApiResponseTest extends BaseWebMvcTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(MdtLogExceptionCode.TUID_ERROR.getCode()));
     }
+
+    @Test
+    @DisplayName("Jakarta Validation 예외가 발생한 경우 rstCd==400 을 반환한다.")
+    public void testJakartaValidationException() throws Exception {
+        var validPath = "/test/validation";
+        var invalidValue = 0;
+        var expectedCode = 400;
+
+        var req = request(HttpMethod.POST, validPath)
+            .param("value", String.valueOf(invalidValue));
+        mvc.perform(req)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(expectedCode));
+    }
 }

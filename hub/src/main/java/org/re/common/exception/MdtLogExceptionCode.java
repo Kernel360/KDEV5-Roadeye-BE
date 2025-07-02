@@ -15,6 +15,7 @@ public enum MdtLogExceptionCode implements AppExceptionCode {
     MDN_NOT_FOUND("304", "MDN not found"),
     MDN_MISMATCH("304", "Mismatched MDN"),
     IGNITION_ALREADY_ON("400", "Ignition is already on"),
+    FIELD_VALIDATION_ERROR("400", "Field validation error"),
     DATA_PROCESSING_ERROR("400", "An error occurred while processing the data"),
     INTERNAL_SERVER_ERROR("500", "Internal server error"),
     ;

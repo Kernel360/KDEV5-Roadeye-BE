@@ -1,5 +1,6 @@
 package org.re.test.api;
 
+import jakarta.validation.constraints.Min;
 import org.re.common.api.payload.BaseMdtResponse;
 import org.re.common.exception.MdtLogExceptionCode;
 import org.re.mdtlog.domain.TransactionUUID;
@@ -7,6 +8,7 @@ import org.re.test.service.TestService;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -38,5 +40,12 @@ public class TestApi {
         TransactionUUID uuid
     ) {
         return new BaseMdtResponse(MdtLogExceptionCode.Success);
+    }
+
+    @PostMapping("/test/validation")
+    public Object jakartaValidation(
+        @Min(10) @RequestParam Integer value
+    ) {
+        return value;
     }
 }

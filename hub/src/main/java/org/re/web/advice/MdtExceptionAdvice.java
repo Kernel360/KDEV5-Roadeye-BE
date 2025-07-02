@@ -10,6 +10,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
@@ -27,6 +28,11 @@ public class MdtExceptionAdvice {
 
         log.error("Unknown exception: {}", e.getMessage(), e);
         return createErrorResponse(MdtLogExceptionCode.DATA_PROCESSING_ERROR);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public Object handleValidationException(HandlerMethodValidationException e) {
+        return createErrorResponse(MdtLogExceptionCode.FIELD_VALIDATION_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
