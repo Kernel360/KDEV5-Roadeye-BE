@@ -15,6 +15,7 @@ public enum MdtLogExceptionCode implements AppExceptionCode {
     TUID_MISSING("108", "TUID is missing"),
     TUID_ERROR("108", "TUID error"),
     PROTOCOL_FORMAT_ERROR("300", "Protocol format error"),
+    REQUIRED_FIELD_MISSING("301", "Required field is missing"),
     MDN_NOT_FOUND("304", "MDN not found"),
     MDN_MISMATCH("304", "Mismatched MDN"),
     IGNITION_ALREADY_ON("400", "Ignition is already on"),

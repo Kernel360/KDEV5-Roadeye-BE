@@ -10,10 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.Objects;
 
 @Slf4j
 @Order(100)
@@ -64,6 +67,16 @@ public class MdtExceptionAdvice {
             return createErrorResponse(MdtLogExceptionCode.PROTOCOL_FORMAT_ERROR);
         }
         return createErrorResponse(MdtLogExceptionCode.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        var isRequiredFieldMissing = e.getBindingResult().getFieldErrors().stream()
+            .anyMatch((fe) -> Objects.isNull(fe.getRejectedValue()));
+        if (isRequiredFieldMissing) {
+            return createErrorResponse(MdtLogExceptionCode.REQUIRED_FIELD_MISSING);
+        }
+        return createErrorResponse(MdtLogExceptionCode.FIELD_VALIDATION_ERROR);
     }
 
     private ResponseEntity<?> createErrorResponse(MdtLogExceptionCode code) {

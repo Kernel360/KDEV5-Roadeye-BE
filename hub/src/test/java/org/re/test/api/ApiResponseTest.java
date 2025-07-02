@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
@@ -132,6 +133,23 @@ public class ApiResponseTest extends BaseWebMvcTest {
         mvc.perform(request(HttpMethod.POST, validPath)
                 .contentType("application/json")
                 .content(invalidJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(expectedCode));
+    }
+
+    @Test
+    @DisplayName("필수 값이 누락된 JSON 요청인 경우 rstCd==301을 반환한다.")
+    public void testUnmappableJsonRequest() throws Exception {
+        var validPath = "/test/json/todo";
+        var unmappableJson = objectMapper.writeValueAsString(Map.of(
+            "nonExistentField", "value"
+        ));
+        var expectedCode = 301;
+
+        var req = request(HttpMethod.POST, validPath)
+            .contentType("application/json")
+            .content(unmappableJson);
+        mvc.perform(req)
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(expectedCode));
     }

@@ -7,6 +7,7 @@ import org.re.common.api.payload.BaseMdtResponse;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.common.exception.MdtLogExceptionCode;
 import org.re.mdtlog.domain.TransactionUUID;
+import org.re.test.api.payload.TodoItem;
 import org.re.test.service.TestService;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +44,13 @@ public class TestApi {
         @RequestBody Map<String, Object> jsonRequest
     ) {
         return jsonRequest;
+    }
+
+    @PostMapping("/test/json/todo")
+    public Object testJson2(
+        @Valid @RequestBody TodoItem todoItem
+    ) {
+        return todoItem;
     }
 
     @PostMapping("/test/tuid")
