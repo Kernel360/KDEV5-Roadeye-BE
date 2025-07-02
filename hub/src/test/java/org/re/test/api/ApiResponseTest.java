@@ -69,7 +69,7 @@ public class ApiResponseTest extends BaseWebMvcTest {
 
         mvc.perform(request(HttpMethod.POST, validPath))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.rstCd").value(MdtLogExceptionCode.TUID_ERROR.getCode()));
+            .andExpect(jsonPath("$.rstCd").value(MdtLogExceptionCode.TUID_MISSING.getCode()));
     }
 
     @Test
