@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.*;
 import org.re.car.domain.CarLocation;
+import org.re.mdtlog.constraints.ValidLatitude;
 import org.re.mdtlog.constraints.ValidPacketVersion;
 import org.re.mdtlog.databind.MdtLogGpsConditionDeserializer;
 import org.re.mdtlog.databind.MdtLogGpsConditionSerializer;
@@ -45,8 +46,7 @@ public record MdtIgnitionOnMessage(
     MdtLogGpsCondition gpsCondition,
 
     @JsonProperty("lat")
-    @DecimalMin(value = "-90.0")
-    @DecimalMax(value = "90.0")
+    @ValidLatitude
     BigDecimal gpsLatitude,
 
     @JsonProperty("lon")

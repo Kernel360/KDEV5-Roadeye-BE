@@ -8,6 +8,7 @@ import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import org.re.car.domain.CarLocation;
+import org.re.mdtlog.constraints.ValidLatitude;
 import org.re.mdtlog.constraints.ValidPacketVersion;
 import org.re.mdtlog.databind.MdtLogGpsConditionDeserializer;
 import org.re.mdtlog.databind.MdtLogGpsConditionSerializer;
@@ -98,8 +99,7 @@ public record MdtCycleLogMessage(
         MdtLogGpsCondition gpsCondition,
 
         @JsonProperty("lat")
-        @DecimalMin(value = "-90.0")
-        @DecimalMax(value = "90.0")
+        @ValidLatitude
         @NotNull
         BigDecimal gpsLatitude,
 

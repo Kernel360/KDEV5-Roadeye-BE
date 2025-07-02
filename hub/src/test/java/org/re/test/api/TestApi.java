@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.re.common.api.payload.BaseMdtResponse;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.common.exception.MdtLogExceptionCode;
+import org.re.mdtlog.constraints.ValidLatitude;
 import org.re.mdtlog.constraints.ValidPacketVersion;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.re.test.api.payload.TodoItem;
@@ -13,6 +14,7 @@ import org.re.test.service.TestService;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -81,6 +83,14 @@ public class TestApi {
         @RequestParam @ValidPacketVersion Integer packetVersion
     ) {
         System.out.println("packetVersion = " + packetVersion);
+        return new BaseMdtResponse(MdtLogExceptionCode.Success);
+    }
+
+    @PostMapping("/test/field/latitude")
+    public BaseMdtResponse latitude(
+        @RequestParam @ValidLatitude BigDecimal latitude
+    ) {
+        System.out.println("latitude = " + latitude);
         return new BaseMdtResponse(MdtLogExceptionCode.Success);
     }
 }
