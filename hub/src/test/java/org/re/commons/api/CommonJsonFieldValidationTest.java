@@ -123,4 +123,20 @@ public class CommonJsonFieldValidationTest extends BaseWebMvcTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(code));
     }
+
+    @ParameterizedTest
+    @DisplayName("Battery Voltage 테스트")
+    @CsvSource({
+        "-1, 400",
+        "0, 000",
+        "9999, 000",
+        "10000, 400",
+    })
+    public void testBatteryVoltage(Integer batteryVoltage, String code) throws Exception {
+        var req = post("/test/field/batteryVoltage")
+            .param("batteryVoltage", String.valueOf(batteryVoltage));
+        mvc.perform(req)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(code));
+    }
 }

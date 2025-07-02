@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -122,8 +120,7 @@ public record MdtCycleLogMessage(
         int mdtMileageSum,
 
         @JsonProperty("bat")
-        @Min(0)
-        @Max(9999)
+        @ValidBatteryVoltage
         int batteryVoltage
     ) {
         public CarLocation toCarLocation() {

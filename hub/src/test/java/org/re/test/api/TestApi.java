@@ -124,4 +124,12 @@ public class TestApi {
         System.out.println("mileageSum = " + mileageSum);
         return new BaseMdtResponse(MdtLogExceptionCode.Success);
     }
+
+    @PostMapping("/test/field/batteryVoltage")
+    public BaseMdtResponse batteryVoltage(
+        @RequestParam @ValidBatteryVoltage Integer batteryVoltage
+    ) {
+        System.out.println("batteryVoltage = " + batteryVoltage);
+        return new BaseMdtResponse(MdtLogExceptionCode.Success);
+    }
 }
