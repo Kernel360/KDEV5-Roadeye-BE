@@ -27,7 +27,10 @@ async function buildK6Script() {
             sourcemap: true,
             minify: false,
             external: ["k6"],
-            define
+            define,
+            alias: {
+                '~': path.resolve(__dirname, 'src'),
+            }
         });
         console.log('esbuild: bundling k6 script done');
     } catch (error) {
