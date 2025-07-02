@@ -72,4 +72,23 @@ public class CommonJsonFieldValidationTest extends BaseWebMvcTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rstCd").value(code));
     }
+
+    @ParameterizedTest
+    @DisplayName("Angle 테스트")
+    @CsvSource({
+        "-1, 400",
+        "-0.1, 400",
+        "0.0, 000",
+        "365, 000",
+        "365.0, 000",
+        "365.000001, 400",
+        "366, 400",
+    })
+    public void testAngle(Double angle, String code) throws Exception {
+        var req = post("/test/field/angle")
+            .param("angle", String.valueOf(angle));
+        mvc.perform(req)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(code));
+    }
 }

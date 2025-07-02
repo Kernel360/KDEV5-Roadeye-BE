@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import org.re.car.domain.CarLocation;
+import org.re.mdtlog.constraints.ValidAngle;
 import org.re.mdtlog.constraints.ValidLatitude;
 import org.re.mdtlog.constraints.ValidLongitude;
 import org.re.mdtlog.constraints.ValidPacketVersion;
@@ -112,8 +113,7 @@ public record MdtCycleLogMessage(
         BigDecimal gpsLongitude,
 
         @JsonProperty("ang")
-        @Min(0)
-        @Max(365)
+        @ValidAngle
         int mdtAngle,
 
         @JsonProperty("spd")

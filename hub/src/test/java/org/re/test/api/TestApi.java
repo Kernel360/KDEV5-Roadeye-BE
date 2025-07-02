@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.re.common.api.payload.BaseMdtResponse;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.common.exception.MdtLogExceptionCode;
+import org.re.mdtlog.constraints.ValidAngle;
 import org.re.mdtlog.constraints.ValidLatitude;
 import org.re.mdtlog.constraints.ValidLongitude;
 import org.re.mdtlog.constraints.ValidPacketVersion;
@@ -100,6 +101,14 @@ public class TestApi {
         @RequestParam @ValidLongitude BigDecimal longitude
     ) {
         System.out.println("longitude = " + longitude);
+        return new BaseMdtResponse(MdtLogExceptionCode.Success);
+    }
+
+    @PostMapping("/test/field/angle")
+    public BaseMdtResponse angle(
+        @RequestParam @ValidAngle BigDecimal angle
+    ) {
+        System.out.println("angle = " + angle);
         return new BaseMdtResponse(MdtLogExceptionCode.Success);
     }
 }

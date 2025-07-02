@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.re.car.domain.CarLocation;
+import org.re.mdtlog.constraints.ValidAngle;
 import org.re.mdtlog.constraints.ValidLatitude;
 import org.re.mdtlog.constraints.ValidLongitude;
 import org.re.mdtlog.constraints.ValidPacketVersion;
@@ -61,8 +62,7 @@ public record MdtIgnitionOffMessage(
     BigDecimal gpsLongitude,
 
     @JsonProperty("ang")
-    @Min(0)
-    @Max(365)
+    @ValidAngle
     int mdtAngle,
 
     @JsonProperty("spd")
