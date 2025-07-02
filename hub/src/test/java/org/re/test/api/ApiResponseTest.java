@@ -64,6 +64,18 @@ public class ApiResponseTest extends BaseWebMvcTest {
     }
 
     @Test
+    @DisplayName("타임스탬프 헤더가 누락된 경우 rstCd==107 을 반환한다.")
+    public void testMissingTimestampHeader() throws Exception {
+        var validPath = "/test/timestamp";
+        var expectedCode = 107;
+
+        var req = request(HttpMethod.POST, validPath);
+        mvc.perform(req)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rstCd").value(expectedCode));
+    }
+
+    @Test
     @DisplayName("트랜잭션 ID 헤더가 누락된 경우 rstCd==108 을 반환한다.")
     public void testMissingTransactionIdHeader() throws Exception {
         var validPath = "/test/tuid";

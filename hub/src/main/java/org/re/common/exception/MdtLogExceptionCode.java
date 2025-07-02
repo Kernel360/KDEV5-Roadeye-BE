@@ -10,6 +10,7 @@ public enum MdtLogExceptionCode implements AppExceptionCode {
     INVALID_ACCESS_PATH("100", "Invalid access path"),
     WRONG_APPROACH("101", "Wrong approach"),
     CONTENT_TYPE_NOT_SUPPORTED("102", "Content type not supported"),
+    TIMESTAMP_MISSING("107", "Timestamp is missing"),
     TUID_MISSING("108", "TUID is missing"),
     TUID_ERROR("108", "TUID error"),
     MDN_NOT_FOUND("304", "MDN not found"),

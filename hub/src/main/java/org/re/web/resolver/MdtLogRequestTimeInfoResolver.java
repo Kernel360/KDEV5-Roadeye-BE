@@ -2,6 +2,8 @@ package org.re.web.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
+import org.re.common.exception.AppException;
+import org.re.common.exception.MdtLogExceptionCode;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -12,6 +14,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class MdtLogRequestTimeInfoResolver implements HandlerMethodArgumentResolver {
+    private static final String TIMESTAMP_HEADER = "X-Timestamp";
+
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     @Override
@@ -27,10 +31,10 @@ public class MdtLogRequestTimeInfoResolver implements HandlerMethodArgumentResol
         WebDataBinderFactory binderFactory
     ) {
         var servletRequest = (HttpServletRequest) webRequest.getNativeRequest();
-        var timestamp = servletRequest.getHeader("X-Timestamp");
+        var timestamp = servletRequest.getHeader(TIMESTAMP_HEADER);
         var receivedAt = LocalDateTime.now();
         if (timestamp == null) {
-            return new MdtLogRequestTimeInfo(receivedAt, receivedAt);
+            throw new AppException(MdtLogExceptionCode.TIMESTAMP_MISSING);
         }
         try {
             var occurredAt = LocalDateTime.parse(timestamp, formatter);
