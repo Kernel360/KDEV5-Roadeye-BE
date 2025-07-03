@@ -4,10 +4,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     runtimeOnly("com.mysql:mysql-connector-j")
 
-	implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

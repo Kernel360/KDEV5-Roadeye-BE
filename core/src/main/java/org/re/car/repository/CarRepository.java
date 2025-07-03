@@ -48,4 +48,6 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     Long countByCompanyIdAndIgnitionStatusAndStatus(Long companyId, CarIgnitionStatus ignitionStatus, EntityLifecycleStatus entityLifecycleStatus);
 
     Optional<Car> findByCompanyIdAndIdAndStatus(Long companyId, Long id, EntityLifecycleStatus status);
+
+    boolean existsById(Long carId);
 }

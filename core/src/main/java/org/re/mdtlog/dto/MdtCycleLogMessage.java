@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import org.re.car.domain.CarLocation;
+import org.re.mdtlog.constraints.*;
 import org.re.mdtlog.databind.MdtLogGpsConditionDeserializer;
 import org.re.mdtlog.databind.MdtLogGpsConditionSerializer;
 import org.re.mdtlog.domain.MdtLog;
@@ -34,8 +35,7 @@ public record MdtCycleLogMessage(
     String manufacturerId,
 
     @JsonProperty("pv")
-    @Min(0)
-    @Max(65535)
+    @ValidPacketVersion
     int packetVersion,
 
     @JsonProperty("did")
@@ -98,35 +98,29 @@ public record MdtCycleLogMessage(
         MdtLogGpsCondition gpsCondition,
 
         @JsonProperty("lat")
-        @DecimalMin(value = "-90.0")
-        @DecimalMax(value = "90.0")
+        @ValidLatitude
         @NotNull
         BigDecimal gpsLatitude,
 
         @JsonProperty("lon")
-        @DecimalMin(value = "-180.0")
-        @DecimalMax(value = "180.0")
+        @ValidLongitude
         @NotNull
         BigDecimal gpsLongitude,
 
         @JsonProperty("ang")
-        @Min(0)
-        @Max(365)
+        @ValidAngle
         int mdtAngle,
 
         @JsonProperty("spd")
-        @Min(0)
-        @Max(255)
+        @ValidSpeed
         int mdtSpeed,
 
         @JsonProperty("sum")
-        @Min(0)
-        @Max(9999999)
+        @ValidMileageSum
         int mdtMileageSum,
 
         @JsonProperty("bat")
-        @Min(0)
-        @Max(9999)
+        @ValidBatteryVoltage
         int batteryVoltage
     ) {
         public CarLocation toCarLocation() {

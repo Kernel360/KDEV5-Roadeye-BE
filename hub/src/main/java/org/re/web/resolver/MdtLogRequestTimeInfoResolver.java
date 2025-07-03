@@ -2,6 +2,8 @@ package org.re.web.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
+import org.re.common.exception.AppException;
+import org.re.common.exception.MdtLogExceptionCode;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -12,7 +14,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class MdtLogRequestTimeInfoResolver implements HandlerMethodArgumentResolver {
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    public static final String TIMESTAMP_HEADER_NAME = "X-Timestamp";
+    public static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN);
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -27,17 +32,16 @@ public class MdtLogRequestTimeInfoResolver implements HandlerMethodArgumentResol
         WebDataBinderFactory binderFactory
     ) {
         var servletRequest = (HttpServletRequest) webRequest.getNativeRequest();
-        var timestamp = servletRequest.getHeader("X-Timestamp");
-        var receivedAt = LocalDateTime.now();
+        var timestamp = servletRequest.getHeader(TIMESTAMP_HEADER_NAME);
         if (timestamp == null) {
-            return new MdtLogRequestTimeInfo(receivedAt, receivedAt);
+            throw new AppException(MdtLogExceptionCode.TIMESTAMP_MISSING);
         }
         try {
             var occurredAt = LocalDateTime.parse(timestamp, formatter);
+            var receivedAt = LocalDateTime.now();
             return new MdtLogRequestTimeInfo(occurredAt, receivedAt);
         } catch (Exception e) {
-            // TODO: 무슨 에러를 던져줘야 하지?
-            throw new IllegalArgumentException("Invalid timestamp format", e);
+            throw new AppException(MdtLogExceptionCode.TIMESTAMP_INVALID);
         }
     }
 }
