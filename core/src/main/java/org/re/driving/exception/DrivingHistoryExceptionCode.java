@@ -8,6 +8,7 @@ import org.re.common.exception.DomainExceptionCode;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum DrivingHistoryExceptionCode implements DomainExceptionCode {
+    NOT_FOUND("002", "Driving history not found."),
     ALREADY_ENDED("001", "Driving history has already ended."),
     ;
 

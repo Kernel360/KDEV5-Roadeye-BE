@@ -15,19 +15,17 @@ public class SessionInfoResponse extends SuccessResponse<SessionInfoResponse.Ses
     }
 
     public record SessionInfo(
-        String id,
         ZonedDateTime createdAt,
         ZonedDateTime lastAccessedAt,
         ZonedDateTime expireAt
     ) {
-        private static final SessionInfo INVALIDATED_SESSION = new SessionInfo("INVALIDATED", null, null, null);
+        private static final SessionInfo INVALIDATED_SESSION = new SessionInfo(null, null, null);
 
         private static SessionInfo from(HttpSession session) {
             var createdAt = LocalDateTime.ofEpochSecond(session.getCreationTime() / 1000, 0, ZoneOffset.UTC);
             var lastAccessedAt = LocalDateTime.ofEpochSecond(session.getLastAccessedTime() / 1000, 0, ZoneOffset.UTC);
             var expireAt = lastAccessedAt.plusSeconds(session.getMaxInactiveInterval());
             return new SessionInfo(
-                session.getId(),
                 ZonedDateTime.ofLocal(createdAt, ZoneOffset.UTC, null),
                 ZonedDateTime.ofLocal(lastAccessedAt, ZoneOffset.UTC, null),
                 ZonedDateTime.ofLocal(expireAt, ZoneOffset.UTC, null)

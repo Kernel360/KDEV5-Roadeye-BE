@@ -3,6 +3,7 @@ package org.re.driving.api;
 import lombok.RequiredArgsConstructor;
 import org.re.common.api.payload.ListResponse;
 import org.re.common.api.payload.PageResponse;
+import org.re.common.api.payload.SingleItemResponse;
 import org.re.company.domain.CompanyId;
 import org.re.driving.api.payload.DrivingHistoryInfo;
 import org.re.driving.api.payload.DrivingLocationDetail;
@@ -26,7 +27,13 @@ public class DrivingHistoryApi {
     }
 
     @GetMapping("/{drivingId}")
-    public ListResponse<DrivingLocationDetail> getDrivingHistoryLog(@PathVariable Long drivingId) {
+    public SingleItemResponse<DrivingHistoryInfo> getDrivingHistoryById(@PathVariable Long drivingId) {
+        var item = drivingHistoryService.getDrivingHistoryById(drivingId);
+        return SingleItemResponse.of(item, DrivingHistoryInfo::from);
+    }
+
+    @GetMapping("/{drivingId}/path")
+    public ListResponse<DrivingLocationDetail> getDrivingHistoryPathById(@PathVariable Long drivingId) {
         var page = drivingHistoryService.getDrivingHistoryLogs(drivingId);
         return ListResponse.of(page, DrivingLocationDetail::from);
     }
