@@ -25,6 +25,10 @@ public class DrivingHistoryService {
         return drivingHistoryDomainService.findAll(companyId, pageable);
     }
 
+    public DrivingHistory getDrivingHistoryById(Long drivingId) {
+        return drivingHistoryDomainService.findById(drivingId);
+    }
+
     public List<LocationHistory> getDrivingHistoryLogs(Long drivingId) {
         return locationHistoryDomainService.findByDrivingId(drivingId);
     }

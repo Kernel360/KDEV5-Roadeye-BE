@@ -4,11 +4,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.re.car.domain.Car;
+import org.re.common.exception.DomainException;
 import org.re.common.stereotype.DomainService;
 import org.re.company.domain.CompanyId;
 import org.re.driving.domain.DrivingHistory;
 import org.re.driving.domain.DrivingHistoryStatus;
 import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
+import org.re.driving.exception.DrivingHistoryExceptionCode;
 import org.re.driving.repository.DrivingHistoryRepository;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.springframework.data.domain.Page;
@@ -41,6 +43,11 @@ public class DrivingHistoryDomainService {
 
     public Page<DrivingHistory> findAll(CompanyId companyId, Pageable pageable) {
         return drivingHistoryRepository.findDrivingHistoryByCompanyId(companyId.value(), pageable);
+    }
+
+    public DrivingHistory findById(Long drivingId) {
+        return drivingHistoryRepository.findById(drivingId)
+            .orElseThrow(() -> new DomainException(DrivingHistoryExceptionCode.NOT_FOUND));
     }
 
     public List<DrivingHistoryMonthlyCountResult> getMonthlyCount() {
