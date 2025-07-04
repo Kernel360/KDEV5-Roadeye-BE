@@ -25,12 +25,9 @@ public class HourlyDrivingStatistics {
 
     private int vehicleCount;
 
-    private HourlyDrivingStatistics(LocalDateTime date, int hour, int vehicleCount) {
+    public HourlyDrivingStatistics(LocalDateTime date, int hour, int vehicleCount) {
         this.date = date;
         this.hour = hour;
         this.vehicleCount = vehicleCount;
-    }
-    public static HourlyDrivingStatistics of(LocalDateTime date, int hour, int vehicleCount) {
-        return new HourlyDrivingStatistics(date, hour, vehicleCount);
     }
 }

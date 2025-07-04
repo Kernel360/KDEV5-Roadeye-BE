@@ -23,21 +23,15 @@ public class DailyDrivingStatistics {
 
     private int totalTripCount;
 
-    private int averageDistance;
+    private int distance;
 
-    private int averageDuration;
+    private int duration;
 
-    private Long maxDrivingId;
-
-    private DailyDrivingStatistics(LocalDateTime date, int totalTripCount, int averageDistance, int averageDuration, Long maxDrivingId) {
+    public DailyDrivingStatistics(LocalDateTime date, int totalTripCount, int distance, int duration) {
         this.date = date;
         this.totalTripCount = totalTripCount;
-        this.averageDistance = averageDistance;
-        this.averageDuration = averageDuration;
-        this.maxDrivingId = maxDrivingId;
+        this.distance = distance;
+        this.duration = duration;
     }
 
-    public static DailyDrivingStatistics of(LocalDateTime date, int totalTripCount, int averageDistance, int averageDuration, Long maxDrivingId) {
-        return new DailyDrivingStatistics(date, totalTripCount, averageDistance, averageDuration, maxDrivingId);
-    }
 }
