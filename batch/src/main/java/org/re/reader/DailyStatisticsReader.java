@@ -23,7 +23,7 @@ public class DailyStatisticsReader  {
     public JpaPagingItemReader<DrivingHistory> drivingHistoryReader(
         EntityManagerFactory entityManagerFactory
     ) {
-        LocalDate day = LocalDate.now();
+        LocalDate day = LocalDate.now().minusDays(1);
         LocalDateTime start =day.atStartOfDay();
         LocalDateTime end = day.atTime(LocalTime.MAX);
 
@@ -34,7 +34,10 @@ public class DailyStatisticsReader  {
         return new JpaPagingItemReaderBuilder<DrivingHistory>()
             .name("drivingHistoryReader")
             .entityManagerFactory(entityManagerFactory)
-            .queryString("SELECT d FROM DrivingHistory d WHERE d.status = 'Ended' AND d.previousDrivingSnapShot.datetime BETWEEN :start AND :end")
+            .queryString("""
+                SELECT d FROM DrivingHistory d
+                WHERE d.status = 'Ended' AND d.previousDrivingSnapShot.datetime BETWEEN :start AND :end
+                """)
             .parameterValues(params)
             .pageSize(1000) // chunk size와 동일하게
             .build();

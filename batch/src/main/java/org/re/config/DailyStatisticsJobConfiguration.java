@@ -13,6 +13,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -27,13 +28,13 @@ public class DailyStatisticsJobConfiguration {
 
 
     @Bean
-    public Job job(JobRepository jobRepository, Step step) {
+    public Job dailyDrivingStatisticsJob(JobRepository jobRepository, @Qualifier("dailyDrivingStatisticsStep")Step step) {
         return new JobBuilder("dailyDrivingStatisticsJob",jobRepository)
             .start(step).build();
     }
 
     @Bean
-    public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+    public Step dailyDrivingStatisticsStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                      EntityManagerFactory entityManagerFactory) {
         StepBuilder stepBuilder = new StepBuilder("dailyDrivingStatisticsStep", jobRepository);
         return stepBuilder

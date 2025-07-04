@@ -19,8 +19,6 @@ public class DailyStatisticsProcessor implements ItemProcessor<DrivingHistory, D
     private int totalTripCount = 0;
     private int totalDistance = 0;
     private long totalDuration = 0;
-    private Long maxDrivingId = null;
-    private int maxDrivingDistance = 0;
     private final Map<Integer, Integer> hourlyCount = new HashMap<>();
 
     @Override
@@ -32,10 +30,6 @@ public class DailyStatisticsProcessor implements ItemProcessor<DrivingHistory, D
 
         Duration duration = Duration.between( item.getPreviousDrivingSnapShot().datetime(), item.getEndDrivingSnapShot().datetime());
         totalDuration += duration.getSeconds();
-        if (distance > maxDrivingDistance) {
-            maxDrivingId = item.getId();
-            maxDrivingDistance = distance;
-        }
 
         int startHour = item.getPreviousDrivingSnapShot().datetime().getHour();
         int endHour = item.getEndDrivingSnapShot().datetime().getHour();
@@ -43,23 +37,11 @@ public class DailyStatisticsProcessor implements ItemProcessor<DrivingHistory, D
             hourlyCount.put(hour, hourlyCount.getOrDefault(hour, 0) + 1);
         }
 
-        return null;
-    }
-
-    public DailyDrivingStatistics toStatistics() {
-        return DailyDrivingStatistics.of(
+        return new DailyDrivingStatistics(
             LocalDate.now().minusDays(1).atStartOfDay(),
             totalTripCount,
-            totalDistance / totalTripCount,
-            (int) totalDuration / totalTripCount,
-            maxDrivingId
+            totalDistance ,
+            (int) totalDuration
         );
-    }
-
-    public List<HourlyDrivingStatistics> toHourlyStatistics() {
-        LocalDateTime date = LocalDate.now().minusDays(1).atStartOfDay();
-        return hourlyCount.entrySet().stream()
-            .map(e -> HourlyDrivingStatistics.of(date, e.getKey(), e.getValue()))
-            .toList();
     }
 }

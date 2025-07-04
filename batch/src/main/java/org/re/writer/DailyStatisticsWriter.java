@@ -10,6 +10,7 @@ import org.re.statistics.repository.DailyStatisticsRepository;
 import org.re.statistics.repository.HourlyStatisticsRepository;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -17,22 +18,31 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DailyStatisticsWriter implements ItemWriter<DailyDrivingStatistics> {
 
-    private final DailyStatisticsProcessor processor;
-    private final DailyStatisticsRepository dailyStatisticsRepository;
-    private final HourlyStatisticsRepository hourlyStatisticsRepository;
-    private boolean written = false;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void write(Chunk<? extends DailyDrivingStatistics> chunk) throws Exception {
-        if (written) return;
+    public void write(Chunk<? extends DailyDrivingStatistics> items) throws Exception {
 
-        DailyDrivingStatistics stat = processor.toStatistics();
-        dailyStatisticsRepository.save(stat);
+        if (!items.isEmpty()) {
+            DailyDrivingStatistics stat = items.getItems().getLast();
 
-        List<HourlyDrivingStatistics> hourStat = processor.toHourlyStatistics();
-        hourlyStatisticsRepository.saveAll(hourStat);
+            String sql = """
+            INSERT INTO daily_driving_statistics (
+                date, distance, duration, total_trip_count
+            ) VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                distance = distance + VALUES(distance),
+                duration = duration + VALUES(duration),
+                total_trip_count = total_trip_count + VALUES(total_trip_count)
+            """;
 
-        log.info("✅ Saved DailyDrivingStatistics: {}", stat);
-        written = true;
+            jdbcTemplate.update(sql,
+                stat.getDate(),
+                stat.getDistance(),
+                stat.getDuration(),
+                stat.getTotalTripCount()
+            );
+        }
+
     }
 }
