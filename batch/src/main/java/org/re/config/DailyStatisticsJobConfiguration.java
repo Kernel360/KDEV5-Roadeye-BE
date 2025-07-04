@@ -38,7 +38,7 @@ public class DailyStatisticsJobConfiguration {
                      EntityManagerFactory entityManagerFactory) {
         StepBuilder stepBuilder = new StepBuilder("dailyDrivingStatisticsStep", jobRepository);
         return stepBuilder
-            .<DrivingHistory, DailyDrivingStatistics>chunk(1000,transactionManager)
+            .<DrivingHistory, DailyDrivingStatistics>chunk(100,transactionManager)
             .reader(reader.drivingHistoryReader(entityManagerFactory))
             .processor(processor)
             .writer(writer)

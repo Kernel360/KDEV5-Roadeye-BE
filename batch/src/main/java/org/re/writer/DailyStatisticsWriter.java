@@ -1,13 +1,9 @@
 package org.re.writer;
 
-import java.util.List;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.re.processor.DailyStatisticsProcessor;
 import org.re.statistics.domain.DailyDrivingStatistics;
-import org.re.statistics.domain.HourlyDrivingStatistics;
-import org.re.statistics.repository.DailyStatisticsRepository;
-import org.re.statistics.repository.HourlyStatisticsRepository;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,27 +18,39 @@ public class DailyStatisticsWriter implements ItemWriter<DailyDrivingStatistics>
 
     @Override
     public void write(Chunk<? extends DailyDrivingStatistics> items) throws Exception {
+        int totalTripCount = 0;
+        int totalDistance = 0;
+        long totalDuration = 0;
 
-        if (!items.isEmpty()) {
-            DailyDrivingStatistics stat = items.getItems().getLast();
-
-            String sql = """
-            INSERT INTO daily_driving_statistics (
-                date, distance, duration, total_trip_count
-            ) VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-                distance = distance + VALUES(distance),
-                duration = duration + VALUES(duration),
-                total_trip_count = total_trip_count + VALUES(total_trip_count)
-            """;
-
-            jdbcTemplate.update(sql,
-                stat.getDate(),
-                stat.getDistance(),
-                stat.getDuration(),
-                stat.getTotalTripCount()
-            );
+        for (DailyDrivingStatistics stat : items) {
+            totalTripCount += stat.getTotalTripCount();
+            totalDistance += stat.getDistance();
+            totalDuration += stat.getDuration();
         }
+
+        DailyDrivingStatistics lastStat = new DailyDrivingStatistics(
+            LocalDate.now().minusDays(1).atStartOfDay(),
+            totalTripCount,
+            totalDistance,
+            (int) totalDuration
+        );
+
+        String sql = """
+        INSERT INTO daily_driving_statistics (
+            date, distance, duration, total_trip_count
+        ) VALUES (?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            distance = distance + VALUES(distance),
+            duration = duration + VALUES(duration),
+            total_trip_count = total_trip_count + VALUES(total_trip_count)
+        """;
+
+        jdbcTemplate.update(sql,
+            lastStat.getDate(),
+            lastStat.getDistance(),
+            lastStat.getDuration(),
+            lastStat.getTotalTripCount()
+        );
 
     }
 }
