@@ -9,7 +9,9 @@ public enum EmployeeDomainException implements DomainExceptionCode {
     ACCOUNT_NOT_FOUND          ("000", "Account not found."),
     ROOT_ACCOUNT_NOT_FOUND     ("100", "Root account not found."),
     ROOT_ACCOUNT_ALREADY_EXISTS("101", "Root account already exists."),
-    USERNAME_DUPLICATED        ("102", "Username is duplicated."),;
+    USERNAME_DUPLICATED        ("102", "Username is duplicated."),
+    ROOT_ACCOUNT_IS_IMMUTABLE  ("103", "Root account is immutable and cannot be modified."),
+    ;
     // @formatter:on
 
     private static final String PREFIX = "EMP_";
