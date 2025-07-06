@@ -77,4 +77,12 @@ public class Employee extends BaseEntity {
         }
         super.disable();
     }
+
+    @Override
+    public void delete() {
+        if (role == EmployeeRole.ROOT) {
+            throw new DomainException(EmployeeDomainException.ROOT_ACCOUNT_IS_IMMUTABLE);
+        }
+        super.delete();
+    }
 }

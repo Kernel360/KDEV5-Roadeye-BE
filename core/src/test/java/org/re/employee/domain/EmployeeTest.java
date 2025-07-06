@@ -47,4 +47,20 @@ class EmployeeTest {
             }
         );
     }
+
+    @Test
+    @DisplayName("ROOT 계정은 삭제할 수 없다.")
+    void rootAccountCannotBeDeleted() {
+        var employee = Employee.createRoot(
+            1L,
+            EmployeeCredentials.create("loginId", "password"),
+            EmployeeMetadata.create("name", "password")
+        );
+
+        assertThrows(
+            DomainException.class, () -> {
+                employee.delete();
+            }
+        );
+    }
 }
