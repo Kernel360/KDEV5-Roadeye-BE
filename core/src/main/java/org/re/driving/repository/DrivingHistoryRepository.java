@@ -1,5 +1,7 @@
 package org.re.driving.repository;
 
+import java.util.Date;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.re.car.domain.Car;
 import org.re.driving.domain.DrivingHistory;
@@ -13,4 +15,5 @@ public interface DrivingHistoryRepository extends JpaRepository<DrivingHistory, 
     DrivingHistory findByCarAndTxUidAndStatus(Car car, TransactionUUID txUid, DrivingHistoryStatus status);
 
     boolean existsByCarAndTxUid(Car car, TransactionUUID txUid);
+
 }
