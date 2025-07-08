@@ -8,11 +8,13 @@ import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.re.mdtlog.dto.MdtCycleLogMessage;
 import org.re.mdtlog.service.MdtCycleLogService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping("/api/cycle-log")
 @RequiredArgsConstructor

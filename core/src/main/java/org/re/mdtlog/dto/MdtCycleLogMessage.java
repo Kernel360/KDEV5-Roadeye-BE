@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,44 +24,41 @@ import java.util.List;
 
 @Builder(access = AccessLevel.PACKAGE)
 public record MdtCycleLogMessage(
-    @JsonProperty("mdn")
     @NotNull
+    @JsonProperty("mdn")
     Long carId,
 
-    @JsonProperty("tid")
     @NotNull
+    @JsonProperty("tid")
     String terminalId,
 
-    @JsonProperty("mid")
     @NotNull
+    @JsonProperty("mid")
     String manufacturerId,
 
+    @NotNull
     @JsonProperty("pv")
     @ValidPacketVersion
-    int packetVersion,
+    Integer packetVersion,
 
-    @JsonProperty("did")
     @NotNull
+    @JsonProperty("did")
     String deviceId,
 
+    @NotNull
     @JsonProperty("oTime")
     @JsonFormat(pattern = "yyyyMMddHHmm")
-    @NotNull
     LocalDateTime occurredAt,
 
-    @JsonProperty("cCnt")
-    int cycleCount,
-
-    @JsonProperty("cList")
     @NotNull
+    @JsonProperty("cCnt")
+    Integer cycleCount,
+
+    @Valid
+    @NotNull
+    @JsonProperty("cList")
     List<MdtCycleLogItem> cycleLogList
 ) {
-    public MdtCycleLogMessage {
-        if (cycleCount != cycleLogList.size()) {
-            throw new IllegalArgumentException("Cycle count mismatch");
-        }
-    }
-
     public List<MdtLog> toLogEntries(TransactionUUID transactionUUID, LocalDateTime sentAt, @NotNull LocalDateTime receivedAt) {
         return cycleLogList.stream()
             .map(item -> {
@@ -89,39 +88,45 @@ public record MdtCycleLogMessage(
 
     @Builder(access = AccessLevel.PACKAGE)
     public record MdtCycleLogItem(
-        int sec,
+        @NotNull
+        @Min(0)
+        Integer sec,
 
+        @NotNull
         @JsonProperty("gcd")
         @JsonSerialize(using = MdtLogGpsConditionSerializer.class)
         @JsonDeserialize(using = MdtLogGpsConditionDeserializer.class)
-        @NotNull
         MdtLogGpsCondition gpsCondition,
 
+        @NotNull
         @JsonProperty("lat")
         @ValidLatitude
-        @NotNull
         BigDecimal gpsLatitude,
 
+        @NotNull
         @JsonProperty("lon")
         @ValidLongitude
-        @NotNull
         BigDecimal gpsLongitude,
 
+        @NotNull
         @JsonProperty("ang")
         @ValidAngle
-        int mdtAngle,
+        Integer mdtAngle,
 
+        @NotNull
         @JsonProperty("spd")
         @ValidSpeed
-        int mdtSpeed,
+        Integer mdtSpeed,
 
+        @NotNull
         @JsonProperty("sum")
         @ValidMileageSum
-        int mdtMileageSum,
+        Integer mdtMileageSum,
 
+        @NotNull
         @JsonProperty("bat")
         @ValidBatteryVoltage
-        int batteryVoltage
+        Integer batteryVoltage
     ) {
         public CarLocation toCarLocation() {
             return new CarLocation(gpsLatitude, gpsLongitude);
