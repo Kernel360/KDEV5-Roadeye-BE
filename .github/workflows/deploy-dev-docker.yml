@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        module: [ 'application', 'hub', 'consumer' ]
+        module: [ 'application', 'hub', 'consumer', 'batch' ]
     env:
       DOCKER_IMAGE: ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/${{ matrix.module }}
     steps:
