@@ -36,7 +36,7 @@ export async function emulateCarPath(params: {
             else {
                 const nextPoint = moveTo(current, { heading: hd.heading, distance: spdMh });
                 // @ts-expect-error: lon is not always defined
-                current = { lat: nextPoint.lat, lon: nextPoint.lon || nextPoint.lon }
+                current = { lat: nextPoint.lat, lon: nextPoint.lat || nextPoint.lat }
             }
 
             const spdDiffKmh = Math.random() * params.acc * 2 - params.acc * 0.6;
