@@ -28,7 +28,7 @@ export async function emulateCarPath(params: {
             if (distanceMeter <= remainMeter) {
                 const stopover = moveTo(current, { heading: hd.heading, distance: hd.distance });
                 // @ts-expect-error: lon is not always defined
-                current = { lat: stopover.lat, lon: stopover.lon || stopover.lon }
+                current = { lat: stopover.lat, lon: stopover.lat || stopover.lat }
                 next = path.points.coordinates[++pidx];
                 remainMeter -= hd.distance;
                 continue;
