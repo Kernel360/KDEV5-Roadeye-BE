@@ -26,7 +26,7 @@ class EmployeeServiceTest {
     void 루트_계정을_생성합니다() {
         var credentials = new EmployeeCredentials("root", "root");
         var employeeId = employeeService.createRoot(defaultCompanyId, credentials, EmployeeMetadata.create("root", "root"));
-        var employee = employeeService.read(defaultCompanyId, employeeId);
+        var employee = employeeService.findById(defaultCompanyId, employeeId);
 
         assertThat(employee.getRole()).isEqualTo(EmployeeRole.ROOT);
     }
@@ -45,7 +45,7 @@ class EmployeeServiceTest {
         var credentials = new EmployeeCredentials("root", "root");
         var employeeId = employeeService.createNormal(defaultCompanyId, credentials, EmployeeMetadata.create("root", "root"));
 
-        var employee = employeeService.read(defaultCompanyId, employeeId);
+        var employee = employeeService.findById(defaultCompanyId, employeeId);
 
         assertThat(employee.getRole()).isEqualTo(EmployeeRole.NORMAL);
     }

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Import({ QueryDslConfig.class,CompanyDomainService.class, EmployeeDomainService.class})
+@Import({QueryDslConfig.class, CompanyDomainService.class, EmployeeDomainService.class})
 @DataJpaTest
 class CompanyDomainServiceTest {
     @Autowired
@@ -60,7 +60,7 @@ class CompanyDomainServiceTest {
 
             // When
             var company = companyDomainService.createCompany(quote);
-            var rootAccount = employeeDomainService.findCompanyRootAccount(company.getId());
+            var rootAccount = employeeDomainService.findRootAccountInCompany(company.getId());
 
             // Then
             assertNotNull(company);
