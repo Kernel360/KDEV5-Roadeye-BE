@@ -11,8 +11,6 @@ import org.re.company.repository.CompanyRepository;
 import org.re.employee.domain.EmployeeCredentials;
 import org.re.employee.domain.EmployeeMetadata;
 import org.re.employee.service.EmployeeDomainService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 @DomainService
 @Transactional
@@ -20,10 +18,6 @@ import org.springframework.data.domain.Pageable;
 public class CompanyDomainService {
     private final EmployeeDomainService employeeService;
     private final CompanyRepository companyRepository;
-
-    public Page<Company> findAll(Pageable pageable) {
-        return companyRepository.findAll(pageable);
-    }
 
     public Company findById(Long id) {
         return companyRepository.findById(id)
