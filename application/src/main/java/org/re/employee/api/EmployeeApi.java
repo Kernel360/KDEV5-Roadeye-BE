@@ -3,7 +3,7 @@ package org.re.employee.api;
 import lombok.RequiredArgsConstructor;
 import org.re.company.domain.CompanyId;
 import org.re.employee.api.payload.EmployeeCreateRequest;
-import org.re.employee.api.payload.EmployeeSearchResponse;
+import org.re.employee.api.payload.EmployeeInfo;
 import org.re.employee.api.payload.EmployeeStatusChangeRequest;
 import org.re.employee.api.payload.EmployeeUpdateRequest;
 import org.re.employee.service.EmployeeService;
@@ -20,8 +20,8 @@ public class EmployeeApi {
     private final EmployeeService employeeService;
 
     @GetMapping("/my")
-    public EmployeeSearchResponse getMyInfo(CompanyUserDetails userDetails) {
-        return EmployeeSearchResponse.from(employeeService.getMyInfo(userDetails));
+    public EmployeeInfo getMyInfo(CompanyUserDetails userDetails) {
+        return EmployeeInfo.from(employeeService.getMyInfo(userDetails));
     }
 
     @PostMapping
@@ -49,9 +49,9 @@ public class EmployeeApi {
     }
 
     @GetMapping
-    public PagedModel<EmployeeSearchResponse> getAll(CompanyId companyId, Pageable pageable, @RequestParam(required = false) String status) {
+    public PagedModel<EmployeeInfo> getAll(CompanyId companyId, Pageable pageable, @RequestParam(required = false) String status) {
         return new PagedModel<>(employeeService.readByStatus(companyId, pageable, status)
-            .map(EmployeeSearchResponse::from)
+            .map(EmployeeInfo::from)
         );
     }
 
