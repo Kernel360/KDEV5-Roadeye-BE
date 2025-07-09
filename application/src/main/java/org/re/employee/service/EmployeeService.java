@@ -28,6 +28,10 @@ public class EmployeeService {
         return read(userDetails.getCompanyId(), userDetails.getUserId());
     }
 
+    public Employee getById(CompanyId companyId, Long employeeId) {
+        return read(companyId, employeeId);
+    }
+
     public Long createRoot(CompanyId companyId, EmployeeCredentials credentials, EmployeeMetadata metadata) {
         employeeDomainService.validateExistsRootAccount(companyId.value());
 

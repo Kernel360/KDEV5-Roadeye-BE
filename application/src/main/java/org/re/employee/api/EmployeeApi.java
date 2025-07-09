@@ -16,8 +16,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/employees")
 @RequiredArgsConstructor
 public class EmployeeApi {
-
     private final EmployeeService employeeService;
+
+    @GetMapping
+    public PagedModel<EmployeeInfo> getAll(CompanyId companyId, Pageable pageable, @RequestParam(required = false) String status) {
+        return new PagedModel<>(employeeService.readByStatus(companyId, pageable, status)
+            .map(EmployeeInfo::from)
+        );
+    }
+
+    @GetMapping("/{employeeId}")
+    public EmployeeInfo getById(CompanyId companyId, @PathVariable Long employeeId) {
+        var employee = employeeService.getById(companyId, employeeId);
+        return EmployeeInfo.from(employee);
+    }
 
     @GetMapping("/my")
     public EmployeeInfo getMyInfo(CompanyUserDetails userDetails) {
@@ -47,12 +59,4 @@ public class EmployeeApi {
     public void delete(CompanyId companyId, @PathVariable Long employeeId) {
         employeeService.delete(companyId, employeeId);
     }
-
-    @GetMapping
-    public PagedModel<EmployeeInfo> getAll(CompanyId companyId, Pageable pageable, @RequestParam(required = false) String status) {
-        return new PagedModel<>(employeeService.readByStatus(companyId, pageable, status)
-            .map(EmployeeInfo::from)
-        );
-    }
-
 }
