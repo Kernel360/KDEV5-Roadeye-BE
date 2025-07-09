@@ -7,6 +7,7 @@ import org.re.employee.api.payload.EmployeeInfo;
 import org.re.employee.api.payload.EmployeeStatusChangeRequest;
 import org.re.employee.api.payload.EmployeeUpdateRequest;
 import org.re.employee.service.EmployeeService;
+import org.re.security.access.ManagerOnly;
 import org.re.security.userdetails.CompanyUserDetails;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -36,6 +37,7 @@ public class EmployeeApi {
         return EmployeeInfo.from(employeeService.getMyInfo(userDetails));
     }
 
+    @ManagerOnly
     @PostMapping
     public void create(CompanyId companyId, @RequestBody EmployeeCreateRequest employeeCreateRequest) {
         employeeService.createNormal(
@@ -45,16 +47,19 @@ public class EmployeeApi {
         );
     }
 
+    @ManagerOnly
     @PutMapping("/{employeeId}")
     public void update(CompanyId companyId, @PathVariable Long employeeId, @RequestBody EmployeeUpdateRequest employeeUpdateRequest) {
         employeeService.update(companyId, employeeId, employeeUpdateRequest.toCommand(), employeeUpdateRequest.status());
     }
 
+    @ManagerOnly
     @PatchMapping("/{employeeId}/status")
     public void changeStatus(CompanyId companyId, @PathVariable Long employeeId, @RequestBody EmployeeStatusChangeRequest request) {
         employeeService.changeStatus(companyId, employeeId, request.status());
     }
 
+    @ManagerOnly
     @DeleteMapping("/{employeeId}")
     public void delete(CompanyId companyId, @PathVariable Long employeeId) {
         employeeService.delete(companyId, employeeId);
