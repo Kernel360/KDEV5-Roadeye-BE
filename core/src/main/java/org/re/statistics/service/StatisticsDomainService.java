@@ -24,8 +24,8 @@ public class StatisticsDomainService {
     private final DailyStatisticsRepository dailyStatisticsRepository;
     private final HourlyStatisticsRepository hourlyStatisticsRepository;
 
-    public DailyDrivingStatistics findDailyStatistics() {
-        var date = LocalDate.now().minusDays(1).atStartOfDay();
+    public DailyDrivingStatistics findDailyStatistics(LocalDate localDate) {
+        var date = localDate.atStartOfDay();
         var dailyStatistics = dailyStatisticsRepository.findByDate(date);
         if (dailyStatistics == null) {
             return DailyDrivingStatistics.create(date);
@@ -33,8 +33,8 @@ public class StatisticsDomainService {
         return dailyStatistics;
     }
 
-    public List<HourlyDrivingStatistics> findHourlyStatistics() {
-        return hourlyStatisticsRepository.findByDate(LocalDate.now().minusDays(1).atStartOfDay());
+    public List<HourlyDrivingStatistics> findHourlyStatistics(LocalDate localDate) {
+        return hourlyStatisticsRepository.findByDate(localDate.atStartOfDay());
     }
 
     public void save(DailyDrivingStatistics statistics) {

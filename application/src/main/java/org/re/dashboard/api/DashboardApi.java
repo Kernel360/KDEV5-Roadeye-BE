@@ -1,5 +1,6 @@
 package org.re.dashboard.api;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.re.common.api.payload.ListResponse;
 import org.re.common.api.payload.SingleItemResponse;
@@ -8,6 +9,7 @@ import org.re.dashboard.api.payload.StatisticsInfo;
 import org.re.dashboard.service.DashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,8 +25,8 @@ public class DashboardApi {
     }
 
     @GetMapping("/daily")
-    public SingleItemResponse<StatisticsInfo> getStatistics() {
-        var page = dashboardService.getStatisticsInfo();
+    public SingleItemResponse<StatisticsInfo> getStatistics(@RequestParam LocalDate date) {
+        var page = dashboardService.getStatisticsInfo(date);
         return SingleItemResponse.of(page);
     }
 }

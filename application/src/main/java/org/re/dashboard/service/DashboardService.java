@@ -21,10 +21,10 @@ public class DashboardService {
         return drivingHistoryDomainService.getMonthlyCount();
     }
 
-    public StatisticsInfo getStatisticsInfo() {
-        var dailyStatistics = statisticsDomainService.findDailyStatistics();
+    public StatisticsInfo getStatisticsInfo(LocalDate date) {
+        var dailyStatistics = statisticsDomainService.findDailyStatistics(date);
 
-        var hourlyStatistics = statisticsDomainService.findHourlyStatistics();
+        var hourlyStatistics = statisticsDomainService.findHourlyStatistics(date);
         return StatisticsInfo.from(dailyStatistics, hourlyStatistics != null ? hourlyStatistics : List.of());
     }
 }
