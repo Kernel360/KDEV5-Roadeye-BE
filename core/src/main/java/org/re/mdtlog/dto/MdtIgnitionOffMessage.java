@@ -18,26 +18,33 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record MdtIgnitionOffMessage(
+    @NotNull
     @JsonProperty("mdn")
     Long carId,
 
+    @NotNull
     @JsonProperty("tid")
     String terminalId,
 
+    @NotNull
     @JsonProperty("mid")
     String manufacturerId,
 
+    @NotNull
     @JsonProperty("pv")
     @ValidPacketVersion
-    int packetVersion,
+    Integer packetVersion,
 
+    @NotNull
     @JsonProperty("did")
     String deviceId,
 
+    @NotNull
     @JsonProperty("onTime")
     @JsonFormat(pattern = "yyyyMMddHHmmss")
     LocalDateTime ignitionOnTime,
 
+    @NotNull
     @JsonProperty("offTime")
     @JsonFormat(pattern = "yyyyMMddHHmmss")
     LocalDateTime ignitionOffTime,
@@ -48,25 +55,30 @@ public record MdtIgnitionOffMessage(
     @JsonDeserialize(using = MdtLogGpsConditionDeserializer.class)
     MdtLogGpsCondition gpsCondition,
 
+    @NotNull
     @JsonProperty("lat")
     @ValidLatitude
     BigDecimal gpsLatitude,
 
+    @NotNull
     @JsonProperty("lon")
     @ValidLongitude
     BigDecimal gpsLongitude,
 
+    @NotNull
     @JsonProperty("ang")
     @ValidAngle
-    int mdtAngle,
+    Integer mdtAngle,
 
+    @NotNull
     @JsonProperty("spd")
     @ValidSpeed
-    int mdtSpeed,
+    Integer mdtSpeed,
 
+    @NotNull
     @JsonProperty("sum")
     @ValidMileageSum
-    int mdtMileageSum
+    Integer mdtMileageSum
 ) {
     public MdtLog toLogEntry(TransactionUUID transactionUUID, LocalDateTime sentAt, LocalDateTime receivedAt) {
         return MdtLog.builder()

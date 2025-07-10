@@ -11,7 +11,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 public class TransactionUUIDResolver implements HandlerMethodArgumentResolver {
-    private static final String HEADER_NAME = "X-TUID";
+    public static final String HEADER_NAME = "X-TUID";
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {

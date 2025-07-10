@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 import org.re.common.domain.BaseEntity;
+import org.re.common.exception.DomainException;
 import org.re.employee.dto.UpdateEmployeeCommand;
+import org.re.employee.exception.EmployeeDomainException;
 
 @Entity
 @Getter
@@ -54,5 +56,21 @@ public class Employee extends BaseEntity {
     public void update(UpdateEmployeeCommand updateEmployeeCommand) {
         metadata.updateName(updateEmployeeCommand.name());
         metadata.updatePosition(updateEmployeeCommand.position());
+    }
+
+    @Override
+    public void disable() {
+        if (role == EmployeeRole.ROOT) {
+            throw new DomainException(EmployeeDomainException.ROOT_ACCOUNT_IS_IMMUTABLE);
+        }
+        super.disable();
+    }
+
+    @Override
+    public void delete() {
+        if (role == EmployeeRole.ROOT) {
+            throw new DomainException(EmployeeDomainException.ROOT_ACCOUNT_IS_IMMUTABLE);
+        }
+        super.delete();
     }
 }
