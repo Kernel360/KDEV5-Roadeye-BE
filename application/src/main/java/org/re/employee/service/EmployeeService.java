@@ -2,8 +2,7 @@ package org.re.employee.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
-import org.re.common.domain.EntityLifecycleStatus;
+import org.jspecify.annotations.Nullable;
 import org.re.company.domain.CompanyId;
 import org.re.employee.api.payload.AccountStatus;
 import org.re.employee.domain.Employee;
@@ -24,62 +23,47 @@ public class EmployeeService {
     private final EmployeeDomainService employeeDomainService;
     private final PasswordEncoder passwordEncoder;
 
-    public Employee getMyInfo(CompanyUserDetails userDetails) {
-        return read(userDetails.getCompanyId(), userDetails.getUserId());
+    public Employee findById(CompanyId companyId, Long employeeId) {
+        return employeeDomainService.findById(companyId.value(), employeeId);
+    }
+
+    public Employee findByCurrentPrincipal(CompanyUserDetails userDetails) {
+        return findById(userDetails.getCompanyId(), userDetails.getUserId());
+    }
+
+    public Page<Employee> findByStatus(CompanyId companyId, Pageable pageable, AccountStatus status) {
+        if (status == null)
+            return employeeDomainService.findAllInCompany(companyId.value(), pageable);
+        var entityStatus = status.toEntityLifecycleStatus(status);
+        return employeeDomainService.findAllInCompany(companyId.value(), pageable, entityStatus);
     }
 
     public Long createRoot(CompanyId companyId, EmployeeCredentials credentials, EmployeeMetadata metadata) {
-        employeeDomainService.validateExistsRootAccount(companyId.value());
-
-        var employee = Employee.createRoot(
-            companyId.value(),
-            credentials.withPassword(passwordEncoder.encode(credentials.password())),
-            metadata
-        );
-        return employeeDomainService.create(employee);
+        var encodedCredentials = credentials.withPassword(passwordEncoder.encode(credentials.password()));
+        var entity = employeeDomainService.createRootAccount(companyId.value(), encodedCredentials, metadata);
+        return entity.getId();
     }
 
     public Long createNormal(CompanyId companyId, EmployeeCredentials credentials, EmployeeMetadata metadata) {
-        var employee = Employee.createNormal(
-            companyId.value(),
-            credentials.withPassword(passwordEncoder.encode(credentials.password())),
-            metadata
-        );
-        return employeeDomainService.create(employee);
+        var encodedCredentials = credentials.withPassword(passwordEncoder.encode(credentials.password()));
+        var entity = employeeDomainService.createNormalAccount(companyId.value(), encodedCredentials, metadata);
+        return entity.getId();
     }
 
-    public Employee read(CompanyId companyId, Long employeeId) {
-        return employeeDomainService.read(companyId.value(), employeeId);
-    }
+    public void update(CompanyId companyId, Long employeeId, UpdateEmployeeCommand command, @Nullable AccountStatus status) {
+        var employee = employeeDomainService.findById(companyId.value(), employeeId);
 
-    public void changeStatus(CompanyId companyId, Long employeeId, @NonNull AccountStatus status) {
-        var employee = employeeDomainService.read(companyId.value(), employeeId);
-
-        switch (status) {
-            case ENABLE -> employee.enable();
-            case DISABLE -> employee.disable();
+        employeeDomainService.update(employee, command);
+        if (status != null) {
+            switch (status) {
+                case ENABLE -> employee.enable();
+                case DISABLE -> employee.disable();
+            }
         }
     }
 
     public void delete(CompanyId companyId, Long employeeId) {
-        employeeDomainService.delete(companyId.value(), employeeId);
-    }
-
-    public Page<Employee> readAll(CompanyId companyId, Pageable pageable) {
-        return employeeDomainService.readAll(companyId.value(), pageable);
-    }
-
-    public Page<Employee> readByStatus(CompanyId companyId, Pageable pageable, String status) {
-        if (status == null)
-            return employeeDomainService.readAll(companyId.value(), pageable);
-        return employeeDomainService.readByStatus(companyId.value(), pageable, EntityLifecycleStatus.valueOf(status));
-    }
-
-    public void update(CompanyId companyId, Long employeeId, UpdateEmployeeCommand command, AccountStatus status) {
-        employeeDomainService.updateMetadata(companyId.value(), employeeId, command);
-        switch (status) {
-            case ENABLE -> employeeDomainService.enable(companyId.value(), employeeId);
-            case DISABLE -> employeeDomainService.disable(companyId.value(), employeeId);
-        }
+        var employee = employeeDomainService.findById(companyId.value(), employeeId);
+        employeeDomainService.delete(employee);
     }
 }

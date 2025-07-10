@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.re.employee.domain.EmployeeCredentials;
+import org.re.employee.domain.EmployeeMetadata;
 import org.re.employee.service.EmployeeDomainService;
 import org.re.web.filter.CompanyIdContextFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,9 @@ public class CompanyLoginTest {
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
 
-            employeeDomainService.createRootAccount(companyId, credential, name, position);
+            employeeDomainService.createRootAccount(companyId, credential, meta);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -83,8 +85,9 @@ public class CompanyLoginTest {
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
 
-            employeeDomainService.createRootAccount(companyId, credential, name, position);
+            employeeDomainService.createRootAccount(companyId, credential, meta);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -110,8 +113,9 @@ public class CompanyLoginTest {
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
 
-            employeeDomainService.createRootAccount(companyId, credential, name, position);
+            employeeDomainService.createRootAccount(companyId, credential, meta);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -136,8 +140,9 @@ public class CompanyLoginTest {
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
 
-            employeeDomainService.createRootAccount(companyId, credential, name, position);
+            employeeDomainService.createRootAccount(companyId, credential, meta);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -166,8 +171,9 @@ public class CompanyLoginTest {
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
 
-            employeeDomainService.createNormalAccount(companyId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, meta);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -193,8 +199,9 @@ public class CompanyLoginTest {
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
 
-            employeeDomainService.createNormalAccount(companyId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, meta);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -220,8 +227,9 @@ public class CompanyLoginTest {
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
 
-            employeeDomainService.createNormalAccount(companyId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, meta);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -246,8 +254,9 @@ public class CompanyLoginTest {
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
 
-            employeeDomainService.createNormalAccount(companyId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, meta);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(
@@ -272,8 +281,9 @@ public class CompanyLoginTest {
             var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
             var name = "name";
             var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
 
-            employeeDomainService.createNormalAccount(companyId, credential, name, position);
+            employeeDomainService.createNormalAccount(companyId, credential, meta);
 
             // when
             var body = objectMapper.writeValueAsString(Map.of(

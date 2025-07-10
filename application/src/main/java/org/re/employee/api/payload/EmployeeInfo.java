@@ -5,7 +5,7 @@ import org.re.employee.domain.EmployeeRole;
 
 import java.time.LocalDateTime;
 
-public record EmployeeSearchResponse(
+public record EmployeeInfo(
     Long employeeId,
     Long companyId,
     String loginId,
@@ -16,8 +16,8 @@ public record EmployeeSearchResponse(
     String status
 ) {
 
-    public static EmployeeSearchResponse from(Employee employee) {
-        return new EmployeeSearchResponse(
+    public static EmployeeInfo from(Employee employee) {
+        return new EmployeeInfo(
             employee.getId(),
             employee.getCompanyId(),
             employee.getCredentials().loginId(),

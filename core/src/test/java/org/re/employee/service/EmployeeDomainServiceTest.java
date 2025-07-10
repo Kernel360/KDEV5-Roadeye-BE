@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.re.common.domain.EntityLifecycleStatus;
 import org.re.common.exception.DomainException;
 import org.re.employee.domain.EmployeeCredentials;
-import org.re.employee.dto.UpdateEmployeeCommand;
+import org.re.employee.domain.EmployeeMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
@@ -17,32 +17,22 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
 @SpringBootTest(properties = {"spring.jpa.show-sql=true"})
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class EmployeeDomainServiceTest {
-
     @Autowired
     private EmployeeDomainService employeeDomainService;
-
-
-    @Test
-    void 계정_정보를_업데이트_할_때_계정이_존재하지_않는_경우_에러가_발생한다() {
-        var updateEmployeeCommand = new UpdateEmployeeCommand("name", "position");
-
-        assertThatThrownBy(() -> employeeDomainService.updateMetadata(1L, 1L, updateEmployeeCommand))
-            .isInstanceOf(DomainException.class);
-
-    }
 
     @Test
     void 계정_정보를_비활성화_합니다() {
         var credentials = new EmployeeCredentials("root", "root");
-        var employee = employeeDomainService.createNormalAccount(1L, credentials, "root", "root");
+        var meta = EmployeeMetadata.create("root", "root");
+        var employee = employeeDomainService.createNormalAccount(1L, credentials, meta);
 
-        employeeDomainService.disable(employee.getCompanyId(), employee.getId());
+        employeeDomainService.disable(employee);
 
         System.out.println(employee.getUpdatedAt());
         assertAll(
@@ -55,10 +45,11 @@ class EmployeeDomainServiceTest {
     @Test
     void 계정_정보를_활성화_합니다() {
         var credentials = new EmployeeCredentials("root", "root");
-        var employee = employeeDomainService.createNormalAccount(1L, credentials, "root", "root");
+        var meta = EmployeeMetadata.create("root", "root");
+        var employee = employeeDomainService.createNormalAccount(1L, credentials, meta);
 
-        employeeDomainService.disable(employee.getCompanyId(), employee.getId());
-        employeeDomainService.enable(employee.getCompanyId(), employee.getId());
+        employeeDomainService.disable(employee);
+        employeeDomainService.enable(employee);
 
         assertAll(
             () -> assertThat(employee.getStatus()).isEqualTo(EntityLifecycleStatus.ACTIVE),
@@ -74,10 +65,11 @@ class EmployeeDomainServiceTest {
                 var username = "root" + idx;
                 var password = "password";
                 var credentials = new EmployeeCredentials(username, password);
-                employeeDomainService.createNormalAccount(1L, credentials, "root", "root");
+                var meta = EmployeeMetadata.create("root", "root");
+                employeeDomainService.createNormalAccount(1L, credentials, meta);
             });
 
-        var actual = employeeDomainService.readAll(1L, PageRequest.of(0, 10));
+        var actual = employeeDomainService.findAllInCompany(1L, PageRequest.of(0, 10));
 
         assertThat(actual.getTotalElements()).isEqualTo(30);
         assertThat(actual.getSize()).isEqualTo(10);
@@ -91,13 +83,14 @@ class EmployeeDomainServiceTest {
                 var username = "root" + idx;
                 var password = "password";
                 var credentials = new EmployeeCredentials(username, password);
-                return employeeDomainService.createNormalAccount(1L, credentials, "root", "root");
+                var meta = EmployeeMetadata.create("root", "root");
+                return employeeDomainService.createNormalAccount(1L, credentials, meta);
             }).toList();
 
-        var employee = employeeDomainService.read(1L, sample.getFirst().getId());
-        employeeDomainService.delete(1L, employee.getId());
+        var employee = employeeDomainService.findById(1L, sample.getFirst().getId());
+        employeeDomainService.delete(employee);
 
-        var actual = employeeDomainService.readAll(1L, PageRequest.of(0, 10));
+        var actual = employeeDomainService.findAllInCompany(1L, PageRequest.of(0, 10));
         assertThat(actual.getTotalElements()).isEqualTo(29);
         assertThat(actual.getSize()).isEqualTo(10);
     }
@@ -110,8 +103,10 @@ class EmployeeDomainServiceTest {
         var credentials = new EmployeeCredentials(username, password);
 
         assertThatThrownBy(() -> {
-            employeeDomainService.createNormalAccount(1L, credentials, "User One", "Position One");
-            employeeDomainService.createNormalAccount(1L, credentials, "User Two", "Position Two");
+            var meta1 = EmployeeMetadata.create("User One", "Position One");
+            var meta2 = EmployeeMetadata.create("User Two", "Position Two");
+            employeeDomainService.createNormalAccount(1L, credentials, meta1);
+            employeeDomainService.createNormalAccount(1L, credentials, meta2);
         }).isInstanceOf(DomainException.class);
     }
 }
