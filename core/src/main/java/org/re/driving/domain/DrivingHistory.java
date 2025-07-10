@@ -32,7 +32,7 @@ public class DrivingHistory {
     private DrivingHistoryStatus status;
 
     @Convert(converter = TransactionIdConverter.class)
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, columnDefinition = "BINARY(16)")
     private TransactionUUID txUid;
 
     @Embedded
