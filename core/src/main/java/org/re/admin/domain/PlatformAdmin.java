@@ -16,19 +16,15 @@ public class PlatformAdmin extends BaseEntity {
     private PlatformAdminPrincipal loginInfo;
 
     @Column(nullable = false)
-    private int loginFailCount;
-
-    @Column(nullable = false)
     private String name;
 
-    PlatformAdmin(PlatformAdminPrincipal loginInfo, int loginFailCount, String name) {
+    PlatformAdmin(PlatformAdminPrincipal loginInfo, String name) {
         this.loginInfo = loginInfo;
-        this.loginFailCount = loginFailCount;
         this.name = name;
     }
 
     public static PlatformAdmin create(String username, String encodedPassword) {
         var loginInfo = new PlatformAdminPrincipal(username, encodedPassword);
-        return new PlatformAdmin(loginInfo, 0, "admin");
+        return new PlatformAdmin(loginInfo, "admin");
     }
 }
