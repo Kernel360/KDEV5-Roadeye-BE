@@ -37,10 +37,10 @@ public class DrivingHistory {
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "mileageSum", column = @Column(name = "previous_mileage_sum")),
+        @AttributeOverride(name = "mileageSum", column = @Column(name = "prev_mileage_sum")),
         @AttributeOverride(name = "datetime", column = @Column(name = "drive_started_at")),
-        @AttributeOverride(name = "location.latitude", column = @Column(name = "previous_latitude")),
-        @AttributeOverride(name = "location.longitude", column = @Column(name = "previous_longitude"))
+        @AttributeOverride(name = "location.latitude", column = @Column(name = "prev_latitude")),
+        @AttributeOverride(name = "location.longitude", column = @Column(name = "prev_longitude"))
     })
     private DrivingSnapShot previousDrivingSnapShot;
 
