@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.stat.Statistics;
+import org.jspecify.annotations.Nullable;
 import org.re.common.stereotype.DomainService;
 import org.re.statistics.domain.DailyDrivingStatistics;
 import org.re.statistics.domain.HourlyDrivingStatistics;
@@ -24,13 +25,10 @@ public class StatisticsDomainService {
     private final DailyStatisticsRepository dailyStatisticsRepository;
     private final HourlyStatisticsRepository hourlyStatisticsRepository;
 
+    @Nullable
     public DailyDrivingStatistics findDailyStatistics(LocalDate localDate) {
         var date = localDate.atStartOfDay();
-        var dailyStatistics = dailyStatisticsRepository.findByDate(date);
-        if (dailyStatistics == null) {
-            return DailyDrivingStatistics.create(date);
-        }
-        return dailyStatistics;
+        return dailyStatisticsRepository.findByDate(date);
     }
 
     public List<HourlyDrivingStatistics> findHourlyStatistics(LocalDate localDate) {

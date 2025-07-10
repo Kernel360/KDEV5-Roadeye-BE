@@ -24,7 +24,11 @@ public class DashboardService {
     public StatisticsInfo getStatisticsInfo(LocalDate date) {
         var dailyStatistics = statisticsDomainService.findDailyStatistics(date);
 
+        if (dailyStatistics == null) {
+            return StatisticsInfo.emptyOf(date);
+        }
+
         var hourlyStatistics = statisticsDomainService.findHourlyStatistics(date);
-        return StatisticsInfo.from(dailyStatistics, hourlyStatistics != null ? hourlyStatistics : List.of());
+        return StatisticsInfo.from(dailyStatistics, hourlyStatistics);
     }
 }
