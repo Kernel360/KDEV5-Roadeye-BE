@@ -34,4 +34,7 @@ public class DailyDrivingStatistics {
         this.duration = duration;
     }
 
+    public static DailyDrivingStatistics create(LocalDateTime date){
+        return new DailyDrivingStatistics(date, 0, 0, 0);
+    }
 }

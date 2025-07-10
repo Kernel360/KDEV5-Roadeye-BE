@@ -2,7 +2,9 @@ package org.re.dashboard.api;
 
 import lombok.RequiredArgsConstructor;
 import org.re.common.api.payload.ListResponse;
+import org.re.common.api.payload.SingleItemResponse;
 import org.re.dashboard.api.payload.DrivingLogCount;
+import org.re.dashboard.api.payload.StatisticsInfo;
 import org.re.dashboard.service.DashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,5 +20,11 @@ public class DashboardApi {
     public ListResponse<DrivingLogCount> getDrivingLogCount() {
         var page = dashboardService.getDrivingHistoryMonthlyCountCommand();
         return ListResponse.of(page, DrivingLogCount::from);
+    }
+
+    @GetMapping("/daily")
+    public SingleItemResponse<StatisticsInfo> getStatistics() {
+        var page = dashboardService.getStatisticsInfo();
+        return SingleItemResponse.of(page);
     }
 }
