@@ -3,8 +3,10 @@ package org.re.employee.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
+import org.re.common.domain.EntityLifecycleStatus;
 import org.re.company.domain.CompanyId;
 import org.re.employee.api.payload.AccountStatus;
+import org.re.employee.api.payload.EmployeeStatusCount;
 import org.re.employee.domain.Employee;
 import org.re.employee.domain.EmployeeCredentials;
 import org.re.employee.domain.EmployeeMetadata;
@@ -32,8 +34,9 @@ public class EmployeeService {
     }
 
     public Page<Employee> findByStatus(CompanyId companyId, Pageable pageable, AccountStatus status) {
-        if (status == null)
+        if (status == null) {
             return employeeDomainService.findAllInCompany(companyId.value(), pageable);
+        }
         var entityStatus = status.toEntityLifecycleStatus(status);
         return employeeDomainService.findAllInCompany(companyId.value(), pageable, entityStatus);
     }
@@ -50,7 +53,8 @@ public class EmployeeService {
         return entity.getId();
     }
 
-    public void update(CompanyId companyId, Long employeeId, UpdateEmployeeCommand command, @Nullable AccountStatus status) {
+    public void update(CompanyId companyId, Long employeeId, UpdateEmployeeCommand command,
+                       @Nullable AccountStatus status) {
         var employee = employeeDomainService.findById(companyId.value(), employeeId);
 
         employeeDomainService.update(employee, command);
@@ -65,5 +69,14 @@ public class EmployeeService {
     public void delete(CompanyId companyId, Long employeeId) {
         var employee = employeeDomainService.findById(companyId.value(), employeeId);
         employeeDomainService.delete(employee);
+    }
+
+    public EmployeeStatusCount getEmployeeStatusCount(CompanyId companyId) {
+        var activeEmployee = employeeDomainService.countAllByStatus(companyId.value(), EntityLifecycleStatus.ACTIVE);
+        var inActiveEmployee = employeeDomainService.countAllByStatus(companyId.value(),
+            EntityLifecycleStatus.DISABLED);
+        var adminEmployee = employeeDomainService.countAllByPosition(companyId.value(), "Administrator");
+
+        return EmployeeStatusCount.of(activeEmployee, inActiveEmployee, adminEmployee);
     }
 }

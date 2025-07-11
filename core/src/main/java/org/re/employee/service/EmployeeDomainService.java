@@ -35,6 +35,14 @@ public class EmployeeDomainService {
             .orElseThrow(() -> new DomainException(EmployeeDomainException.ROOT_ACCOUNT_NOT_FOUND));
     }
 
+    public int countAllByStatus(Long companyId, EntityLifecycleStatus status) {
+        return employeeRepository.countAllByCompanyIdAndStatus(companyId, status);
+    }
+
+    public int countAllByPosition(Long companyId, String position) {
+        return employeeRepository.countAllByCompanyIdAndMetadata_Position(companyId, position);
+    }
+
     public Employee createRootAccount(Long companyId, EmployeeCredentials credentials, EmployeeMetadata metadata) {
         if (employeeRepository.existsByCompanyId(companyId)) {
             throw new DomainException(EmployeeDomainException.ROOT_ACCOUNT_ALREADY_EXISTS);
