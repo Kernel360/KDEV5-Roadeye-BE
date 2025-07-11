@@ -1,10 +1,12 @@
 package org.re.employee.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import org.re.company.domain.CompanyQuote;
 
 @Embeddable
 public record EmployeeCredentials(
+    @Column(name = "username")
     String loginId,
     String password
 ) {

@@ -5,10 +5,10 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public record PlatformAdminPrincipal(
-    @Column(name = "login_username", nullable = false, unique = true, length = 30)
+    @Column(nullable = false, unique = true, length = 30)
     String username,
 
-    @Column(name = "login_password", nullable = false)
+    @Column(nullable = false)
     String password
 ) {
 }

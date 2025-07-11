@@ -13,16 +13,16 @@ public class CompanyQuoteInfo {
     @Column(nullable = false, length = 50)
     private String companyName;
 
-    @Column(nullable = false)
+    @Column(name = "username", nullable = false)
     private String rootAccountUsername;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String rootAccountPassword;
 
     @Column(nullable = false)
     private String companyEmail;
 
-    @Column(nullable = false)
+    @Column(name = "company_bizno", nullable = false)
     private String companyBusinessNumber;
 
     public CompanyQuoteInfo(
