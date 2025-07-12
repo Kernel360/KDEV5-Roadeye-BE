@@ -7,7 +7,7 @@ import org.re.mdtlog.dto.MdtCycleLogMessage;
 import org.re.mdtlog.dto.MdtEventMessage;
 import org.re.mdtlog.dto.MdtIgnitionOffMessage;
 import org.re.mdtlog.dto.MdtIgnitionOnMessage;
-import org.re.mdtlog.service.MdtEventHandler;
+import org.re.mdtlog.service.MdtEventService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -17,25 +17,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 public class MdtEventConsumer {
-    private final MdtEventHandler mdtEventHandler;
+    private final MdtEventService mdtEventService;
 
     @RabbitListener(queues = AMQPConfig.QueueNames.MDT_IGNITION_ON)
     public void handleMdtIgnitionOnMessage(@Payload MdtEventMessage<MdtIgnitionOnMessage> message) {
         log.debug("Received MDT ignition message: {}", message);
-        mdtEventHandler.handleMdtIgnitionOnMessage(message);
+        mdtEventService.handleMdtIgnitionOnMessage(message);
     }
 
     @Transactional
     @RabbitListener(queues = AMQPConfig.QueueNames.MDT_IGNITION_OFF)
     public void handleMdtIgnitionOffMessage(@Payload MdtEventMessage<MdtIgnitionOffMessage> message) {
         log.debug("Received MDT ignition off message: {}", message);
-        mdtEventHandler.handleMdtIgnitionOffMessage(message);
+        mdtEventService.handleMdtIgnitionOffMessage(message);
     }
 
     @Transactional
     @RabbitListener(queues = AMQPConfig.QueueNames.MDT_CAR_LOCATION)
     public void handleMdtCarLocationMessage(@Payload MdtEventMessage<MdtCycleLogMessage> message) {
         log.debug("Received MDT car location message: {}", message);
-        mdtEventHandler.handleMdtCarLocationMessage(message);
+        mdtEventService.handleMdtCarLocationMessage(message);
     }
 }

@@ -24,7 +24,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MdtEventHandler {
+public class MdtEventService {
     private final MdtLogService mdtLogService;
     private final CarDomainService carDomainService;
     private final DrivingHistoryDomainService drivingHistoryDomainService;
@@ -43,9 +43,9 @@ public class MdtEventHandler {
         List<LocationHistory> sampledLogs = new ArrayList<>();
         for (int i = 0; i < logs.size(); i++) {
             if (i % 10 == 0) {
-                DrivingMoment drivingMoment = new DrivingMoment(logs.get(i).getOccurredAt(),logs.get(i).getMdtSpeed());
+                DrivingMoment drivingMoment = new DrivingMoment(logs.get(i).getOccurredAt(), logs.get(i).getMdtSpeed());
                 CarLocation carLocation = logs.get(i).toCarLocation();
-                LocationHistory history = LocationHistory.of(drivingHistory.getId(),carLocation,drivingMoment);
+                LocationHistory history = LocationHistory.of(drivingHistory.getId(), carLocation, drivingMoment);
                 sampledLogs.add(history);
             }
         }
@@ -74,7 +74,8 @@ public class MdtEventHandler {
         var drivingHistory = findHistoryInProgress(car, message);
         if (drivingHistory == null) {
             log.warn("No driving history found for car {} and transaction ID {}", car.getId(), message.transactionId());
-        } else {
+        }
+        else {
             drivingHistory.end(car, message.payload().ignitionOffTime());
         }
     }
