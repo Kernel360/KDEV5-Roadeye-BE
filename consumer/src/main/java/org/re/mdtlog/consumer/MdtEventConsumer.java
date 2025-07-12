@@ -11,7 +11,6 @@ import org.re.mdtlog.service.MdtEventService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -25,14 +24,12 @@ public class MdtEventConsumer {
         mdtEventService.handleMdtIgnitionOnMessage(message);
     }
 
-    @Transactional
     @RabbitListener(queues = AMQPConfig.QueueNames.MDT_IGNITION_OFF)
     public void handleMdtIgnitionOffMessage(@Payload MdtEventMessage<MdtIgnitionOffMessage> message) {
         log.debug("Received MDT ignition off message: {}", message);
         mdtEventService.handleMdtIgnitionOffMessage(message);
     }
 
-    @Transactional
     @RabbitListener(queues = AMQPConfig.QueueNames.MDT_CAR_LOCATION)
     public void handleMdtCarLocationMessage(@Payload MdtEventMessage<MdtCycleLogMessage> message) {
         log.debug("Received MDT car location message: {}", message);
