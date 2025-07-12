@@ -1,6 +1,12 @@
 package org.re.mdtlog.domain;
 
-import jakarta.persistence.*;
+import io.hypersistence.utils.hibernate.id.Tsid;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,19 +16,15 @@ import org.re.mdtlog.converter.MdtLogEventTypeConverter;
 import org.re.mdtlog.converter.MdtLogGpsConditionConverter;
 import org.re.mdtlog.converter.TransactionIdConverter;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MdtLog {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "log_id", columnDefinition = "BINARY(16)", nullable = false)
-    private UUID id;
+    @Tsid // @see io.hypersistence.utils.hibernate.id.TsidGenerator
+    @Column(name = "log_id", nullable = false)
+    private Long id;
 
     @Column(name = "packet_ver", nullable = false, columnDefinition = "SMALLINT UNSIGNED")
     private int packetVer;
@@ -85,7 +87,11 @@ public class MdtLog {
     private LocalDateTime receivedAt;
 
     @Builder
-    MdtLog(int packetVer, MdtLogEventType eventType, TransactionUUID txUid, Long carId, String terminalId, String manufactureId, String deviceId, MdtLogGpsCondition gpsCond, BigDecimal gpsLat, BigDecimal gpsLon, int mdtAngle, int mdtSpeed, int mdtMileageSum, Integer mdtBatteryVoltage, LocalDateTime mdtIgnitionOnTime, LocalDateTime mdtIgnitionOffTime, LocalDateTime occurredAt, LocalDateTime sentAt, LocalDateTime receivedAt) {
+    MdtLog(
+        int packetVer, MdtLogEventType eventType, TransactionUUID txUid, Long carId, String terminalId, String manufactureId, String deviceId, MdtLogGpsCondition gpsCond, BigDecimal gpsLat,
+        BigDecimal gpsLon, int mdtAngle, int mdtSpeed, int mdtMileageSum, Integer mdtBatteryVoltage, LocalDateTime mdtIgnitionOnTime, LocalDateTime mdtIgnitionOffTime, LocalDateTime occurredAt,
+        LocalDateTime sentAt, LocalDateTime receivedAt
+    ) {
         this.packetVer = packetVer;
         this.eventType = eventType;
         this.txUid = txUid;

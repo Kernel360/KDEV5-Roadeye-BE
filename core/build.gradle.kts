@@ -1,9 +1,9 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 springBoot {
-	tasks.withType<BootJar> {
-		enabled = false
-	}
+    tasks.withType<BootJar> {
+        enabled = false
+    }
 }
 
 dependencies {
@@ -13,6 +13,7 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.10.1")
 
     implementation("org.springframework.amqp:spring-amqp")
 
