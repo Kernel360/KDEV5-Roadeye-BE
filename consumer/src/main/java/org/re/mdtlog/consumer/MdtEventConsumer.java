@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RoadeyeMdtLogConsumer {
+public class MdtEventConsumer {
     private final MdtEventHandler mdtEventHandler;
 
     @RabbitListener(queues = AMQPConfig.QueueNames.MDT_IGNITION_ON)
