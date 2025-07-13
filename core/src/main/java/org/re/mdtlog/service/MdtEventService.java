@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.re.car.service.CarDomainService;
 import org.re.driving.service.DrivingHistoryDomainService;
+import org.re.location.service.LocationHistoryDomainService;
 import org.re.mdtlog.domain.MdtLogRepository;
 import org.re.mdtlog.dto.MdtCycleLogMessage;
 import org.re.mdtlog.dto.MdtEventMessage;
@@ -22,12 +23,21 @@ public class MdtEventService {
     private final MdtLogRepository mdtLogRepository;
     private final CarDomainService carDomainService;
     private final DrivingHistoryDomainService drivingHistoryDomainService;
+    private final LocationHistoryDomainService locationHistoryDomainService;
 
     @Transactional
     public void handleMdtCarLocationMessageBatch(List<MdtEventMessage<MdtCycleLogMessage>> batch) {
         for (MdtEventMessage<MdtCycleLogMessage> message : batch) {
             var logs = message.payload().toLogEntries(message.transactionId(), message.sentAt(), message.receivedAt());
             mdtLogRepository.saveAll(logs);
+
+            var drivingHistory = drivingHistoryDomainService.findHistoryInProgress(message.payload().carId(), message.transactionId());
+            if (drivingHistory == null) {
+                log.warn("No driving history found for car: {}, TUID: {}.", message.payload().carId(), message.transactionId());
+            }
+            else {
+                locationHistoryDomainService.sampling(drivingHistory, logs);
+            }
         }
     }
 

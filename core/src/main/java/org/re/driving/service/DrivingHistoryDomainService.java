@@ -40,7 +40,11 @@ public class DrivingHistoryDomainService {
     }
 
     public DrivingHistory findHistoryInProgress(Car car, TransactionUUID transactionUUID) {
-        return drivingHistoryRepository.findByCarAndTxUidAndStatus(car, transactionUUID, DrivingHistoryStatus.DRIVING);
+        return drivingHistoryRepository.findByCarIdAndTxUidAndStatus(car.getId(), transactionUUID, DrivingHistoryStatus.DRIVING);
+    }
+
+    public DrivingHistory findHistoryInProgress(Long carId, TransactionUUID transactionUUID) {
+        return drivingHistoryRepository.findByCarIdAndTxUidAndStatus(carId, transactionUUID, DrivingHistoryStatus.DRIVING);
     }
 
     public Page<DrivingHistory> findAll(CompanyId companyId, Pageable pageable) {
