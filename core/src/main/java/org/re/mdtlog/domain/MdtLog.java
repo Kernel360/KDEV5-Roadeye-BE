@@ -26,7 +26,7 @@ public class MdtLog {
     @Column(name = "log_id", nullable = false)
     private Long id;
 
-    @Column(name = "packet_ver", nullable = false, columnDefinition = "SMALLINT UNSIGNED")
+    @Column(name = "packet_ver", nullable = false)
     private int packetVer;
 
     @Convert(converter = MdtLogEventTypeConverter.class)
@@ -34,7 +34,7 @@ public class MdtLog {
     private MdtLogEventType eventType;
 
     @Convert(converter = TransactionIdConverter.class)
-    @Column(name = "tx_uid", columnDefinition = "BINARY(16)", nullable = false)
+    @Column(name = "txUid", columnDefinition = "BINARY(16)", nullable = false)
     private TransactionUUID txUid;
 
     @Column(name = "car_id", nullable = false)
@@ -59,16 +59,16 @@ public class MdtLog {
     @Column(name = "gps_lon", precision = 10, scale = 6, nullable = false)
     private BigDecimal gpsLon;
 
-    @Column(name = "mdt_angle", nullable = false, columnDefinition = "SMALLINT UNSIGNED")
+    @Column(name = "mdt_angle", nullable = false)
     private int mdtAngle;
 
-    @Column(name = "mdt_speed", nullable = false, columnDefinition = "TINYINT UNSIGNED")
+    @Column(name = "mdt_speed", nullable = false)
     private int mdtSpeed;
 
-    @Column(name = "mdt_mileage_sum", nullable = false, columnDefinition = "MEDIUMINT UNSIGNED")
+    @Column(name = "mdt_mileage_sum", nullable = false)
     private int mdtMileageSum;
 
-    @Column(name = "mdt_battery_voltage", columnDefinition = "SMALLINT UNSIGNED")
+    @Column(name = "mdt_battery_voltage")
     private Integer mdtBatteryVoltage;
 
     @Column(name = "mdt_ignition_onTime")
