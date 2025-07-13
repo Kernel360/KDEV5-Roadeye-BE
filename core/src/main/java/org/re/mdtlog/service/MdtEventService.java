@@ -4,6 +4,7 @@ package org.re.mdtlog.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.re.car.service.CarDomainService;
+import org.re.driving.domain.DrivingSnapShot;
 import org.re.driving.service.DrivingHistoryDomainService;
 import org.re.location.service.LocationHistoryDomainService;
 import org.re.mdtlog.domain.MdtLogRepository;
@@ -60,6 +61,13 @@ public class MdtEventService {
         var car = carDomainService.getCarById(message.payload().carId());
         car.turnOffIgnition(message);
 
-        drivingHistoryDomainService.end(car, message);
+        var driving = drivingHistoryDomainService.findHistoryInProgress(car, message.transactionId());
+        if (driving == null) {
+            log.warn("No driving history found for car: {}, TUID: {}.", car.getId(), message.transactionId());
+        }
+        else {
+            var snapshot = DrivingSnapShot.from(car, message.payload().ignitionOffTime());
+            drivingHistoryDomainService.end(driving, snapshot, message.payload().ignitionOffTime());
+        }
     }
 }

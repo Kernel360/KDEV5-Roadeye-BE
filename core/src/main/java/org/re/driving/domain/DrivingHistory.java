@@ -72,12 +72,12 @@ public class DrivingHistory {
         return new DrivingHistory(car, DrivingHistoryStatus.DRIVING, txUid, snapshot);
     }
 
-    public void end(Car car, LocalDateTime driveEndAt) {
+    public void end(DrivingSnapShot snapShot, LocalDateTime driveEndAt) {
         if (this.status != DrivingHistoryStatus.DRIVING) {
             throw new DomainException(DrivingHistoryExceptionCode.ALREADY_ENDED);
 
         }
         this.status = DrivingHistoryStatus.ENDED;
-        this.endDrivingSnapShot = DrivingSnapShot.from(car, driveEndAt);
+        this.endDrivingSnapShot = snapShot;
     }
 }
