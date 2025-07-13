@@ -13,6 +13,8 @@ import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.exception.DrivingHistoryExceptionCode;
 import org.re.driving.repository.DrivingHistoryRepository;
 import org.re.mdtlog.domain.TransactionUUID;
+import org.re.mdtlog.dto.MdtEventMessage;
+import org.re.mdtlog.dto.MdtIgnitionOffMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -52,5 +54,15 @@ public class DrivingHistoryDomainService {
 
     public List<DrivingHistoryMonthlyCountResult> getMonthlyCount() {
         return drivingHistoryRepository.countByMonth(LocalDateTime.now().minusMonths(11));
+    }
+
+    public void end(Car car, MdtEventMessage<MdtIgnitionOffMessage> message) {
+        var drivingHistory = findHistoryInProgress(car, message.transactionId());
+        if (drivingHistory == null) {
+            log.warn("No driving history found for car {} and transaction ID {}", car.getId(), message.transactionId());
+        }
+        else {
+            drivingHistory.end(car, message.payload().ignitionOffTime());
+        }
     }
 }
