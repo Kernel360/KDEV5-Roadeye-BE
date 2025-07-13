@@ -1,5 +1,6 @@
 package org.re.mdtlog.consumer;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.re.config.AMQPConfig;
@@ -12,8 +13,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ public class MdtEventConsumer {
         batch = "false"
     )
     public void handleMdtIgnitionOnMessage(@Payload MdtEventMessage<MdtIgnitionOnMessage> message) {
-        log.debug("Received MDT ignition message: {}", message);
+        log.debug("[Thread-{}] Received MDT ignition on message: {}", Thread.currentThread(), message);
         mdtEventService.handleMdtIgnitionOnMessage(message);
     }
 
@@ -34,7 +33,7 @@ public class MdtEventConsumer {
         batch = "false"
     )
     public void handleMdtIgnitionOffMessage(@Payload MdtEventMessage<MdtIgnitionOffMessage> message) {
-        log.debug("Received MDT ignition off message: {}", message);
+        log.debug("[Thread-{}] Received MDT ignition off message: {}", Thread.currentThread(), message);
         mdtEventService.handleMdtIgnitionOffMessage(message);
     }
 
