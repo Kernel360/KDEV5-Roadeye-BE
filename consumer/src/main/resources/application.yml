@@ -1,3 +1,30 @@
 spring:
   profiles:
     include: amqp
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 600
+        order_inserts: true
+        order_updates: true
+  rabbitmq:
+    listener:
+      direct:
+        prefetch: 500
+        default-requeue-rejected: false
+        de-batching-enabled: true
+        retry:
+          enabled: true
+      simple:
+        prefetch: 500
+        batch-size: 10
+        concurrency: 5
+        max-concurrency: 10
+        default-requeue-rejected: false
+        consumer-batch-enabled: false
+        retry:
+          enabled: true
