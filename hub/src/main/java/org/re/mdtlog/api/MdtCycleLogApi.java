@@ -27,7 +27,7 @@ public class MdtCycleLogApi {
         @NotNull MdtLogRequestTimeInfo timeInfo,
         TransactionUUID tuid
     ) {
-        cycleLogService.addCycleLogs(tuid, dto, timeInfo);
+        cycleLogService.addCycleLogs(tuid.value(), dto, timeInfo);
         return new BaseMdtLogResponse(dto.carId());
     }
 }

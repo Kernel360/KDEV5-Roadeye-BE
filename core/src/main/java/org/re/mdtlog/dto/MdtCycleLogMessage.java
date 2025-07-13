@@ -7,20 +7,25 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import org.re.car.domain.CarLocation;
-import org.re.mdtlog.constraints.*;
+import org.re.mdtlog.constraints.ValidAngle;
+import org.re.mdtlog.constraints.ValidBatteryVoltage;
+import org.re.mdtlog.constraints.ValidLatitude;
+import org.re.mdtlog.constraints.ValidLongitude;
+import org.re.mdtlog.constraints.ValidMileageSum;
+import org.re.mdtlog.constraints.ValidPacketVersion;
+import org.re.mdtlog.constraints.ValidSpeed;
 import org.re.mdtlog.databind.MdtLogGpsConditionDeserializer;
 import org.re.mdtlog.databind.MdtLogGpsConditionSerializer;
 import org.re.mdtlog.domain.MdtLog;
 import org.re.mdtlog.domain.MdtLogEventType;
 import org.re.mdtlog.domain.MdtLogGpsCondition;
-import org.re.mdtlog.domain.TransactionUUID;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder(access = AccessLevel.PACKAGE)
 public record MdtCycleLogMessage(
@@ -59,14 +64,14 @@ public record MdtCycleLogMessage(
     @JsonProperty("cList")
     List<MdtCycleLogItem> cycleLogList
 ) {
-    public List<MdtLog> toLogEntries(TransactionUUID transactionUUID, LocalDateTime sentAt, @NotNull LocalDateTime receivedAt) {
+    public List<MdtLog> toLogEntries(UUID txid, LocalDateTime sentAt, @NotNull LocalDateTime receivedAt) {
         return cycleLogList.stream()
             .map(item -> {
                 var occurredAt = this.occurredAt.plusSeconds(item.sec());
                 return MdtLog.builder()
                     .packetVer(packetVersion)
                     .eventType(MdtLogEventType.CYCLE_LOG)
-                    .txUid(transactionUUID)
+                    .txUid(txid)
                     .carId(carId)
                     .terminalId(terminalId)
                     .manufactureId(manufacturerId)

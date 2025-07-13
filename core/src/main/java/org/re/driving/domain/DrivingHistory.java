@@ -22,7 +22,6 @@ import org.re.car.domain.Car;
 import org.re.common.exception.DomainException;
 import org.re.driving.converter.DrivingHistoryStatusConverter;
 import org.re.driving.exception.DrivingHistoryExceptionCode;
-import org.re.mdtlog.domain.TransactionUUID;
 
 @Getter
 @Entity
@@ -66,12 +65,12 @@ public class DrivingHistory {
     private DrivingHistory(
         Car car,
         DrivingHistoryStatus status,
-        TransactionUUID txUid,
+        UUID txid,
         DrivingSnapShot previousDrivingSnapShot
     ) {
         this.car = car;
         this.status = status;
-        this.txUid = txUid.value();
+        this.txUid = txid;
         this.previousDrivingSnapShot = previousDrivingSnapShot;
     }
 

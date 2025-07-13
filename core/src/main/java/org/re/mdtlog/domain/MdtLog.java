@@ -87,13 +87,13 @@ public class MdtLog {
 
     @Builder
     MdtLog(
-        int packetVer, MdtLogEventType eventType, TransactionUUID txUid, Long carId, String terminalId, String manufactureId, String deviceId, MdtLogGpsCondition gpsCond, BigDecimal gpsLat,
+        int packetVer, MdtLogEventType eventType, UUID txUid, Long carId, String terminalId, String manufactureId, String deviceId, MdtLogGpsCondition gpsCond, BigDecimal gpsLat,
         BigDecimal gpsLon, int mdtAngle, int mdtSpeed, int mdtMileageSum, Integer mdtBatteryVoltage, LocalDateTime mdtIgnitionOnTime, LocalDateTime mdtIgnitionOffTime, LocalDateTime occurredAt,
         LocalDateTime sentAt, LocalDateTime receivedAt
     ) {
         this.packetVer = packetVer;
         this.eventType = eventType;
-        this.txUid = txUid.value();
+        this.txUid = txUid;
         this.carId = carId;
         this.terminalId = terminalId;
         this.manufactureId = manufactureId;

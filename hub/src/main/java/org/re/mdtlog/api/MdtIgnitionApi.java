@@ -29,7 +29,7 @@ public class MdtIgnitionApi {
         @NotNull MdtLogRequestTimeInfo timeInfo,
         TransactionUUID tuid
     ) {
-        mdtIgnitionService.ignitionOn(tuid, dto, timeInfo);
+        mdtIgnitionService.ignitionOn(tuid.value(), dto, timeInfo);
         return new BaseMdtLogResponse(dto.carId());
     }
 
@@ -39,7 +39,7 @@ public class MdtIgnitionApi {
         @NotNull MdtLogRequestTimeInfo timeInfo,
         TransactionUUID tuid
     ) {
-        mdtIgnitionService.ignitionOff(tuid, dto, timeInfo);
+        mdtIgnitionService.ignitionOff(tuid.value(), dto, timeInfo);
         return new BaseMdtLogResponse(dto.carId());
     }
 }

@@ -5,17 +5,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import org.re.car.domain.CarLocation;
-import org.re.mdtlog.constraints.*;
+import org.re.mdtlog.constraints.ValidAngle;
+import org.re.mdtlog.constraints.ValidLatitude;
+import org.re.mdtlog.constraints.ValidLongitude;
+import org.re.mdtlog.constraints.ValidMileageSum;
+import org.re.mdtlog.constraints.ValidPacketVersion;
+import org.re.mdtlog.constraints.ValidSpeed;
 import org.re.mdtlog.databind.MdtLogGpsConditionDeserializer;
 import org.re.mdtlog.databind.MdtLogGpsConditionSerializer;
 import org.re.mdtlog.domain.MdtLog;
 import org.re.mdtlog.domain.MdtLogEventType;
 import org.re.mdtlog.domain.MdtLogGpsCondition;
-import org.re.mdtlog.domain.TransactionUUID;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public record MdtIgnitionOffMessage(
     @NotNull
@@ -80,7 +84,7 @@ public record MdtIgnitionOffMessage(
     @ValidMileageSum
     Integer mdtMileageSum
 ) {
-    public MdtLog toLogEntry(TransactionUUID transactionUUID, LocalDateTime sentAt, LocalDateTime receivedAt) {
+    public MdtLog toLogEntry(UUID txid, LocalDateTime sentAt, LocalDateTime receivedAt) {
         return MdtLog.builder()
             .packetVer(packetVersion)
             .eventType(MdtLogEventType.IGNITION)
@@ -88,7 +92,7 @@ public record MdtIgnitionOffMessage(
             .terminalId(terminalId)
             .manufactureId(manufacturerId)
             .deviceId(deviceId)
-            .txUid(transactionUUID)
+            .txUid(txid)
             .gpsCond(gpsCondition)
             .gpsLat(gpsLatitude)
             .gpsLon(gpsLongitude)

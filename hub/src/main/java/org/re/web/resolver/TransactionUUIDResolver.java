@@ -1,6 +1,7 @@
 package org.re.web.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.UUID;
 import org.re.common.exception.AppException;
 import org.re.common.exception.MdtLogExceptionCode;
 import org.re.mdtlog.domain.TransactionUUID;
@@ -31,7 +32,8 @@ public class TransactionUUIDResolver implements HandlerMethodArgumentResolver {
             throw new AppException(MdtLogExceptionCode.TUID_ERROR);
         }
         try {
-            return TransactionUUID.from(tuid);
+            var uuid = UUID.fromString(tuid);
+            return new TransactionUUID(uuid);
         } catch (IllegalArgumentException e) {
             throw new AppException(MdtLogExceptionCode.TUID_ERROR);
         }
