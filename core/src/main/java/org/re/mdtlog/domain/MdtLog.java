@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,6 @@ import lombok.NoArgsConstructor;
 import org.re.car.domain.CarLocation;
 import org.re.mdtlog.converter.MdtLogEventTypeConverter;
 import org.re.mdtlog.converter.MdtLogGpsConditionConverter;
-import org.re.mdtlog.converter.TransactionIdConverter;
 
 
 @Getter
@@ -33,9 +33,8 @@ public class MdtLog {
     @Column(name = "event_type", length = 10, nullable = false)
     private MdtLogEventType eventType;
 
-    @Convert(converter = TransactionIdConverter.class)
-    @Column(name = "txUid", columnDefinition = "BINARY(16)", nullable = false)
-    private TransactionUUID txUid;
+    @Column(name = "tx_Uid", columnDefinition = "BINARY(16)", nullable = false)
+    private UUID txUid;
 
     @Column(name = "car_id", nullable = false)
     private Long carId;
@@ -94,7 +93,7 @@ public class MdtLog {
     ) {
         this.packetVer = packetVer;
         this.eventType = eventType;
-        this.txUid = txUid;
+        this.txUid = txUid.value();
         this.carId = carId;
         this.terminalId = terminalId;
         this.manufactureId = manufactureId;
