@@ -10,3 +10,21 @@ dependencies {
     testImplementation("org.springframework.batch:spring-batch-test")
 
 }
+
+tasks.register("buildDockerImage") {
+    group = "build"
+
+    dependsOn("bootJar")
+
+    doLast {
+        exec {
+            commandLine(
+                "docker", "build",
+                "-t", "${rootProject.name}/${project.name}:latest",
+                "-t", "${rootProject.name}/${project.name}:${project.version}",
+                ".",
+                "--build-arg", "JAR_FILE=build/libs/${project.name}-${project.version}.jar"
+            )
+        }
+    }
+}
