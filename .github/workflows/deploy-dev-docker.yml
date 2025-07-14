@@ -17,7 +17,8 @@ jobs:
       matrix:
         module: [ 'application', 'hub', 'consumer', 'batch' ]
     env:
-      DOCKER_IMAGE: ${{ secrets.AWS_ECR_REPOSITORY }}/roadeye/${{ matrix.module }}
+      DOCKER_REPO: ${{ secrets.AWS_ECR_REPOSITORY }}
+      DOCKER_IMAGE: roadeye/${{ matrix.module }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -52,7 +53,7 @@ jobs:
       #        run: |
       #          ./gradlew --quiet --build-cache \
       #            :${{ matrix.module }}:bootBuildImage \
-      #            --imageName=${{ env.DOCKER_IMAGE }}:latest
+      #            --imageName=${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -66,5 +67,5 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker tag ${{ env.DOCKER_IMAGE }}:latest ${{ env.DOCKER_IMAGE }}:latest
-          docker push ${{ env.DOCKER_IMAGE }}:latest
+          docker tag ${{ env.DOCKER_IMAGE }}:latest ${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest
+          docker push ${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest
