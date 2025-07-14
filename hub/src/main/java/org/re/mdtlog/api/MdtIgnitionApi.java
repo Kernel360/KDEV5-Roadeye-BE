@@ -11,12 +11,8 @@ import org.re.mdtlog.dto.MdtIgnitionOffMessage;
 import org.re.mdtlog.dto.MdtIgnitionOnMessage;
 import org.re.mdtlog.service.MdtIgnitionService;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
@@ -30,7 +26,7 @@ public class MdtIgnitionApi {
         @Valid @RequestBody MdtIgnitionOnMessage dto,
         @NotNull MdtLogRequestTimeInfo timeInfo,
         TransactionUUID tuid,
-        @Nullable @Header(value = "X-routing-key", required = false) String routingKey
+        @Nullable @RequestHeader(value = "X-routing-key", required = false) String routingKey
     ) {
         mdtIgnitionService.ignitionOn(tuid.value(), dto, timeInfo, routingKey);
         return new BaseMdtLogResponse(dto.carId());
@@ -41,7 +37,7 @@ public class MdtIgnitionApi {
         @Valid @RequestBody MdtIgnitionOffMessage dto,
         @NotNull MdtLogRequestTimeInfo timeInfo,
         TransactionUUID tuid,
-        @Nullable @Header(value = "X-routing-key", required = false) String routingKey
+        @Nullable @RequestHeader(value = "X-routing-key", required = false) String routingKey
     ) {
         mdtIgnitionService.ignitionOff(tuid.value(), dto, timeInfo, routingKey);
         return new BaseMdtLogResponse(dto.carId());
