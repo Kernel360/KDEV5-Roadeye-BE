@@ -3,24 +3,18 @@ spring:
     include: amqp
   datasource:
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: 20
   jpa:
     properties:
       hibernate:
         jdbc:
-          batch_size: 600
+          batch_size: 1200
         order_inserts: true
         order_updates: true
   rabbitmq:
     listener:
-      direct:
-        prefetch: 500
-        default-requeue-rejected: false
-        de-batching-enabled: true
-        retry:
-          enabled: true
       simple:
-        prefetch: 500
+        prefetch: 100
         batch-size: 10
         concurrency: 5
         max-concurrency: 10
@@ -28,3 +22,9 @@ spring:
         consumer-batch-enabled: false
         retry:
           enabled: true
+      batch:
+        prefetch: 30
+        batch-size: 30
+        consumers: 10
+        maxConsumers: 10
+
