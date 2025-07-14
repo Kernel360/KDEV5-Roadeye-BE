@@ -30,7 +30,7 @@ public class MdtCycleLogApi {
         TransactionUUID tuid,
         @Nullable @Header(value = "X-routing-key", required = false) String routingKey
     ) {
-        cycleLogService.addCycleLogs(tuid, dto, timeInfo, routingKey);
+        cycleLogService.addCycleLogs(tuid.value(), dto, timeInfo, routingKey);
         return new BaseMdtLogResponse(dto.carId());
     }
 }

@@ -12,10 +12,10 @@ import org.re.mdtlog.databind.MdtLogGpsConditionSerializer;
 import org.re.mdtlog.domain.MdtLog;
 import org.re.mdtlog.domain.MdtLogEventType;
 import org.re.mdtlog.domain.MdtLogGpsCondition;
-import org.re.mdtlog.domain.TransactionUUID;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record MdtIgnitionOnMessage(
     @NotNull
@@ -79,7 +79,7 @@ public record MdtIgnitionOnMessage(
         return new CarLocation(gpsLatitude, gpsLongitude);
     }
 
-    public MdtLog toLogEntry(TransactionUUID transactionUUID, LocalDateTime sentAt, LocalDateTime receivedAt) {
+    public MdtLog toLogEntry(UUID txid, LocalDateTime sentAt, LocalDateTime receivedAt) {
         return MdtLog.builder()
             .packetVer(packetVersion)
             .eventType(MdtLogEventType.IGNITION)
@@ -87,7 +87,7 @@ public record MdtIgnitionOnMessage(
             .terminalId(terminalId)
             .manufactureId(manufacturerId)
             .deviceId(deviceId)
-            .txUid(transactionUUID)
+            .txUid(txid)
             .gpsCond(gpsCondition)
             .gpsLat(gpsLatitude)
             .gpsLon(gpsLongitude)

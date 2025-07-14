@@ -32,7 +32,7 @@ public class MdtIgnitionApi {
         TransactionUUID tuid,
         @Nullable @Header(value = "X-routing-key", required = false) String routingKey
     ) {
-        mdtIgnitionService.ignitionOn(tuid, dto, timeInfo, routingKey);
+        mdtIgnitionService.ignitionOn(tuid.value(), dto, timeInfo, routingKey);
         return new BaseMdtLogResponse(dto.carId());
     }
 
@@ -43,7 +43,7 @@ public class MdtIgnitionApi {
         TransactionUUID tuid,
         @Nullable @Header(value = "X-routing-key", required = false) String routingKey
     ) {
-        mdtIgnitionService.ignitionOff(tuid, dto, timeInfo, routingKey);
+        mdtIgnitionService.ignitionOff(tuid.value(), dto, timeInfo, routingKey);
         return new BaseMdtLogResponse(dto.carId());
     }
 }

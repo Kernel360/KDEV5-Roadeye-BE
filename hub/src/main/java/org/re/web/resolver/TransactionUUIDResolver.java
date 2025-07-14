@@ -10,6 +10,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.UUID;
+
 public class TransactionUUIDResolver implements HandlerMethodArgumentResolver {
     public static final String HEADER_NAME = "X-TUID";
 
@@ -31,7 +33,8 @@ public class TransactionUUIDResolver implements HandlerMethodArgumentResolver {
             throw new AppException(MdtLogExceptionCode.TUID_ERROR);
         }
         try {
-            return TransactionUUID.from(tuid);
+            var uuid = UUID.fromString(tuid);
+            return new TransactionUUID(uuid);
         } catch (IllegalArgumentException e) {
             throw new AppException(MdtLogExceptionCode.TUID_ERROR);
         }

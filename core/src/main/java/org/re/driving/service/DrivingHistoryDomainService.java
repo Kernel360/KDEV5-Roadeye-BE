@@ -9,15 +9,16 @@ import org.re.common.stereotype.DomainService;
 import org.re.company.domain.CompanyId;
 import org.re.driving.domain.DrivingHistory;
 import org.re.driving.domain.DrivingHistoryStatus;
+import org.re.driving.domain.DrivingSnapShot;
 import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.exception.DrivingHistoryExceptionCode;
 import org.re.driving.repository.DrivingHistoryRepository;
-import org.re.mdtlog.domain.TransactionUUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
@@ -37,8 +38,12 @@ public class DrivingHistoryDomainService {
         drivingHistoryRepository.save(drivingHistory);
     }
 
-    public DrivingHistory findHistoryInProgress(Car car, TransactionUUID transactionUUID) {
-        return drivingHistoryRepository.findByCarAndTxUidAndStatus(car, transactionUUID, DrivingHistoryStatus.DRIVING);
+    public DrivingHistory findHistoryInProgress(Car car, UUID txid) {
+        return drivingHistoryRepository.findByCarIdAndTxUidAndStatus(car.getId(), txid, DrivingHistoryStatus.DRIVING);
+    }
+
+    public DrivingHistory findHistoryInProgress(Long carId, UUID txid) {
+        return drivingHistoryRepository.findByCarIdAndTxUidAndStatus(carId, txid, DrivingHistoryStatus.DRIVING);
     }
 
     public Page<DrivingHistory> findAll(CompanyId companyId, Pageable pageable) {
@@ -52,5 +57,9 @@ public class DrivingHistoryDomainService {
 
     public List<DrivingHistoryMonthlyCountResult> getMonthlyCount() {
         return drivingHistoryRepository.countByMonth(LocalDateTime.now().minusMonths(11));
+    }
+
+    public void end(DrivingHistory driving, DrivingSnapShot snapShot, LocalDateTime driveEndAt) {
+        driving.end(snapShot, driveEndAt);
     }
 }

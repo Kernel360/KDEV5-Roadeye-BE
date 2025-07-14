@@ -1,11 +1,9 @@
 package org.re.employee.api;
 
 import lombok.RequiredArgsConstructor;
+import org.re.common.api.payload.SingleItemResponse;
 import org.re.company.domain.CompanyId;
-import org.re.employee.api.payload.AccountStatus;
-import org.re.employee.api.payload.EmployeeCreateRequest;
-import org.re.employee.api.payload.EmployeeInfo;
-import org.re.employee.api.payload.EmployeeUpdateRequest;
+import org.re.employee.api.payload.*;
 import org.re.employee.service.EmployeeService;
 import org.re.security.access.ManagerOnly;
 import org.re.security.userdetails.CompanyUserDetails;
@@ -65,5 +63,11 @@ public class EmployeeApi {
     @DeleteMapping("/{employeeId}")
     public void delete(CompanyId companyId, @PathVariable Long employeeId) {
         employeeService.delete(companyId, employeeId);
+    }
+
+    @GetMapping("/status/count")
+    public SingleItemResponse<EmployeeStatusCount> count(CompanyId companyId) {
+        var data = employeeService.getEmployeeStatusCount(companyId);
+        return SingleItemResponse.of(data);
     }
 }

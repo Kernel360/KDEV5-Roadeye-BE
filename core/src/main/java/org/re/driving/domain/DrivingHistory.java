@@ -9,10 +9,9 @@ import org.re.car.domain.Car;
 import org.re.common.exception.DomainException;
 import org.re.driving.converter.DrivingHistoryStatusConverter;
 import org.re.driving.exception.DrivingHistoryExceptionCode;
-import org.re.mdtlog.converter.TransactionIdConverter;
-import org.re.mdtlog.domain.TransactionUUID;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Entity
@@ -31,9 +30,8 @@ public class DrivingHistory {
     @Convert(converter = DrivingHistoryStatusConverter.class)
     private DrivingHistoryStatus status;
 
-    @Convert(converter = TransactionIdConverter.class)
-    @Column(nullable = false, updatable = false, columnDefinition = "BINARY(16)")
-    private TransactionUUID txUid;
+    @Column(name = "tx_uid", nullable = false, updatable = false, columnDefinition = "BINARY(16)")
+    private UUID txUid;
 
     @Embedded
     @AttributeOverrides({
@@ -57,12 +55,12 @@ public class DrivingHistory {
     private DrivingHistory(
         Car car,
         DrivingHistoryStatus status,
-        TransactionUUID txUid,
+        UUID txid,
         DrivingSnapShot previousDrivingSnapShot
     ) {
         this.car = car;
         this.status = status;
-        this.txUid = txUid;
+        this.txUid = txid;
         this.previousDrivingSnapShot = previousDrivingSnapShot;
     }
 
@@ -72,12 +70,12 @@ public class DrivingHistory {
         return new DrivingHistory(car, DrivingHistoryStatus.DRIVING, txUid, snapshot);
     }
 
-    public void end(Car car, LocalDateTime driveEndAt) {
+    public void end(DrivingSnapShot snapShot, LocalDateTime driveEndAt) {
         if (this.status != DrivingHistoryStatus.DRIVING) {
             throw new DomainException(DrivingHistoryExceptionCode.ALREADY_ENDED);
 
         }
         this.status = DrivingHistoryStatus.ENDED;
-        this.endDrivingSnapShot = DrivingSnapShot.from(car, driveEndAt);
+        this.endDrivingSnapShot = snapShot;
     }
 }

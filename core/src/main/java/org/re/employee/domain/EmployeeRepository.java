@@ -25,4 +25,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     @Query("SELECT e FROM Employee e WHERE e.companyId = :companyId AND e.role = :role")
     Optional<Employee> findByCompanyIdAndRole(Long companyId, EmployeeRole role);
+
+    int countAllByCompanyIdAndStatus(Long companyId, EntityLifecycleStatus status);
+
+    int countAllByCompanyIdAndMetadata_Position(Long companyId, String metadataPosition);
 }

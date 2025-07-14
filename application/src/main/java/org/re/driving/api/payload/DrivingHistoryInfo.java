@@ -2,15 +2,15 @@ package org.re.driving.api.payload;
 
 import org.re.driving.domain.DrivingHistory;
 import org.re.driving.domain.DrivingHistoryStatus;
-import org.re.mdtlog.domain.TransactionUUID;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record DrivingHistoryInfo(
     Long id,
     DrivingHistoryStatus status,
-    TransactionUUID txUid,
+    UUID txid,
     Integer previousMileageSum,
     LocalDateTime driveStartedAt,
     BigDecimal previousLatitude,
@@ -21,7 +21,7 @@ public record DrivingHistoryInfo(
     BigDecimal nextLongitude,
     String carName,
     String licenseNumber
-){
+) {
     public static DrivingHistoryInfo from(DrivingHistory history) {
         var endDrivingSnapShot = history.getEndDrivingSnapShot();
         var car = history.getCar();

@@ -12,13 +12,12 @@ import org.re.car.converter.CarIgnitionStatusConverter;
 import org.re.car.exception.CarDomainException;
 import org.re.common.exception.DomainException;
 import org.re.mdtlog.converter.MdtLogGpsConditionConverter;
-import org.re.mdtlog.converter.TransactionIdConverter;
 import org.re.mdtlog.domain.MdtLogGpsCondition;
-import org.re.mdtlog.domain.TransactionUUID;
 import org.re.util.Integers;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Embeddable
 @Getter
@@ -64,27 +63,26 @@ public class CarMdtStatus {
     @Column(nullable = false)
     private CarIgnitionStatus ignition;
 
-    @Convert(converter = TransactionIdConverter.class)
     @Column(columnDefinition = "BINARY(16)")
-    private TransactionUUID activeTuid;
+    private UUID activeTuid;
 
-    public CarMdtStatus(int batteryVoltage, CarIgnitionStatus ignition, TransactionUUID activeTuid) {
+    public CarMdtStatus(int batteryVoltage, CarIgnitionStatus ignition, UUID txid) {
         this.batteryVoltage = batteryVoltage;
         this.ignition = ignition;
-        this.activeTuid = activeTuid;
+        this.activeTuid = txid;
     }
 
     public static CarMdtStatus create() {
         return new CarMdtStatus(Integers.ZERO, CarIgnitionStatus.OFF, null);
     }
 
-    public void turnOnIgnition(TransactionUUID transactionId) {
+    public void turnOnIgnition(UUID txid) {
         this.ignition = CarIgnitionStatus.ON;
-        this.activeTuid = transactionId;
+        this.activeTuid = txid;
     }
 
-    public void turnOffIgnition(TransactionUUID transactionId) {
-        if (!Objects.equals(this.activeTuid, transactionId)) {
+    public void turnOffIgnition(UUID txid) {
+        if (!Objects.equals(this.activeTuid, txid)) {
             throw new DomainException(CarDomainException.TRANSACTION_ID_MISMATCH);
         }
         this.ignition = CarIgnitionStatus.OFF;
@@ -96,4 +94,3 @@ public class CarMdtStatus {
         this.activeTuid = null;
     }
 }
-
