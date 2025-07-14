@@ -1,6 +1,5 @@
 package org.re.mdtlog.consumer;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.re.config.AMQPConfig;
@@ -12,6 +11,8 @@ import org.re.mdtlog.service.MdtEventService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Slf4j
 @Component

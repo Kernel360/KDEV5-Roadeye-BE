@@ -1,10 +1,11 @@
 package org.re.car.api.payload;
 
+import org.re.car.domain.Car;
+import org.re.car.domain.CarIgnitionStatus;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import org.re.car.domain.Car;
-import org.re.car.domain.CarIgnitionStatus;
 
 public record CarInfoDetails(
     Long id,

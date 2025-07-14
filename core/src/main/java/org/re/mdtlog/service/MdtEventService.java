@@ -35,8 +35,7 @@ public class MdtEventService {
             var drivingHistory = drivingHistoryDomainService.findHistoryInProgress(message.payload().carId(), message.transactionId());
             if (drivingHistory == null) {
                 log.warn("No driving history found for car: {}, TUID: {}.", message.payload().carId(), message.transactionId());
-            }
-            else {
+            } else {
                 locationHistoryDomainService.sampling(drivingHistory, logs);
             }
         }
@@ -64,8 +63,7 @@ public class MdtEventService {
         var driving = drivingHistoryDomainService.findHistoryInProgress(car, message.transactionId());
         if (driving == null) {
             log.warn("No driving history found for car: {}, TUID: {}.", car.getId(), message.transactionId());
-        }
-        else {
+        } else {
             var snapshot = DrivingSnapShot.from(car, message.payload().ignitionOffTime());
             drivingHistoryDomainService.end(driving, snapshot, message.payload().ignitionOffTime());
         }

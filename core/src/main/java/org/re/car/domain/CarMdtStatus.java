@@ -4,9 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +14,10 @@ import org.re.common.exception.DomainException;
 import org.re.mdtlog.converter.MdtLogGpsConditionConverter;
 import org.re.mdtlog.domain.MdtLogGpsCondition;
 import org.re.util.Integers;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.UUID;
 
 @Embeddable
 @Getter

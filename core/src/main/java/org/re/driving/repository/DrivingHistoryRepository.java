@@ -1,11 +1,12 @@
 package org.re.driving.repository;
 
-import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.re.car.domain.Car;
 import org.re.driving.domain.DrivingHistory;
 import org.re.driving.domain.DrivingHistoryStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.UUID;
 
 public interface DrivingHistoryRepository extends JpaRepository<DrivingHistory, Long>, DrivingHistoryCustomRepository {
     @Nullable

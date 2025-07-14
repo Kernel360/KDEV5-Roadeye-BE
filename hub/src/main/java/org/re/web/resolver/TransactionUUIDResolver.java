@@ -1,7 +1,6 @@
 package org.re.web.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.UUID;
 import org.re.common.exception.AppException;
 import org.re.common.exception.MdtLogExceptionCode;
 import org.re.mdtlog.domain.TransactionUUID;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+
+import java.util.UUID;
 
 public class TransactionUUIDResolver implements HandlerMethodArgumentResolver {
     public static final String HEADER_NAME = "X-TUID";

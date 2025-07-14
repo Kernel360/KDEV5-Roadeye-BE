@@ -7,7 +7,7 @@ import org.re.common.exception.DomainException;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DrivingHistoryTest {
 

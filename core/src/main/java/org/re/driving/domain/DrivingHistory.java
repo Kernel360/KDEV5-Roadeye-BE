@@ -1,19 +1,6 @@
 package org.re.driving.domain;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +9,9 @@ import org.re.car.domain.Car;
 import org.re.common.exception.DomainException;
 import org.re.driving.converter.DrivingHistoryStatusConverter;
 import org.re.driving.exception.DrivingHistoryExceptionCode;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Entity

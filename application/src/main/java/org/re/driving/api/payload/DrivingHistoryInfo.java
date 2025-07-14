@@ -1,10 +1,11 @@
 package org.re.driving.api.payload;
 
+import org.re.driving.domain.DrivingHistory;
+import org.re.driving.domain.DrivingHistoryStatus;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import org.re.driving.domain.DrivingHistory;
-import org.re.driving.domain.DrivingHistoryStatus;
 
 public record DrivingHistoryInfo(
     Long id,

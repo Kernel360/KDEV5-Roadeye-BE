@@ -1,9 +1,6 @@
 package org.re.driving.service;
 
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.re.car.domain.Car;
@@ -16,11 +13,12 @@ import org.re.driving.domain.DrivingSnapShot;
 import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.exception.DrivingHistoryExceptionCode;
 import org.re.driving.repository.DrivingHistoryRepository;
-import org.re.mdtlog.domain.TransactionUUID;
-import org.re.location.service.LocationHistoryDomainService;
-import org.re.mdtlog.domain.MdtLogRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
