@@ -2,6 +2,7 @@ package org.re.mdtlog.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.re.car.service.CarDomainService;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.common.exception.AppException;
@@ -21,7 +22,7 @@ public class MdtIgnitionService {
     private final CarDomainService carDomainService;
     private final MdtLogMessagingService mdtLogMessagingService;
 
-    public void ignitionOn(TransactionUUID tuid, MdtIgnitionOnMessage dto, MdtLogRequestTimeInfo timeInfo) {
+    public void ignitionOn(TransactionUUID tuid, MdtIgnitionOnMessage dto, MdtLogRequestTimeInfo timeInfo, @Nullable String routingKey) {
         var car = carDomainService.getCarById(dto.carId());
         if (car.isIgnitionOn()) {
             if (Objects.equals(car.getMdtStatus().getActiveTuid(), tuid)) {
@@ -31,15 +32,15 @@ public class MdtIgnitionService {
             throw new AppException(MdtLogExceptionCode.IGNITION_ALREADY_ON);
         }
 
-        mdtLogMessagingService.send(tuid, dto, timeInfo);
+        mdtLogMessagingService.send(tuid, dto, timeInfo, routingKey);
     }
 
-    public void ignitionOff(TransactionUUID tuid, MdtIgnitionOffMessage dto, MdtLogRequestTimeInfo timeInfo) {
+    public void ignitionOff(TransactionUUID tuid, MdtIgnitionOffMessage dto, MdtLogRequestTimeInfo timeInfo, @Nullable String routingKey) {
         var car = carDomainService.getCarById(dto.carId());
         if (!Objects.equals(car.getMdtStatus().getActiveTuid(), tuid)) {
             throw new AppException(MdtLogExceptionCode.TUID_ERROR);
         }
 
-        mdtLogMessagingService.send(tuid, dto, timeInfo);
+        mdtLogMessagingService.send(tuid, dto, timeInfo, routingKey);
     }
 }

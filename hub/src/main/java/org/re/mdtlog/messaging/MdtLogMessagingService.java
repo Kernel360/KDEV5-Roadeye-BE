@@ -1,6 +1,7 @@
 package org.re.mdtlog.messaging;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.config.AMQPConfig;
 import org.re.mdtlog.domain.TransactionUUID;
@@ -16,18 +17,24 @@ import org.springframework.stereotype.Component;
 public class MdtLogMessagingService {
     private final AMQPService amqpService;
 
-    public void send(TransactionUUID tuid, MdtIgnitionOnMessage dto, MdtLogRequestTimeInfo timeInfo) {
-        var routingKey = AMQPConfig.QueueNames.MDT_IGNITION_ON;
+    public void send(TransactionUUID tuid, MdtIgnitionOnMessage dto, MdtLogRequestTimeInfo timeInfo, @Nullable String routingKey) {
+        if (routingKey == null) {
+            routingKey = AMQPConfig.QueueNames.MDT_IGNITION_ON;
+        }
         send(routingKey, tuid, dto, timeInfo);
     }
 
-    public void send(TransactionUUID tuid, MdtIgnitionOffMessage dto, MdtLogRequestTimeInfo timeInfo) {
-        var routingKey = AMQPConfig.QueueNames.MDT_IGNITION_OFF;
+    public void send(TransactionUUID tuid, MdtIgnitionOffMessage dto, MdtLogRequestTimeInfo timeInfo, @Nullable String routingKey) {
+        if (routingKey == null) {
+            routingKey = AMQPConfig.QueueNames.MDT_IGNITION_OFF;
+        }
         send(routingKey, tuid, dto, timeInfo);
     }
 
-    public void send(TransactionUUID tuid, MdtCycleLogMessage dto, MdtLogRequestTimeInfo timeInfo) {
-        var routingKey = AMQPConfig.QueueNames.MDT_CAR_LOCATION;
+    public void send(TransactionUUID tuid, MdtCycleLogMessage dto, MdtLogRequestTimeInfo timeInfo, @Nullable String routingKey) {
+        if (routingKey == null) {
+            routingKey = AMQPConfig.QueueNames.MDT_CAR_LOCATION;
+        }
         send(routingKey, tuid, dto, timeInfo);
     }
 
