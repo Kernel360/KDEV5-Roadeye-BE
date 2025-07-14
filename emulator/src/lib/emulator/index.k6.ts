@@ -1,4 +1,4 @@
-import { headingDistanceTo, moveTo, normalizeHeading } from "geolocation-utils";
+import { headingDistanceTo, moveTo, normalizeHeading, normalizeLatitude, normalizeLongitude } from "geolocation-utils";
 import { findRoute } from "../graphhopper/index.k6";
 
 export async function emulateCarPath(params: {
@@ -28,7 +28,7 @@ export async function emulateCarPath(params: {
             if (distanceMeter <= remainMeter) {
                 const stopover = moveTo(current, { heading: hd.heading, distance: hd.distance });
                 // @ts-expect-error: lon is not always defined
-                current = { lat: stopover.lat, lon: stopover.lat || stopover.lat }
+                current = { lat: stopover.lat, lon: stopover.lon || stopover.lng }
                 next = path.points.coordinates[++pidx];
                 remainMeter -= hd.distance;
                 continue;
@@ -36,14 +36,17 @@ export async function emulateCarPath(params: {
             else {
                 const nextPoint = moveTo(current, { heading: hd.heading, distance: spdMh });
                 // @ts-expect-error: lon is not always defined
-                current = { lat: nextPoint.lat, lon: nextPoint.lat || nextPoint.lat }
+                current = { lat: nextPoint.lat, lon: nextPoint.lon || nextPoint.lng }
             }
 
             const spdDiffKmh = Math.random() * params.acc * 2 - params.acc * 0.6;
             spdKmh = Math.min(Math.max(0, spdKmh + spdDiffKmh), params.maxSpdKmh);
 
             return {
-                current,
+                current: {
+                    lat: normalizeLatitude(current.lat),
+                    lon: normalizeLongitude(current.lon),
+                },
                 next,
                 ang: normalizeHeading(hd.heading),
                 spd: spdKmh,
