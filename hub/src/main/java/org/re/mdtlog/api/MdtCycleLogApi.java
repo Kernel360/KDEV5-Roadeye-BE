@@ -9,12 +9,8 @@ import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.mdtlog.domain.TransactionUUID;
 import org.re.mdtlog.dto.MdtCycleLogMessage;
 import org.re.mdtlog.service.MdtCycleLogService;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
@@ -28,7 +24,7 @@ public class MdtCycleLogApi {
         @Valid @RequestBody MdtCycleLogMessage dto,
         @NotNull MdtLogRequestTimeInfo timeInfo,
         TransactionUUID tuid,
-        @Nullable @Header(value = "X-routing-key", required = false) String routingKey
+        @Nullable @RequestHeader(value = "X-routing-key", required = false) String routingKey
     ) {
         cycleLogService.addCycleLogs(tuid.value(), dto, timeInfo, routingKey);
         return new BaseMdtLogResponse(dto.carId());
