@@ -32,6 +32,9 @@ public class MdtEventService {
             var logs = message.payload().toLogEntries(message.transactionId(), message.sentAt(), message.receivedAt());
             mdtLogRepository.saveAll(logs);
 
+            var car = carDomainService.getCarById(message.payload().carId());
+            car.updateMdtStatus(message);
+
             var drivingHistory = drivingHistoryDomainService.findHistoryInProgress(message.payload().carId(), message.transactionId());
             if (drivingHistory == null) {
                 log.warn("No driving history found for car: {}, TUID: {}.", message.payload().carId(), message.transactionId());
