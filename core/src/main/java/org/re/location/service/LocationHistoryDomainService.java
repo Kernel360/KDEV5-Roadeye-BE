@@ -2,10 +2,16 @@ package org.re.location.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
+import org.re.car.domain.CarLocation;
 import org.re.common.stereotype.DomainService;
+import org.re.driving.domain.DrivingHistory;
+import org.re.location.domain.DrivingMoment;
 import org.re.location.domain.LocationHistory;
 import org.re.location.repository.LocationHistoryRepository;
+import org.re.mdtlog.domain.MdtLog;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @DomainService
@@ -24,5 +30,18 @@ public class LocationHistoryDomainService {
 
     public List<LocationHistory> findByDrivingId(Long drivingId) {
         return locationHistoryRepository.findByDrivingId(drivingId);
+    }
+
+    public void sampling(@NonNull DrivingHistory drivingHistory, List<MdtLog> logs) {
+        var sampled = new ArrayList<LocationHistory>();
+        for (int i = 0; i < logs.size(); i++) {
+            if (i % 10 == 0) {
+                DrivingMoment drivingMoment = new DrivingMoment(logs.get(i).getOccurredAt(), logs.get(i).getMdtSpeed());
+                CarLocation carLocation = logs.get(i).toCarLocation();
+                LocationHistory history = LocationHistory.of(drivingHistory.getId(), carLocation, drivingMoment);
+                sampled.add(history);
+            }
+        }
+        save(sampled);
     }
 }

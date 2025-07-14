@@ -7,7 +7,7 @@ import org.re.common.exception.DomainException;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DrivingHistoryTest {
 
@@ -20,12 +20,16 @@ class DrivingHistoryTest {
         var driveEndAt = driveStartAt.plusMinutes(10);
 
         var history = DrivingHistory.createNew(car, driveStartAt);
-        history.end(car, driveEndAt);
+        var snapshot = DrivingSnapShot.from(car, driveEndAt);
+        history.end(snapshot, driveEndAt);
 
         // when & then
-        assertThrows(DomainException.class, () -> {
-            var driveEndAt2 = driveStartAt.plusMinutes(20);
-            history.end(car, driveEndAt2);
-        });
+        assertThrows(
+            DomainException.class, () -> {
+                var driveEndAt2 = driveStartAt.plusMinutes(20);
+                var snapshot2 = DrivingSnapShot.from(car, driveEndAt2);
+                history.end(snapshot2, driveEndAt2);
+            }
+        );
     }
 }

@@ -21,6 +21,7 @@ public class HourlyDrivingStatistics {
 
     private LocalDateTime date;
 
+    @Column(name = "\"hour\"")
     private int hour;
 
     private int vehicleCount;

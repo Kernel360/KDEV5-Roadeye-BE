@@ -1,9 +1,9 @@
 package org.re.mdtlog.messaging;
 
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.re.common.api.payload.MdtLogRequestTimeInfo;
 import org.re.config.AMQPConfig;
-import org.re.mdtlog.domain.TransactionUUID;
 import org.re.mdtlog.dto.MdtCycleLogMessage;
 import org.re.mdtlog.dto.MdtEventMessage;
 import org.re.mdtlog.dto.MdtIgnitionOffMessage;
@@ -16,23 +16,23 @@ import org.springframework.stereotype.Component;
 public class MdtLogMessagingService {
     private final AMQPService amqpService;
 
-    public void send(TransactionUUID tuid, MdtIgnitionOnMessage dto, MdtLogRequestTimeInfo timeInfo) {
+    public void send(UUID txid, MdtIgnitionOnMessage dto, MdtLogRequestTimeInfo timeInfo) {
         var routingKey = AMQPConfig.QueueNames.MDT_IGNITION_ON;
-        send(routingKey, tuid, dto, timeInfo);
+        send(routingKey, txid, dto, timeInfo);
     }
 
-    public void send(TransactionUUID tuid, MdtIgnitionOffMessage dto, MdtLogRequestTimeInfo timeInfo) {
+    public void send(UUID txid, MdtIgnitionOffMessage dto, MdtLogRequestTimeInfo timeInfo) {
         var routingKey = AMQPConfig.QueueNames.MDT_IGNITION_OFF;
-        send(routingKey, tuid, dto, timeInfo);
+        send(routingKey, txid, dto, timeInfo);
     }
 
-    public void send(TransactionUUID tuid, MdtCycleLogMessage dto, MdtLogRequestTimeInfo timeInfo) {
+    public void send(UUID txid, MdtCycleLogMessage dto, MdtLogRequestTimeInfo timeInfo) {
         var routingKey = AMQPConfig.QueueNames.MDT_CAR_LOCATION;
-        send(routingKey, tuid, dto, timeInfo);
+        send(routingKey, txid, dto, timeInfo);
     }
 
-    private void send(String routingKey, TransactionUUID tuid, Object dto, MdtLogRequestTimeInfo timeInfo) {
-        var message = new MdtEventMessage<>(tuid, dto, timeInfo.sentAt(), timeInfo.receivedAt());
+    private void send(String routingKey, UUID txid, Object dto, MdtLogRequestTimeInfo timeInfo) {
+        var message = new MdtEventMessage<>(txid, dto, timeInfo.sentAt(), timeInfo.receivedAt());
         amqpService.send(routingKey, message);
     }
 }

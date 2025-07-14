@@ -1,13 +1,10 @@
 package org.re.car.api.payload;
 
-import org.re.car.domain.Car;
-import org.re.car.domain.CarIgnitionStatus;
-import org.re.mdtlog.domain.TransactionUUID;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
+import org.re.car.domain.Car;
+import org.re.car.domain.CarIgnitionStatus;
 
 public record CarInfoDetails(
     Long id,
@@ -39,7 +36,7 @@ public record CarInfoDetails(
             car.getMdtStatus().getMileageSum(),
             car.getMdtStatus().getBatteryVoltage(),
             car.getMdtStatus().getIgnition(),
-            Optional.ofNullable(car.getMdtStatus().getActiveTuid()).map(TransactionUUID::value).orElse(null),
+            car.getMdtStatus().getActiveTuid(),
             car.getCreatedAt(),
             car.getUpdatedAt(),
             car.getMdtStatus().getIgnitionOnTime()

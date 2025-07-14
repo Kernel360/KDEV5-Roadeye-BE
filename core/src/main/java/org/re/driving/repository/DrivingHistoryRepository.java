@@ -1,19 +1,16 @@
 package org.re.driving.repository;
 
-import java.util.Date;
-import java.util.List;
+import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.re.car.domain.Car;
 import org.re.driving.domain.DrivingHistory;
 import org.re.driving.domain.DrivingHistoryStatus;
-import org.re.mdtlog.domain.TransactionUUID;
-import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DrivingHistoryRepository extends JpaRepository<DrivingHistory, Long>, DrivingHistoryCustomRepository {
     @Nullable
-    DrivingHistory findByCarAndTxUidAndStatus(Car car, TransactionUUID txUid, DrivingHistoryStatus status);
+    DrivingHistory findByCarIdAndTxUidAndStatus(Long carId, UUID txid, DrivingHistoryStatus status);
 
-    boolean existsByCarAndTxUid(Car car, TransactionUUID txUid);
+    boolean existsByCarAndTxUid(Car car, UUID txUid);
 
 }
