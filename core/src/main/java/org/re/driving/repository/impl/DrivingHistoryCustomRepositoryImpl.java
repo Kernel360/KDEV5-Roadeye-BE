@@ -14,6 +14,7 @@ import org.re.driving.domain.DrivingHistoryStatus;
 import org.re.driving.domain.QDrivingHistory;
 import org.re.driving.dto.DrivingHistoryMonthlyCountResult;
 import org.re.driving.repository.DrivingHistoryCustomRepository;
+import org.re.statistics.domain.QDailyDrivingStatistics;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,19 +26,19 @@ public class DrivingHistoryCustomRepositoryImpl implements
 
     @Override
     public List<DrivingHistoryMonthlyCountResult> countByMonth(LocalDateTime startDate) {
-        QDrivingHistory dh = QDrivingHistory.drivingHistory;
+        QDailyDrivingStatistics dh = QDailyDrivingStatistics.dailyDrivingStatistics;
 
         StringTemplate yearMonthTemplate = Expressions.stringTemplate(
-            "DATE_FORMAT({0}, '%Y-%m')", dh.previousDrivingSnapShot.datetime
+            "DATE_FORMAT({0}, '%Y-%m')", dh.date
         );
 
         List<Tuple> result = queryFactory
             .select(
                 yearMonthTemplate,
-                dh.count()
+                dh.totalTripCount.sumLong()
             )
             .from(dh)
-            .where(dh.previousDrivingSnapShot.datetime.goe(startDate))
+            .where(dh.date.goe(startDate))
             .groupBy(yearMonthTemplate)
             .orderBy(yearMonthTemplate.asc())
             .fetch();
@@ -45,7 +46,7 @@ public class DrivingHistoryCustomRepositoryImpl implements
         return result.stream()
             .map(tuple -> new DrivingHistoryMonthlyCountResult(
                 tuple.get(yearMonthTemplate),
-                tuple.get(dh.count())
+                tuple.get(dh.totalTripCount.sumLong())
             ))
             .toList();
     }
