@@ -6,20 +6,20 @@ import type { Options } from 'k6/options';
 import * as uuid from 'uuid';
 import { emulateCarPath } from '~/lib/emulator/index.k6';
 import { getCar, getEndStation, getStartStation } from '~/lib/shared.ts';
-import exec from 'k6/execution';
 
-enum Phase {
-    INIT,
-    IGNITION_ON,
-    DRIVING,
-    IGNITION_OFF,
-    IDLE
-}
+const Phase = {
+    INIT: 'INIT',
+    IGNITION_ON: 'IGNITION_ON', 
+    DRIVING: 'DRIVING',
+    IGNITION_OFF: 'IGNITION_OFF',
+    IDLE: 'IDLE'
+} as const;
+
+type Phase = typeof Phase[keyof typeof Phase];
 
 export const options: Options = {
-    vus: 2,
-    // iterations: ,
-    duration: "30m"
+    vus: 30,
+    duration: "24h"
 } as const;
 
 const API_HUB_URL = __ENV.API_HUB_URL;
@@ -30,9 +30,9 @@ async function buildContext(vu: number) {
     const start = getStartStation();
     const end = getEndStation(start);
 
-    return {
+    const ctx = {
         vu,
-        phase: Phase.INIT,
+        phase: Phase.INIT as Phase,
         car: {
             ...getCar(vu),
             lat: start.lat,
@@ -53,7 +53,20 @@ async function buildContext(vu: number) {
         transactionId: null as string | null,
         onTime: null as number | null,
         offTime: null as number | null
-    }
+    };
+
+        
+    (() => {
+        const res = http.get(`http://localhost:5678/cars/${ctx.car.id}`);
+        if (res.status !== 200) {
+            console.log(`Failed to get car info: ${res.status}`);
+        }
+
+        const json = JSON.parse(res.body?.toString() ?? "{}");
+        ctx.car.sum = json.mileage_sum;
+    })();
+
+    return ctx;
 }
 
 type VuContext = Awaited<ReturnType<typeof buildContext>>;
@@ -62,8 +75,17 @@ type TestContext = Awaited<ReturnType<typeof setup>>;
 export async function setup() {
     const context: Record<number, VuContext> = {};
     for (let vu = 1; vu <= options.vus!; vu++) {
+        console.log(`Building context for vu-${vu}...`);
+
         context[vu] = await buildContext(vu);
+
+        http.put(`http://localhost:5678/vus/${vu}`, JSON.stringify(context[vu]), {
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
     }
+
     return {
         context
     }
@@ -92,15 +114,62 @@ export async function main(data: TestContext) {
             ctx.phase = Phase.IDLE;
             break;
         case Phase.IDLE:
-            await idle(ctx);
-            ctx.phase = Phase.IGNITION_ON;
+            await idle();
+            ctx.phase = Phase.INIT;
             break;
     }
+    
+    http.put(`http://localhost:5678/vus/${ctx.vu}`, JSON.stringify(ctx), {
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
 }
 
-export async function teardown(data: TestContext) {
-    for (const ctx of Object.values(data.context)) {
-        await ignitionOff(ctx);
+export function teardown(data: TestContext) {
+    for (const { vu } of Object.values(data.context)) {
+        console.log(`Tearing down vu-${vu}...`);
+
+        const ctx = (() => {
+            const res = http.get(`http://localhost:5678/vus/${vu}`);
+            return JSON.parse(res.body?.toString() ?? "{}");
+        })();
+
+        if (ctx.phase === Phase.IDLE) {
+            continue;
+        }
+
+        const now = Date.now();
+        
+        const res = http.request(
+            "POST",
+            `${API_HUB_URL}/api/ignition/off`,
+            JSON.stringify({
+                mdn: ctx.car.id,
+                tid: `TID`,
+                mid: "MID",
+                pv: 1,
+                did: "DID",
+                onTime: dateFormat(ctx.onTime!, "yyyymmddHHMMss"),
+                offTime: dateFormat(ctx.offTime, "yyyymmddHHMMss"),
+                gcd: 'A',
+                lat: ctx.location.current.lat,
+                lon: ctx.location.current.lon,
+                ang: ctx.car.ang,
+                spd: ctx.car.spd,
+                sum: ctx.car.sum
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    'X-TUID': ctx.transactionId!,
+                    'X-Timestamp': dateFormat(now, "yyyy-mm-dd HH:MM:ss.l")
+                }
+            }
+        )
+        checkResponse(res);
+
+        http.del(`http://localhost:5678/vus/${vu}`);
     }
 }
 
@@ -116,7 +185,12 @@ function checkResponse(res: RefinedResponse<http.ResponseType | undefined>) {
 }
 
 async function init(ctx: VuContext) {
-    ctx.location.start = getStartStation();
+    if (ctx.location.end != null) {
+        ctx.location.start = ctx.location.end;
+    }
+    else {
+        ctx.location.start = getStartStation();
+    }
     ctx.location.end = getEndStation(ctx.location.start);
     ctx.location.current = {
         lat: ctx.location.start.lat,
@@ -190,7 +264,7 @@ async function driving(ctx: VuContext) {
             lat: route.current.lat,
             lon: route.current.lon,
             ang: route.ang,
-            spd: route.spd,
+            spd: route.spdKmh,
             sum: ctx.car.sum,
             bat: ctx.car.bat
         }
@@ -202,9 +276,9 @@ async function driving(ctx: VuContext) {
         }
         ctx.car.lat = route.current.lat;
         ctx.car.lng = route.current.lon;
-        ctx.car.sum = ctx.car.sum + route.spd;
+        ctx.car.sum = ctx.car.sum + route.sum;
         ctx.car.ang = route.ang;
-        ctx.car.spd = route.spd;
+        ctx.car.spd = route.spdKmh
 
         sleep(1);
     }
@@ -272,7 +346,7 @@ async function ignitionOff(ctx: VuContext) {
     checkResponse(res);
 }
 
-async function idle(ctx: VuContext) {
+async function idle() {
     emulator = null;
     
     const minutes = Math.random() * 5 + 3; // 3 to 8 minutes
