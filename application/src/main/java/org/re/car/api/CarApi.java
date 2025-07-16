@@ -5,6 +5,7 @@ import org.re.car.api.payload.CarCreationRequest;
 import org.re.car.api.payload.CarInfoDetails;
 import org.re.car.api.payload.CarInfoSimple;
 import org.re.car.api.payload.CarUpdateRequest;
+import org.re.car.domain.Car;
 import org.re.car.domain.CarIgnitionStatus;
 import org.re.car.service.CarService;
 import org.re.common.api.payload.ListResponse;
@@ -13,6 +14,7 @@ import org.re.common.api.payload.SingleItemResponse;
 import org.re.common.domain.EntityLifecycleStatus;
 import org.re.company.domain.CompanyId;
 import org.re.security.access.ManagerOnly;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,7 +54,7 @@ public class CarApi {
         CompanyId companyId, @RequestParam(required = false) CarIgnitionStatus status,
         Pageable pageable
     ) {
-        var page = carService.searchByIgnitionStatus(companyId, status, pageable);
+        Page<Car> page = carService.searchByIgnitionStatus(companyId, status, pageable);
         return PageResponse.of(page, CarInfoDetails::from);
     }
 

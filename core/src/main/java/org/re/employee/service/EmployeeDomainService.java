@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.re.common.domain.EntityLifecycleStatus;
 import org.re.common.exception.DomainException;
 import org.re.employee.domain.*;
+import org.re.employee.dto.EmployeeSearchCommand;
 import org.re.employee.dto.UpdateEmployeeCommand;
 import org.re.employee.exception.EmployeeDomainException;
 import org.springframework.data.domain.Page;
@@ -75,5 +76,9 @@ public class EmployeeDomainService {
 
     public void delete(Employee employee) {
         employee.delete();
+    }
+
+    public Page<Employee> searchEmployees(Long companyId, EmployeeSearchCommand command, Pageable pageable) {
+        return employeeRepository.search(companyId, command, pageable);
     }
 }
