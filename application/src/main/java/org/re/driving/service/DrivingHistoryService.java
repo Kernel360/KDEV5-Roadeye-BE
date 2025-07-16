@@ -1,6 +1,7 @@
 package org.re.driving.service;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.re.car.service.CarDomainService;
 import org.re.company.domain.CompanyId;
 import org.re.driving.domain.DrivingHistory;
@@ -33,9 +34,12 @@ public class DrivingHistoryService {
         return locationHistoryDomainService.findByDrivingId(drivingId);
     }
 
-    public List<LocationHistory> getDrivingLocationLogs(Long carId) {
+    public List<LocationHistory> getDrivingLocationLogs(Long carId, @Nullable Long cursor) {
         var car = carDomainService.getCarById(carId);
         var drivingHistory = drivingHistoryDomainService.findHistoryInProgress(car, car.getMdtStatus().getActiveTuid());
-        return locationHistoryDomainService.findByDrivingId(drivingHistory.getId());
+        if (cursor == null) {
+            return locationHistoryDomainService.findAll(drivingHistory);
+        }
+        return locationHistoryDomainService.findAllWithCursor(drivingHistory, cursor);
     }
 }
