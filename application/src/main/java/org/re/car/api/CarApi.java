@@ -1,10 +1,8 @@
 package org.re.car.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.re.car.api.payload.CarCreationRequest;
-import org.re.car.api.payload.CarInfoDetails;
-import org.re.car.api.payload.CarInfoSimple;
-import org.re.car.api.payload.CarUpdateRequest;
+import org.re.car.api.payload.*;
 import org.re.car.domain.Car;
 import org.re.car.domain.CarIgnitionStatus;
 import org.re.car.service.CarService;
@@ -16,8 +14,10 @@ import org.re.company.domain.CompanyId;
 import org.re.security.access.ManagerOnly;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/cars")
 @RequiredArgsConstructor
@@ -48,6 +48,15 @@ public class CarApi {
         return ListResponse.of(page, CarInfoDetails::from);
     }
 
+    @GetMapping("/search")
+    public PageResponse<CarInfoDetails> searchCars(
+        @Valid CarSearchRequest request,
+        Pageable pageable,
+        CompanyId companyId
+    ) {
+        var page = carService.search(companyId, request, pageable);
+        return PageResponse.of(page, CarInfoDetails::from);
+    }
 
     @GetMapping("/search/ignition")
     public PageResponse<CarInfoDetails> getCarsByIgnition(

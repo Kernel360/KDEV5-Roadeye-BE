@@ -2,6 +2,7 @@ package org.re.car.service;
 
 import lombok.RequiredArgsConstructor;
 import org.re.car.api.payload.CarCreationRequest;
+import org.re.car.api.payload.CarSearchRequest;
 import org.re.car.api.payload.CarUpdateRequest;
 import org.re.car.domain.Car;
 import org.re.car.domain.CarIgnitionStatus;
@@ -35,6 +36,12 @@ public class CarService {
     public Car getCarById(CompanyId companyId, Long carId) {
         var company = companyDomainService.findById(companyId.value());
         return carDomainService.getCarById(company, carId);
+    }
+
+    public Page<Car> search(CompanyId companyId, CarSearchRequest request, Pageable pageable) {
+        var company = companyDomainService.findById(companyId.value());
+        var command = request.toCommand();
+        return carDomainService.search(company, command, pageable);
     }
 
     public Page<Car> searchByIgnitionStatus(CompanyId companyId, CarIgnitionStatus status, Pageable pageable) {
