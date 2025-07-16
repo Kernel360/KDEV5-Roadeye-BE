@@ -1,6 +1,7 @@
 package org.re.driving.api;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.re.common.api.payload.ListResponse;
 import org.re.common.api.payload.PageResponse;
 import org.re.common.api.payload.SingleItemResponse;
@@ -9,10 +10,7 @@ import org.re.driving.api.payload.DrivingHistoryInfo;
 import org.re.driving.api.payload.DrivingLocationDetail;
 import org.re.driving.service.DrivingHistoryService;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/driving")
@@ -39,9 +37,11 @@ public class DrivingHistoryApi {
     }
 
     @GetMapping("/car/{carId}")
-    public ListResponse<DrivingLocationDetail> getDrivingHistoryLogs(@PathVariable Long carId) {
-        var page = drivingHistoryService.getDrivingLocationLogs(carId);
+    public ListResponse<DrivingLocationDetail> getDrivingHistoryLogs(
+        @PathVariable Long carId,
+        @Nullable @RequestParam(required = false) Long cursor
+    ) {
+        var page = drivingHistoryService.getDrivingLocationLogs(carId, cursor);
         return ListResponse.of(page, DrivingLocationDetail::from);
     }
-
 }

@@ -6,6 +6,7 @@ import org.jspecify.annotations.Nullable;
 import org.re.common.domain.EntityLifecycleStatus;
 import org.re.company.domain.CompanyId;
 import org.re.employee.api.payload.AccountStatus;
+import org.re.employee.api.payload.EmployeeSearchRequest;
 import org.re.employee.api.payload.EmployeeStatusCount;
 import org.re.employee.domain.Employee;
 import org.re.employee.domain.EmployeeCredentials;
@@ -39,6 +40,11 @@ public class EmployeeService {
         }
         var entityStatus = status.toEntityLifecycleStatus(status);
         return employeeDomainService.findAllInCompany(companyId.value(), pageable, entityStatus);
+    }
+
+    public Page<Employee> search(CompanyId companyId, EmployeeSearchRequest request, Pageable pageable) {
+        var command = request.toCommand();
+        return employeeDomainService.searchEmployees(companyId.value(), command, pageable);
     }
 
     public Long createRoot(CompanyId companyId, EmployeeCredentials credentials, EmployeeMetadata metadata) {

@@ -1,6 +1,7 @@
 package org.re.common.api.payload;
 
 import lombok.Getter;
+import org.re.employee.api.payload.EmployeeInfo;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -20,6 +21,10 @@ public class PageResponse<T> extends SuccessResponse<List<T>> {
             .map(mapper)
             .toList();
         return new PageResponse<>(mappedContent, PageInfo.of(page));
+    }
+
+    public static <R, T> PageResponse of2(Page<EmployeeInfo> page, Function<T, R> from) {
+        return null;
     }
 
     public record PageInfo(

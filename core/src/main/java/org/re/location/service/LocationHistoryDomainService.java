@@ -20,6 +20,14 @@ import java.util.List;
 public class LocationHistoryDomainService {
     private final LocationHistoryRepository locationHistoryRepository;
 
+    public List<LocationHistory> findAll(DrivingHistory drivingHistory) {
+        return locationHistoryRepository.findByDrivingId(drivingHistory.getId());
+    }
+
+    public List<LocationHistory> findAllWithCursor(DrivingHistory drivingHistory, @NonNull Long cursor) {
+        return locationHistoryRepository.findByDrivingIdAndIdGreaterThanEqual(drivingHistory.getId(), cursor);
+    }
+
     public void save(LocationHistory locationHistory) {
         locationHistoryRepository.save(locationHistory);
     }

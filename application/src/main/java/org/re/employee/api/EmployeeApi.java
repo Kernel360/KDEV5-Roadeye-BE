@@ -1,6 +1,8 @@
 package org.re.employee.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.re.common.api.payload.PageResponse;
 import org.re.common.api.payload.SingleItemResponse;
 import org.re.company.domain.CompanyId;
 import org.re.employee.api.payload.*;
@@ -9,8 +11,10 @@ import org.re.security.access.ManagerOnly;
 import org.re.security.userdetails.CompanyUserDetails;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/employees")
 @RequiredArgsConstructor
@@ -37,6 +41,16 @@ public class EmployeeApi {
     @GetMapping("/my")
     public EmployeeInfo getMyInfo(CompanyUserDetails userDetails) {
         return EmployeeInfo.from(employeeService.findByCurrentPrincipal(userDetails));
+    }
+
+    @GetMapping("/search")
+    public PageResponse<EmployeeInfo> search(
+        @Valid EmployeeSearchRequest request,
+        Pageable pageable,
+        CompanyId companyId
+    ) {
+        var page = employeeService.search(companyId, request, pageable);
+        return PageResponse.of(page, EmployeeInfo::from);
     }
 
     @ManagerOnly

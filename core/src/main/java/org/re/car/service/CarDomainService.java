@@ -5,6 +5,7 @@ import org.re.car.domain.Car;
 import org.re.car.domain.CarIgnitionStatus;
 import org.re.car.dto.CarCreationCommand;
 import org.re.car.dto.CarDisableCommand;
+import org.re.car.dto.CarSearchCommand;
 import org.re.car.dto.CarUpdateCommand;
 import org.re.car.exception.CarDomainException;
 import org.re.car.repository.CarRepository;
@@ -87,5 +88,10 @@ public class CarDomainService {
     public Car disable(Car car, CarDisableCommand command) {
         car.disable(command.reason());
         return car;
+    }
+
+    public Page<Car> search(Company company, CarSearchCommand command, Pageable pageable) {
+        var companyId = company.getId();
+        return carRepository.search(companyId, command, pageable);
     }
 }
