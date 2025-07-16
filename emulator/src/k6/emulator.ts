@@ -5,7 +5,8 @@ import http, { type RefinedResponse } from 'k6/http';
 import type { Options } from 'k6/options';
 import * as uuid from 'uuid';
 import { emulateCarPath } from '~/lib/emulator/index.k6';
-import { getCar, getEndStation, getRandomStation, getStartStation } from '~/lib/shared.ts';
+import { getCar, getEndStation, getStartStation } from '~/lib/shared.ts';
+import exec from 'k6/execution';
 
 enum Phase {
     INIT,
@@ -15,50 +16,92 @@ enum Phase {
     IDLE
 }
 
-type Context = {
-    phase: Phase
-    car: {
-        id: unknown;
-        latitude: number;
-        longitude: number;
-        ang: number;
-        spd: number;
-        sum: number;
-        bat: number;
-    };
-    location: {
-        start: GpsCoord;
-        current: GpsCoord;
-        end: GpsCoord;
-    };
-    emulator: Awaited<ReturnType<typeof emulateCarPath>>
-    transactionId: string | null;
-    onTime: Date | null;
-    offTime: Date | null;
-}
-
-// @ts-expect-error: INIT PHASE에서 초기화 될 것임.
-const initialContext: Context = {
-    phase: Phase.INIT,
-}
-
-const ctx: Context = initialContext;
-
 export const options: Options = {
-    vus: 50,
-    duration: "1000000h"
+    vus: 2,
+    // iterations: ,
+    duration: "30m"
+} as const;
+
+const API_HUB_URL = __ENV.API_HUB_URL;
+
+let emulator: Awaited<ReturnType<typeof emulateCarPath>> | null = null;
+
+async function buildContext(vu: number) {
+    const start = getStartStation();
+    const end = getEndStation(start);
+
+    return {
+        vu,
+        phase: Phase.INIT,
+        car: {
+            ...getCar(vu),
+            lat: start.lat,
+            lng: start.lon,
+            ang: 0,
+            spd: 0,
+            sum: 0,
+            bat: 20
+        },
+        location: {
+            start,
+            current: {
+                lat: start.lat,
+                lon: start.lon
+            },
+            end
+        },
+        transactionId: null as string | null,
+        onTime: null as number | null,
+        offTime: null as number | null
+    }
 }
 
-export function setup() {
-    const config = {
-        API_HUB_URL: __ENV.API_HUB_URL
-    };
-    console.log(`CONFIG: ${JSON.stringify(config)}`);
-    return config;
+type VuContext = Awaited<ReturnType<typeof buildContext>>;
+type TestContext = Awaited<ReturnType<typeof setup>>;
+
+export async function setup() {
+    const context: Record<number, VuContext> = {};
+    for (let vu = 1; vu <= options.vus!; vu++) {
+        context[vu] = await buildContext(vu);
+    }
+    return {
+        context
+    }
 }
 
-export function teardown() {
+export async function main(data: TestContext) {
+    const ctx = data.context[`${__VU}`];
 
+    switch (ctx.phase) {
+        case Phase.INIT:
+            await init(ctx);
+            ctx.phase = Phase.IGNITION_ON;
+            break;
+        case Phase.IGNITION_ON:
+            await ignitionOn(ctx);
+            ctx.phase = Phase.DRIVING;
+            break;
+        case Phase.DRIVING:
+            await driving(ctx);
+            if (distanceTo(ctx.location.current, ctx.location.end) < 10) {
+                ctx.phase = Phase.IGNITION_OFF;
+            }
+            break;
+        case Phase.IGNITION_OFF:
+            await ignitionOff(ctx);
+            ctx.phase = Phase.IDLE;
+            break;
+        case Phase.IDLE:
+            await idle(ctx);
+            ctx.phase = Phase.IGNITION_ON;
+            break;
+    }
+}
+
+export async function teardown(data: TestContext) {
+    for (const ctx of Object.values(data.context)) {
+        await ignitionOff(ctx);
+    }
 }
 
 function checkResponse(res: RefinedResponse<http.ResponseType | undefined>) {
@@ -72,85 +115,52 @@ function checkResponse(res: RefinedResponse<http.ResponseType | undefined>) {
     })
 }
 
-export default async function (data: ReturnType<typeof setup>) {
-    switch (ctx.phase) {
-        case Phase.INIT:
-            await init(ctx);
-            ctx.phase = Phase.IGNITION_ON;
-            break;
-        case Phase.IGNITION_ON:
-            await ignitionOn(ctx, data);
-            ctx.phase = Phase.DRIVING;
-            break;
-        case Phase.DRIVING:
-            await driving(ctx, data);
-            if (distanceTo(ctx.location.current, ctx.location.end) < 10) {
-                ctx.phase = Phase.IGNITION_OFF;
-            }
-            break;
-        case Phase.IGNITION_OFF:
-            await ignitionOff(ctx, data);
-            ctx.phase = Phase.IDLE;
-            break;
-        case Phase.IDLE:
-            await idle(ctx);
-            ctx.phase = Phase.IGNITION_ON;
-            break;
+async function init(ctx: VuContext) {
+    ctx.location.start = getStartStation();
+    ctx.location.end = getEndStation(ctx.location.start);
+    ctx.location.current = {
+        lat: ctx.location.start.lat,
+        lon: ctx.location.start.lon
     }
-}
 
-async function init(ctx: Context) {
-    console.log(`[VU-${__VU}] init`);
-
-    ctx.car = {
-        ...getCar(),
-        ang: 0,
-        spd: 0,
-        sum: 0,
-        bat: 20
-    }
-    const start = getStartStation();
-    const end = getEndStation(start);
-    ctx.location = {
-        start,
-        current: start,
-        end
-    };
-    ctx.transactionId = null;
-    ctx.onTime = null;
-    ctx.offTime = null;
-}
-
-async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
-    console.log(`[VU-${__VU}] ignitionOn`);
-
-    ctx.onTime = new Date();
-    ctx.transactionId = uuid.v4();
-    ctx.emulator = await emulateCarPath({
+    emulator = await emulateCarPath({
         start: ctx.location.start,
         end: ctx.location.end,
         initSpdKmh: 10,
         maxSpdKmh: 80,
         acc: 0.5,
-    })
+    });
+
+    ctx.car.spd = 0;
+    ctx.car.ang = 0;
+    ctx.onTime = null;
+    ctx.offTime = null;
+    ctx.transactionId = null;
+}
+
+async function ignitionOn(ctx: VuContext) {
+    ctx.onTime = Date.now()
+    ctx.transactionId = uuid.v4();
+
+    const body = {
+        mdn: ctx.car.id,
+        tid: `TID`,
+        mid: "MID",
+        pv: 1,
+        did: "DID",
+        onTime: dateFormat(ctx.onTime, "yyyymmddHHMMss"),
+        gcd: 'A',
+        lat: ctx.location.current.lat,
+        lon: ctx.location.current.lon,
+        ang: ctx.car.ang,
+        spd: ctx.car.spd,
+        sum: ctx.car.sum
+    }
 
     const res = await http.asyncRequest(
         "POST",
-        `${data.API_HUB_URL}/api/ignition/on`,
-        JSON.stringify({
-            mdn: ctx.car.id,
-            tid: `TID`,
-            mid: "MID",
-            pv: 1,
-            did: "DID",
-            onTime: dateFormat(ctx.onTime, "yyyymmddHHMMss"),
-            gcd: 'A',
-            lat: ctx.location.current.lat,
-            lon: ctx.location.current.lon,
-            ang: ctx.car.ang,
-            spd: ctx.car.spd,
-            sum: ctx.car.sum
-        }),
+        `${API_HUB_URL}/api/ignition/on`,
+        JSON.stringify(body),
         {
             headers: {
                 "Content-Type": "application/json",
@@ -162,9 +172,7 @@ async function ignitionOn(ctx: Context, data: ReturnType<typeof setup>) {
     checkResponse(res);
 }
 
-async function driving(ctx: Context, data: ReturnType<typeof setup>) {
-    console.log(`[VU-${__VU}] driving`);
-
+async function driving(ctx: VuContext) {
     const nLogs = 60;
 
     const now = new Date();
@@ -172,7 +180,7 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
     const logs: MdtLog[] = [];
     let i = 0;
     while (i < nLogs) {
-        const next = ctx.emulator.next();
+        const next = emulator!.next();
         if (next.done) break;
         const route = next.value;
 
@@ -188,9 +196,12 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
         }
         logs.push(log);
 
-        ctx.location.current = route.current;
-        ctx.car.latitude = route.current.lat;
-        ctx.car.longitude = route.current.lon;
+        ctx.location.current = {
+            lat: route.current.lat,
+            lon: route.current.lon
+        }
+        ctx.car.lat = route.current.lat;
+        ctx.car.lng = route.current.lon;
         ctx.car.sum = ctx.car.sum + route.spd;
         ctx.car.ang = route.ang;
         ctx.car.spd = route.spd;
@@ -198,16 +209,14 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
         sleep(1);
     }
 
-    console.log(`[VU-${__VU}] driving logs: ${logs.length}`);
     if (logs.length === 0) {
-        console.log("no logs");
         ctx.phase = Phase.IGNITION_OFF;
         return;
     }
 
     const res = await http.asyncRequest(
         "POST",
-        `${data.API_HUB_URL}/api/cycle-log`,
+        `${API_HUB_URL}/api/cycle-log`,
         JSON.stringify({
             mdn: ctx.car.id,
             tid: `TID`,
@@ -229,16 +238,14 @@ async function driving(ctx: Context, data: ReturnType<typeof setup>) {
     checkResponse(res);
 }
 
-async function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
-    console.log(`[VU-${__VU}] ignitionOff`);
-
-    const now = new Date();
+async function ignitionOff(ctx: VuContext) {
+    const now = Date.now();
 
     ctx.offTime = now;
 
     const res = await http.asyncRequest(
         "POST",
-        `${data.API_HUB_URL}/api/ignition/off`,
+        `${API_HUB_URL}/api/ignition/off`,
         JSON.stringify({
             mdn: ctx.car.id,
             tid: `TID`,
@@ -265,21 +272,11 @@ async function ignitionOff(ctx: Context, data: ReturnType<typeof setup>) {
     checkResponse(res);
 }
 
-async function idle(ctx: Context) {
-    console.log(`[VU-${__VU}] idle`);
-
-    while (true) {
-        const st = getRandomStation();
-        if (distanceTo(ctx.location.current, st) > 1000) {
-            ctx.location.end = st;
-            break;
-        }
-    }
-
-    ctx.onTime = null;
-    ctx.offTime = null;
-    ctx.transactionId = null;
-
-    const minutes = Math.random() * 10 + 20;
+async function idle(ctx: VuContext) {
+    emulator = null;
+    
+    const minutes = Math.random() * 5 + 3; // 3 to 8 minutes
     sleep(minutes);
 }
+
+export default main;

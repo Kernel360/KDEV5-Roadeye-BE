@@ -1,15 +1,18 @@
 import { SharedArray } from 'k6/data';
 
-export const cars = new SharedArray('cars', () => {
-    return JSON.parse(open('../data/cars.json')) as CarType[];
-});
-export const stations = new SharedArray('stations', () => {
+// const cars = new SharedArray('cars', () => {
+//     return JSON.parse(open('../data/cars.local.json')) as CarType[];
+// });
+const stations = new SharedArray('stations', () => {
     return JSON.parse(open('../data/stations.json')) as StationType[];
 });
 
-export function getCar() {
-    const idx = __VU - 1;
-    return cars[idx];
+export function getCar(vu: number) {
+    // const idx = __VU - 1;
+    // return cars[idx];
+    return {
+        id: vu + 2
+    } as const;
 }
 
 export function getStartStation() {
