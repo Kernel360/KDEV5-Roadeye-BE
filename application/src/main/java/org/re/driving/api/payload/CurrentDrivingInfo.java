@@ -12,6 +12,7 @@ public record CurrentDrivingInfo(
     DrivingHistoryStatus status,
     Long carId,
     String carName,
+    String carNumber,
     String driver,
     BigDecimal lat,
     BigDecimal lon,
@@ -26,6 +27,7 @@ public record CurrentDrivingInfo(
             drivingHistory.getStatus(),
             car.getId(),
             car.getProfile().getName(),
+            car.getProfile().getLicenseNumber(),
             null, // driver
             car.getMdtStatus().getLocation().getLatitude(),
             car.getMdtStatus().getLocation().getLongitude(),
