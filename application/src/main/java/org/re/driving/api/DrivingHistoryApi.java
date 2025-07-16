@@ -6,6 +6,7 @@ import org.re.common.api.payload.ListResponse;
 import org.re.common.api.payload.PageResponse;
 import org.re.common.api.payload.SingleItemResponse;
 import org.re.company.domain.CompanyId;
+import org.re.driving.api.payload.CurrentDrivingInfo;
 import org.re.driving.api.payload.DrivingHistoryInfo;
 import org.re.driving.api.payload.DrivingLocationDetail;
 import org.re.driving.service.DrivingHistoryService;
@@ -43,5 +44,11 @@ public class DrivingHistoryApi {
     ) {
         var page = drivingHistoryService.getDrivingLocationLogs(carId, cursor);
         return ListResponse.of(page, DrivingLocationDetail::from);
+    }
+
+    @GetMapping("/car/{carId}/current")
+    public SingleItemResponse<CurrentDrivingInfo> getCurrentDrivingLocation(@PathVariable Long carId) {
+        var item = drivingHistoryService.getCurrentDriving(carId);
+        return SingleItemResponse.of(item);
     }
 }
