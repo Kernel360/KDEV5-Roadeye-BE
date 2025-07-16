@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -157,6 +158,55 @@ public class CompanyLoginTest {
             // then
             mvc.perform(req)
                 .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @DisplayName("루트 계정 로그인 후, 로그아웃이 가능해야 한다.")
+        void rootAccountLogoutTest() throws Exception {
+            // given
+            var companyId = 123L;
+            var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
+            var name = "name";
+            var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
+
+            employeeDomainService.createRootAccount(companyId, credential, meta);
+
+            // when
+            var body = objectMapper.writeValueAsString(Map.of(
+                "username", VALID_USERNAME,
+                "password", VALID_PASSWORD
+            ));
+            var mockSession = new MockHttpSession();
+
+            // Perform login
+            mvc.perform(
+                    post("/api/auth/sign-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
+                        .session(mockSession)
+                        .content(body)
+                )
+                .andExpect(status().isOk());
+
+            // then
+            mvc.perform(
+                    post("/api/auth/sign-out")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
+                        .session(mockSession)
+                )
+                .andExpect(status().isOk());
+
+            // Verify session invalidation
+            mvc.perform(
+                    get("/api/session/my")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
+                        .session(mockSession)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.expiredAt").doesNotExist());
         }
     }
 
@@ -310,6 +360,56 @@ public class CompanyLoginTest {
                         .session(mockSession)
                 )
                 .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("일반 계정 로그인 후, 로그아웃이 가능해야 한다.")
+        void normalAccountLogoutTest() throws Exception {
+            // given
+            var companyId = 123L;
+            var credential = new EmployeeCredentials(VALID_USERNAME, passwordEncoder.encode(VALID_PASSWORD));
+            var name = "name";
+            var position = "position";
+            var meta = EmployeeMetadata.create(name, position);
+
+            employeeDomainService.createNormalAccount(companyId, credential, meta);
+
+            // when
+            var body = objectMapper.writeValueAsString(Map.of(
+                "username", VALID_USERNAME,
+                "password", VALID_PASSWORD
+            ));
+
+            var mockSession = new MockHttpSession();
+
+            // Perform login
+            mvc.perform(
+                    post("/api/auth/sign-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
+                        .session(mockSession)
+                        .content(body)
+                )
+                .andExpect(status().isOk());
+
+            // then
+            mvc.perform(
+                    post("/api/auth/sign-out")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
+                        .session(mockSession)
+                )
+                .andExpect(status().isOk());
+
+            // Verify session invalidation
+            mvc.perform(
+                    get("/api/session/my")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
+                        .session(mockSession)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.expiredAt").doesNotExist());
         }
     }
 }

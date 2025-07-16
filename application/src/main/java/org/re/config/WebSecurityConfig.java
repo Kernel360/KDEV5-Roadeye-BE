@@ -2,6 +2,7 @@ package org.re.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Priority;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.re.security.AuthMemberType;
 import org.re.security.userdetails.CompanyUserDetailsService;
@@ -12,6 +13,7 @@ import org.re.security.web.authentication.RoadeyeAuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -30,6 +32,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -73,12 +77,28 @@ public class WebSecurityConfig {
                 .securityMatcher("/api/admin/**")
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                    .requestMatchers("/api/admin/auth/sign-in").permitAll()
+                    .requestMatchers("/api/admin/auth/**").permitAll()
                     .anyRequest().hasAuthority(AuthMemberType.ADMIN.getValue())
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                .logout((logout) -> logout
+                    .logoutUrl("/api/admin/auth/sign-out")
+                    .addLogoutHandler((request, response, authentication) -> {
+                        var session = request.getSession(false);
+                        if (session != null) {
+                            session.invalidate();
+                        }
+                    })
+                    .logoutSuccessHandler((request, response, authentication) -> {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                        try (var writer = response.getWriter()) {
+                            objectMapper.writeValue(writer, Map.of("message", "Logged out successfully"));
+                        }
+                    })
+                )
                 .cors((c) -> c.configurationSource(corsConfigurationSource()))
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -122,13 +142,29 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                     .requestMatchers(CorsUtils::isCorsRequest).permitAll()
-                    .requestMatchers("/api/auth/sign-in", "/api/session").permitAll()
+                    .requestMatchers("/api/auth/**", "/api/session/my").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/company/quotes").permitAll()
                     .anyRequest().hasAuthority(AuthMemberType.USER.getValue())
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                .logout((logout) -> logout
+                    .logoutUrl("/api/auth/sign-out")
+                    .addLogoutHandler((request, response, authentication) -> {
+                        var session = request.getSession(false);
+                        if (session != null) {
+                            session.invalidate();
+                        }
+                    })
+                    .logoutSuccessHandler((request, response, authentication) -> {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                        try (var writer = response.getWriter()) {
+                            objectMapper.writeValue(writer, Map.of("message", "Logged out successfully"));
+                        }
+                    })
+                )
                 .cors((c) -> c.configurationSource(corsConfigurationSource()))
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
