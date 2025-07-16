@@ -66,8 +66,8 @@ public class EmployeeService {
         employeeDomainService.update(employee, command);
         if (status != null) {
             switch (status) {
-                case ENABLE -> employee.enable();
-                case DISABLE -> employee.disable();
+                case ACTIVE -> employee.enable();
+                case DISABLED -> employee.disable();
             }
         }
     }
