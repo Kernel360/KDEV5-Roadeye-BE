@@ -26,7 +26,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(
+    properties = {
+        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.session.SessionAutoConfiguration"
+    }
+)
 @AutoConfigureMockMvc
 @Transactional
 @DisplayName("[통합 테스트] 플랫폼 사용자 로그인 테스트")
@@ -324,7 +328,7 @@ public class CompanyLoginTest {
         }
 
         @Test
-        @DisplayName("일반 계정으로 로그인한 후, 세션ID를 사용해 내 정보를 조회할 수 있어야 한다.")
+        @DisplayName("일반 계정으로 로그인한 후, 내 정보를 조회할 수 있어야 한다.")
         void normalAccountGetMyInfoTest() throws Exception {
             // given
             var companyId = 123L;
@@ -399,7 +403,8 @@ public class CompanyLoginTest {
                         .header(CompanyIdContextFilter.COMPANY_ID_HEADER_NAME, companyId)
                         .session(mockSession)
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
 
             // Verify session invalidation
             mvc.perform(
