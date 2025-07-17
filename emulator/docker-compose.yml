@@ -1,0 +1,11 @@
+name: roadeye
+
+services:
+  navigation:
+    image: israelhikingmap/graphhopper
+    command: [ "--url", "https://download.geofabrik.de/asia/south-korea-latest.osm.pbf" ]
+    ports:
+      - 8989:8989
+      - 8990:8990
+    volumes:
+      - ./graphhopper.sh:/graphhopper/graphhopper.sh

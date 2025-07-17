@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const uuid = require('uuid');
-const {exec, fork} = require('node:child_process');
+const { exec, fork } = require('node:child_process');
 
 (() => {
     const data = {
@@ -12,8 +12,8 @@ const {exec, fork} = require('node:child_process');
         .entries(data)
         .forEach(([name, url]) => fetch(url)
             .then(res => res.text())
-            .then(text => ({name, text}))
-            .then(({name, text}) => {
+            .then(text => ({ name, text }))
+            .then(({ name, text }) => {
                 const outPath = `./src/lib/vendor/${name}.js`;
                 fs.writeFileSync(outPath, text);
             })
@@ -36,7 +36,7 @@ const {exec, fork} = require('node:child_process');
             outPath: path.normalize(`./src/lib/vendor/${name}.js`),
             libPath
         }))
-        .forEach(({name, outPath, libPath}) => {
+        .forEach(({ name, outPath, libPath }) => {
             const modulePath = path.normalize(`./node_modules/${libPath}`);
             const cmd = `${bin} ${modulePath} -s ${name} -o ${outPath}`;
             exec(cmd, (

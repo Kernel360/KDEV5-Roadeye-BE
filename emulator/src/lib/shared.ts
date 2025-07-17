@@ -1,29 +1,38 @@
-import {SharedArray} from 'k6/data';
+import { SharedArray } from 'k6/data';
 
-import type carType from '../data/car.example.json';
-
-export const cars = new SharedArray('cars', () => {
-    return JSON.parse(open('../data/cars.json')) as typeof carType[];
-});
-export const stations = new SharedArray('stations', () => {
-    return JSON.parse(open('../data/stations.json')) as Station[];
+// const cars = new SharedArray('cars', () => {
+//     return JSON.parse(open('../data/cars.local.json')) as CarType[];
+// });
+const stations = new SharedArray('stations', () => {
+    return JSON.parse(open('../data/stations.json')) as StationType[];
 });
 
-export function getCar() {
-    const idx = __VU - 1;
-    return cars[idx];
+export function getCar(vu: number) {
+    // const idx = __VU - 1;
+    // return cars[idx];
+    return {
+        id: vu + 2
+    } as const;
 }
 
 export function getStartStation() {
-    const carIdx = __VU - 1;
-    let stationIdx = (carIdx) % stations.length;
+    const stationIdx = Math.floor(Math.random() * stations.length);
     return stations[stationIdx];
 }
 
-export function getEndStation() {
-    const carIdx = __VU - 1;
-    let stationIdx = (carIdx * 2) % stations.length;
-    return stations[stationIdx];
+export function getEndStation(start: StationType) {
+    if (stations.length === 1) {
+        throw new Error("Only one station");
+    }
+
+    do {
+        const stationIdx = Math.floor(Math.random() * stations.length);
+        const station = stations[stationIdx];
+        if (station !== start) {
+            return station;
+        }
+        // eslint-disable-next-line no-constant-condition
+    } while (true);
 }
 
 export function getRandomStation() {
