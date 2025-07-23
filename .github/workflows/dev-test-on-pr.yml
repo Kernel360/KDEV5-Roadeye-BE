@@ -35,11 +35,11 @@ jobs:
             ~/.gradle/wrapper
 
       - name: Test with Gradle
-        run: ./gradlew --info test
+        run: ./gradlew --quiet test
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: |
-            roadeye-*/**/build/test-results/**/*.xml
+            */**/build/test-results/**/*.xml

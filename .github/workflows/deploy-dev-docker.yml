@@ -1,0 +1,71 @@
+name: Deploy dev branch
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+
+concurrency:
+  group: 'deploy-dev-docker'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        module: [ 'application', 'hub', 'consumer', 'batch' ]
+    env:
+      DOCKER_REPO: ${{ secrets.AWS_ECR_REPOSITORY }}
+      DOCKER_IMAGE: roadeye/${{ matrix.module }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Caching Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # - name: Build Docker Image
+      #   id: build
+      #   run: |
+      #     ./gradlew --quiet --build-cache \
+      #       :${{ matrix.module }}:buildDockerImage
+
+      - name: Build Module
+        id: build
+        run: |
+          ./gradlew --quiet --build-cache \
+            :${{ matrix.module }}:bootBuildImage \
+            --imageName=${{ env.DOCKER_IMAGE }}:latest
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to AWS
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push Docker image
+        run: |
+          docker tag ${{ env.DOCKER_IMAGE }}:latest ${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest
+          docker push ${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}:latest

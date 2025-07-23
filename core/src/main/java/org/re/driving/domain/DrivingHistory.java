@@ -1,0 +1,81 @@
+package org.re.driving.domain;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.jspecify.annotations.Nullable;
+import org.re.car.domain.Car;
+import org.re.common.exception.DomainException;
+import org.re.driving.converter.DrivingHistoryStatusConverter;
+import org.re.driving.exception.DrivingHistoryExceptionCode;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Getter
+@Entity
+@Table(name = "car_driving_history")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class DrivingHistory {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "car_id", nullable = false, updatable = false)
+    private Car car;
+
+    @Column(nullable = false)
+    @Convert(converter = DrivingHistoryStatusConverter.class)
+    private DrivingHistoryStatus status;
+
+    @Column(name = "tx_uid", nullable = false, updatable = false, columnDefinition = "BINARY(16)")
+    private UUID txUid;
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "mileageSum", column = @Column(name = "prev_mileage_sum")),
+        @AttributeOverride(name = "datetime", column = @Column(name = "drive_started_at")),
+        @AttributeOverride(name = "location.latitude", column = @Column(name = "prev_latitude")),
+        @AttributeOverride(name = "location.longitude", column = @Column(name = "prev_longitude"))
+    })
+    private DrivingSnapShot previousDrivingSnapShot;
+
+    @Nullable
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "mileageSum", column = @Column(name = "next_mileage_sum")),
+        @AttributeOverride(name = "datetime", column = @Column(name = "drive_ended_at")),
+        @AttributeOverride(name = "location.latitude", column = @Column(name = "next_latitude")),
+        @AttributeOverride(name = "location.longitude", column = @Column(name = "next_longitude"))
+    })
+    private DrivingSnapShot endDrivingSnapShot;
+
+    private DrivingHistory(
+        Car car,
+        DrivingHistoryStatus status,
+        UUID txid,
+        DrivingSnapShot previousDrivingSnapShot
+    ) {
+        this.car = car;
+        this.status = status;
+        this.txUid = txid;
+        this.previousDrivingSnapShot = previousDrivingSnapShot;
+    }
+
+    public static DrivingHistory createNew(Car car, LocalDateTime driveStartAt) {
+        var snapshot = DrivingSnapShot.from(car, driveStartAt);
+        var txUid = car.getMdtStatus().getActiveTuid();
+        return new DrivingHistory(car, DrivingHistoryStatus.DRIVING, txUid, snapshot);
+    }
+
+    public void end(DrivingSnapShot snapShot, LocalDateTime driveEndAt) {
+        if (this.status != DrivingHistoryStatus.DRIVING) {
+            throw new DomainException(DrivingHistoryExceptionCode.ALREADY_ENDED);
+
+        }
+        this.status = DrivingHistoryStatus.ENDED;
+        this.endDrivingSnapShot = snapShot;
+    }
+}
