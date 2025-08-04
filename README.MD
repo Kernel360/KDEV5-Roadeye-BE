@@ -49,59 +49,22 @@
 
 ---
 
-## ⚙️ 기술 스택
+## ⚙️ 사용 기술
 
-### 🖥️ Front-end
-
-[React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-
----
-
-### 🧠 Back-end
-
-[Java](https://img.shields.io/badge/Java%2017-007396?style=for-the-badge&logo=openjdk&logoColor=white)
-
-[Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
-
-[Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
-
-[Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-007396?style=for-the-badge&logo=spring&logoColor=white)
-
-[QueryDSL](https://img.shields.io/badge/QueryDSL-000000?style=for-the-badge&logo=apachemaven&logoColor=white)
-
-[RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
-
----
-
-### 🏗️ Infra
-
-[AWS EC2](https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
-
-[AWS RDS](https://img.shields.io/badge/AWS%20RDS-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white)
-
-[MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-
-[Undertow](https://img.shields.io/badge/Undertow-000000?style=for-the-badge&logo=java&logoColor=white)
-
----
-
-### 🛠 Tools
-
-[K6](https://img.shields.io/badge/K6-7D64FF?style=for-the-badge&logo=k6&logoColor=white)
-
-[HikariCP](https://img.shields.io/badge/HikariCP-0064a5?style=for-the-badge&logo=postgresql&logoColor=white)
-
-[JDBC](https://img.shields.io/badge/JDBC-BD2130?style=for-the-badge&logo=databricks&logoColor=white)
-
-[GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
-
-[IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-000000?style=for-the-badge&logo=intellijidea&logoColor=white)
+![Java](https://img.shields.io/badge/Java%2017-007396?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
+![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-007396?style=for-the-badge&logo=spring&logoColor=white)
+![QueryDSL](https://img.shields.io/badge/QueryDSL-000000?style=for-the-badge&logo=apachemaven&logoColor=white)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
+![K6](https://img.shields.io/badge/K6-7D64FF?style=for-the-badge&logo=k6&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 
 ---
 
 ## 🏗 프로젝트 아키텍처
 
-![제목 없는 다이어그램.drawio-3.png](attachment:9d338372-0bf9-4c37-a165-15b295bcb4cc:제목_없는_다이어그램.drawio-3.png)
+![arch](/docs/architecture.png)
 
 ## **💁‍♂️ 프로젝트 팀원**
 
