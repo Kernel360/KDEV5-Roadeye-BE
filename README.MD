@@ -64,7 +64,7 @@
 
 ## 🏗 프로젝트 아키텍처
 
-
+![arch](/docs/architecture.png)
 
 ## **💁‍♂️ 프로젝트 팀원**
 
